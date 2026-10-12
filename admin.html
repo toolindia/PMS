@@ -16,7 +16,7 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased selection:bg-[#800020] selection:text-white">
 
-    <div id="toast" class="hidden-view fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-neutral-900 text-white px-5 py-2.5 rounded-xl text-xs font-mono border border-neutral-700"></div>
+    <div id="toast" class="hidden-view fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-neutral-900 text-white px-5 py-2.5 rounded-xl text-xs font-mono border border-neutral-700 shadow-xl"></div>
 
     <!-- PIN AUTH VIEW -->
     <div id="authBox" class="flex-1 flex items-center justify-center p-4">
@@ -79,7 +79,7 @@
             </div>
         </section>
 
-        <!-- BOOKING ARCHIVE & ID PROOFS -->
+        <!-- REGISTRATION ARCHIVE -->
         <section class="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs space-y-4">
             <h2 class="text-xs font-bold uppercase tracking-wider text-black border-b border-neutral-100 pb-3">Registration & Document Archive</h2>
             <div class="overflow-x-auto">
@@ -100,7 +100,7 @@
 
     </main>
 
-    <!-- INLINE IMAGE VIEWER PANEL -->
+    <!-- INLINE VIEWER PANEL -->
     <div id="imagePanel" class="hidden-view fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
         <div class="bg-white p-4 rounded-2xl max-w-md w-full space-y-3">
             <div class="flex justify-between items-center border-b border-neutral-100 pb-2">
@@ -127,16 +127,9 @@
     </footer>
 
     <script>
-        const CLIENT_REGISTRY = {
-            "demo": {
-                name: "Grand Heritage Residency",
-                scriptUrl: "https://script.google.com/macros/s/AKfycbwYOUR_DEMO_SCRIPT_ID/exec",
-                expiryDate: "2027-10-12"
-            }
-        };
-
-        const slug = new URLSearchParams(window.location.search).get('hotel') || "demo";
-        const client = CLIENT_REGISTRY[slug];
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentSlug = urlParams.get('hotel') || "royalstay";
+        let currentClient = null;
         let savedPin = "";
 
         function notify(msg) {
@@ -146,6 +139,25 @@
             setTimeout(() => t.classList.add('hidden-view'), 3000);
         }
 
+        async function initTenant() {
+            try {
+                const cached = localStorage.getItem(`ofbuzz_tenant_${currentSlug}`);
+                if (cached) currentClient = JSON.parse(cached);
+
+                const res = await fetch(`masterdata.json?_ts=${Date.now()}`);
+                if (!res.ok) throw new Error();
+                const registry = await res.json();
+                currentClient = registry[currentSlug];
+
+                if (!currentClient) return false;
+                localStorage.setItem(`ofbuzz_tenant_${currentSlug}`, JSON.stringify(currentClient));
+                document.getElementById('authPropLabel').innerText = currentClient.name;
+                return true;
+            } catch (e) {
+                return !!currentClient;
+            }
+        }
+
         function loginAdmin() {
             savedPin = document.getElementById('pinInput').value.trim();
             if (!savedPin) return notify("Enter security code.");
@@ -153,20 +165,13 @@
         }
 
         function fetchAdminData() {
-            if (!client.scriptUrl || client.scriptUrl.includes("YOUR_DEMO")) {
-                document.getElementById('authBox').classList.add('hidden-view');
-                document.getElementById('dashBox').classList.remove('hidden-view');
-                document.getElementById('propTitle').innerText = `${client.name} - Executive Audit`;
-                return;
-            }
-
-            fetch(`${client.scriptUrl}?action=getAdminData&pin=${encodeURIComponent(savedPin)}&_ts=${Date.now()}`)
+            fetch(`${currentClient.scriptUrl}?action=getAdminData&pin=${encodeURIComponent(savedPin)}&_ts=${Date.now()}`)
                 .then(r => r.json())
                 .then(res => {
                     if (res.success) {
                         document.getElementById('authBox').classList.add('hidden-view');
                         document.getElementById('dashBox').classList.remove('hidden-view');
-                        document.getElementById('propTitle').innerText = `${res.propertyName || client.name} - Executive Audit`;
+                        document.getElementById('propTitle').innerText = `${res.propertyName || currentClient.name} - Executive Audit`;
                         renderDash(res);
                     } else notify(res.error || "Access denied.");
                 })
@@ -220,7 +225,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            if (client) document.getElementById('authPropLabel').innerText = client.name;
+            initTenant();
         });
     </script>
 </body>
