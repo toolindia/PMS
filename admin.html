@@ -16,157 +16,101 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased selection:bg-[#800020] selection:text-white">
 
-    <!-- EXPIRY OVERLAY -->
-    <div id="licenseExpiredOverlay" class="hidden-view fixed inset-0 bg-[#FAF7F2] z-50 flex flex-col items-center justify-center p-6 text-center">
-        <div class="border border-maroon p-8 rounded-2xl max-w-md w-full bg-white shadow-sm space-y-4">
-            <h2 class="text-xl font-bold uppercase tracking-wider text-maroon">Subscription Inactive</h2>
-            <p class="text-xs text-neutral-600 leading-relaxed">
-                The administrative license for this property has expired. Please contact technology support for reactivation.
-            </p>
-            <a href="https://wa.me/917827201014?text=Hello%20Ofbuzz%20Technology,%20admin%20license%20renewal%20inquiry." target="_blank" class="block bg-maroon text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider">
-                Contact Technology Support
-            </a>
+    <div id="toast" class="hidden-view fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-neutral-900 text-white px-5 py-2.5 rounded-xl text-xs font-mono border border-neutral-700"></div>
+
+    <!-- PIN AUTH VIEW -->
+    <div id="authBox" class="flex-1 flex items-center justify-center p-4">
+        <div class="bg-white border border-neutral-200 rounded-2xl p-6 sm:p-8 max-w-sm w-full space-y-4 text-center shadow-xs">
+            <h2 class="text-base font-black uppercase text-maroon">Administrative Security</h2>
+            <p id="authPropLabel" class="text-xs text-neutral-400 uppercase tracking-widest">Authentication Required</p>
+            <input type="password" id="pinInput" maxlength="6" placeholder="••••" class="w-full text-center text-2xl font-mono tracking-widest py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:border-maroon">
+            <button onclick="loginAdmin()" id="btnAuth" class="w-full bg-maroon text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider">Unlock Records</button>
         </div>
     </div>
 
-    <!-- PIN AUTHENTICATION VIEW -->
-    <div id="authContainer" class="flex-1 flex items-center justify-center p-4">
-        <div class="bg-white border border-neutral-200 rounded-2xl p-6 sm:p-8 max-w-sm w-full space-y-5 text-center shadow-xs">
-            <div>
-                <h2 class="text-lg font-black uppercase tracking-tight text-maroon">Owner Access</h2>
-                <p id="authPropertyLabel" class="text-xs text-neutral-400 uppercase tracking-widest mt-0.5">Management Portal</p>
-            </div>
-            <div>
-                <label class="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-2">Enter Security PIN</label>
-                <input type="password" id="pinInput" maxlength="4" placeholder="••••" class="w-full text-center text-2xl font-mono tracking-widest py-3 border border-neutral-200 rounded-xl focus:outline-none focus:border-maroon">
-            </div>
-            <button onclick="handlePinLogin()" id="btnLogin" class="w-full bg-maroon text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition-all">
-                Unlock Dashboard
-            </button>
-        </div>
-    </div>
+    <!-- REPORTING DASHBOARD -->
+    <main id="dashBox" class="hidden-view w-full max-w-6xl mx-auto p-4 sm:p-6 flex-1 space-y-6">
 
-    <!-- MAIN ADMIN DASHBOARD -->
-    <div id="dashboardContainer" class="hidden-view w-full max-w-6xl mx-auto p-4 sm:p-6 flex-1 space-y-6">
-
-        <!-- HEADER -->
         <header class="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                <h1 id="adminPropertyTitle" class="text-xl sm:text-2xl font-black uppercase tracking-tight text-maroon">Owner Analytics</h1>
-                <p class="text-xs font-semibold tracking-wider text-neutral-500 uppercase mt-0.5">Performance & Audit Console</p>
+                <h1 id="propTitle" class="text-xl sm:text-2xl font-black uppercase tracking-tight text-maroon">Executive Analytics</h1>
+                <p class="text-xs font-semibold tracking-wider text-neutral-500 uppercase mt-0.5">Financial & Operations Audit</p>
             </div>
-            <div class="flex items-center gap-3">
-                <button onclick="fetchAdminMetrics()" class="border border-neutral-300 hover:border-black text-black font-semibold text-xs px-4 py-2.5 rounded-xl transition-all">
-                    Refresh Metrics
-                </button>
-                <button onclick="handleLogout()" class="border border-maroon text-maroon hover:bg-maroon hover:text-white font-semibold text-xs px-4 py-2.5 rounded-xl transition-all">
-                    Lock Session
-                </button>
-            </div>
+            <button onclick="fetchAdminData()" class="border border-neutral-300 text-black px-4 py-2 rounded-xl text-xs font-semibold">Refresh Ledger</button>
         </header>
 
-        <!-- KPI SUMMARY CARDS -->
+        <!-- KPI SUMMARY -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             <div class="bg-white border border-neutral-200 p-4 rounded-xl">
-                <span class="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">Occupancy Rate</span>
+                <span class="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">Occupancy</span>
                 <span id="statOccupancy" class="text-xl sm:text-2xl font-black text-maroon font-mono">0%</span>
-                <span id="statRoomCounts" class="text-[10px] text-neutral-400 block mt-1">0 / 0 Rooms Occupied</span>
             </div>
             <div class="bg-white border border-neutral-200 p-4 rounded-xl">
-                <span class="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">Total Revenue</span>
-                <span id="statGrandTotal" class="text-xl sm:text-2xl font-black text-black font-mono">₹0</span>
-                <span class="text-[10px] text-neutral-400 block mt-1">All Recorded Invoices</span>
+                <span class="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">Total Collection</span>
+                <span id="statGrandRev" class="text-xl sm:text-2xl font-black text-black font-mono">₹0</span>
             </div>
             <div class="bg-white border border-neutral-200 p-4 rounded-xl">
-                <span class="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">Room Tariffs</span>
-                <span id="statRoomRevenue" class="text-xl sm:text-2xl font-black text-black font-mono">₹0</span>
-                <span class="text-[10px] text-neutral-400 block mt-1">Direct Accommodation</span>
+                <span class="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">Room Revenue</span>
+                <span id="statRoomRev" class="text-xl sm:text-2xl font-black text-black font-mono">₹0</span>
             </div>
             <div class="bg-white border border-neutral-200 p-4 rounded-xl">
-                <span class="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">Dining / POS</span>
-                <span id="statFoodRevenue" class="text-xl sm:text-2xl font-black text-black font-mono">₹0</span>
-                <span class="text-[10px] text-neutral-400 block mt-1">Food Orders Billed</span>
+                <span class="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">Dining POS Revenue</span>
+                <span id="statFoodRev" class="text-xl sm:text-2xl font-black text-black font-mono">₹0</span>
             </div>
         </div>
 
-        <!-- REVENUE INVOICES TABLE -->
+        <!-- SETTLEMENT INVOICES -->
         <section class="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs space-y-4">
-            <div class="flex justify-between items-center border-b border-neutral-100 pb-3">
-                <h2 class="text-xs font-bold uppercase tracking-wider text-black">Settlement Invoices History</h2>
-                <span class="text-[10px] font-mono text-neutral-400 uppercase">Recent Clearances</span>
-            </div>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-black border-b border-neutral-100 pb-3">Settlement History</h2>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs font-mono">
                     <thead>
                         <tr class="border-b border-neutral-200 text-neutral-400 uppercase text-[10px]">
-                            <th class="py-2.5 px-3">Invoice</th>
-                            <th class="py-2.5 px-3">Room</th>
-                            <th class="py-2.5 px-3">Guest Name</th>
-                            <th class="py-2.5 px-3">Room Rent</th>
-                            <th class="py-2.5 px-3">Dining</th>
-                            <th class="py-2.5 px-3">Advance</th>
-                            <th class="py-2.5 px-3 text-right">Settled Amount</th>
+                            <th class="py-2 px-3">Invoice</th>
+                            <th class="py-2 px-3">Room</th>
+                            <th class="py-2 px-3">Guest</th>
+                            <th class="py-2 px-3">Tariff</th>
+                            <th class="py-2 px-3">Dining</th>
+                            <th class="py-2 px-3 text-right">Settled Amount</th>
                         </tr>
                     </thead>
-                    <tbody id="invoiceTableBody" class="divide-y divide-neutral-100">
-                        <!-- Populated by JS -->
-                    </tbody>
+                    <tbody id="invoiceTableBody" class="divide-y divide-neutral-100"></tbody>
                 </table>
             </div>
         </section>
 
-        <!-- BOOKING AUDIT & ID PROOF ARCHIVE -->
+        <!-- BOOKING ARCHIVE & ID PROOFS -->
         <section class="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs space-y-4">
-            <div class="flex justify-between items-center border-b border-neutral-100 pb-3">
-                <h2 class="text-xs font-bold uppercase tracking-wider text-black">Guest Registration Audit Logs</h2>
-                <span class="text-[10px] font-mono text-neutral-400 uppercase">Archive with Identity Records</span>
-            </div>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-black border-b border-neutral-100 pb-3">Registration & Document Archive</h2>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs font-mono">
                     <thead>
                         <tr class="border-b border-neutral-200 text-neutral-400 uppercase text-[10px]">
-                            <th class="py-2.5 px-3">Booking ID</th>
-                            <th class="py-2.5 px-3">Room</th>
-                            <th class="py-2.5 px-3">Guest Details</th>
-                            <th class="py-2.5 px-3">Check-In</th>
-                            <th class="py-2.5 px-3">Status</th>
-                            <th class="py-2.5 px-3 text-right">Identity Proof</th>
+                            <th class="py-2 px-3">Booking ID</th>
+                            <th class="py-2 px-3">Room</th>
+                            <th class="py-2 px-3">Guest Contact</th>
+                            <th class="py-2 px-3">Check-In</th>
+                            <th class="py-2 px-3 text-right">Document Record</th>
                         </tr>
                     </thead>
-                    <tbody id="bookingTableBody" class="divide-y divide-neutral-100">
-                        <!-- Populated by JS -->
-                    </tbody>
+                    <tbody id="bookingTableBody" class="divide-y divide-neutral-100"></tbody>
                 </table>
             </div>
         </section>
 
-        <!-- GUEST FEEDBACK SCORECARD -->
-        <section class="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs space-y-4">
-            <div class="flex justify-between items-center border-b border-neutral-100 pb-3">
-                <h2 class="text-xs font-bold uppercase tracking-wider text-black">Customer Experience Evaluations</h2>
-                <span class="text-[10px] font-mono text-neutral-400 uppercase">Service Ratings</span>
-            </div>
-            <div id="feedbackList" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <!-- Populated by JS -->
-            </div>
-        </section>
+    </main>
 
-    </div>
-
-    <!-- ID PROOF VIEWER MODAL -->
-    <div id="imageViewerModal" class="hidden-view fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-        <div class="bg-white border border-neutral-200 rounded-2xl p-4 max-w-lg w-full space-y-3">
+    <!-- INLINE IMAGE VIEWER PANEL -->
+    <div id="imagePanel" class="hidden-view fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white p-4 rounded-2xl max-w-md w-full space-y-3">
             <div class="flex justify-between items-center border-b border-neutral-100 pb-2">
-                <span id="viewerGuestName" class="text-xs font-bold uppercase tracking-wider text-maroon">Identity Document Record</span>
-                <button onclick="closeModal('imageViewerModal')" class="text-neutral-400 hover:text-black font-bold text-lg">&times;</button>
+                <span class="text-xs font-bold uppercase text-maroon">Identity Proof Archive</span>
+                <button onclick="document.getElementById('imagePanel').classList.add('hidden-view')" class="font-bold text-lg">&times;</button>
             </div>
-            <div class="bg-neutral-100 rounded-xl overflow-hidden p-1 flex items-center justify-center max-h-[70vh]">
-                <img id="viewerImage" src="" alt="Identity Document" class="max-h-[68vh] w-auto object-contain rounded-lg">
-            </div>
+            <img id="viewerImg" src="" class="max-h-[60vh] mx-auto rounded object-contain">
         </div>
     </div>
 
-    <!-- STANDARDIZED LUXURY FOOTER -->
     <footer class="bg-white border-t border-neutral-200 py-6 mt-12 text-xs">
         <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
@@ -176,97 +120,66 @@
                     <p class="text-[10px] text-neutral-400 uppercase tracking-widest">Ofbuzz PMS &bull; An Indian Technology</p>
                 </div>
             </div>
-            <div>
-                <a href="https://wa.me/917827201014" target="_blank" class="border border-neutral-300 hover:border-black text-black px-4 py-2 rounded-xl text-[11px] font-semibold tracking-wider transition-all inline-flex items-center gap-2">
-                    Help & Support Desk
-                </a>
-            </div>
+            <a href="https://wa.me/917827201014" target="_blank" class="border border-neutral-300 text-black px-4 py-2 rounded-xl text-[11px] font-semibold">
+                Support Desk
+            </a>
         </div>
     </footer>
 
-    <!-- LOGIC SCRIPT -->
     <script>
         const CLIENT_REGISTRY = {
             "demo": {
-                name: "Heritage Grand Hotel",
+                name: "Grand Heritage Residency",
                 scriptUrl: "https://script.google.com/macros/s/AKfycbwYOUR_DEMO_SCRIPT_ID/exec",
                 expiryDate: "2027-10-12"
             }
         };
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const currentSlug = urlParams.get('hotel') || "demo";
-        const currentClient = CLIENT_REGISTRY[currentSlug];
-        let authenticatedPin = null;
+        const slug = new URLSearchParams(window.location.search).get('hotel') || "demo";
+        const client = CLIENT_REGISTRY[slug];
+        let savedPin = "";
 
-        function verifyClientLicense() {
-            if (!currentClient) {
-                document.body.innerHTML = "<div class='p-12 text-center text-xs font-mono uppercase text-maroon'>Property configuration profile not identified.</div>";
-                return false;
-            }
-            document.getElementById('authPropertyLabel').innerText = currentClient.name;
-
-            const expiryTimestamp = new Date(currentClient.expiryDate + "T23:59:59").getTime();
-            if (Date.now() > expiryTimestamp) {
-                document.getElementById('licenseExpiredOverlay').classList.remove('hidden-view');
-                return false;
-            }
-            return true;
+        function notify(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.remove('hidden-view');
+            setTimeout(() => t.classList.add('hidden-view'), 3000);
         }
 
-        function handlePinLogin() {
-            const pin = document.getElementById('pinInput').value.trim();
-            if (pin.length !== 4) return alert("Please enter a valid 4-digit security PIN.");
-
-            authenticatedPin = pin;
-            fetchAdminMetrics();
+        function loginAdmin() {
+            savedPin = document.getElementById('pinInput').value.trim();
+            if (!savedPin) return notify("Enter security code.");
+            fetchAdminData();
         }
 
-        function fetchAdminMetrics() {
-            if (!currentClient.scriptUrl || currentClient.scriptUrl.includes("YOUR_DEMO")) {
-                console.warn("Displaying fallback administrative metrics.");
-                unlockDashboardUI();
-                return renderFallbackAdminData();
+        function fetchAdminData() {
+            if (!client.scriptUrl || client.scriptUrl.includes("YOUR_DEMO")) {
+                document.getElementById('authBox').classList.add('hidden-view');
+                document.getElementById('dashBox').classList.remove('hidden-view');
+                document.getElementById('propTitle').innerText = `${client.name} - Executive Audit`;
+                return;
             }
 
-            const btn = document.getElementById('btnLogin');
-            btn.disabled = true;
-            btn.innerText = "Verifying...";
-
-            fetch(`${currentClient.scriptUrl}?action=getAdminData&pin=${encodeURIComponent(authenticatedPin)}&_ts=${Date.now()}`)
+            fetch(`${client.scriptUrl}?action=getAdminData&pin=${encodeURIComponent(savedPin)}&_ts=${Date.now()}`)
                 .then(r => r.json())
                 .then(res => {
-                    btn.disabled = false;
-                    btn.innerText = "Unlock Dashboard";
                     if (res.success) {
-                        unlockDashboardUI();
-                        renderAdminData(res);
-                    } else {
-                        alert(res.error || "PIN authentication failed.");
-                    }
+                        document.getElementById('authBox').classList.add('hidden-view');
+                        document.getElementById('dashBox').classList.remove('hidden-view');
+                        document.getElementById('propTitle').innerText = `${res.propertyName || client.name} - Executive Audit`;
+                        renderDash(res);
+                    } else notify(res.error || "Access denied.");
                 })
-                .catch(() => {
-                    btn.disabled = false;
-                    btn.innerText = "Unlock Dashboard";
-                    alert("Network connection error.");
-                });
+                .catch(() => notify("Network connection timeout."));
         }
 
-        function unlockDashboardUI() {
-            document.getElementById('authContainer').classList.add('hidden-view');
-            document.getElementById('dashboardContainer').classList.remove('hidden-view');
-            document.getElementById('adminPropertyTitle').innerText = `${currentClient.name} Management`;
-        }
-
-        function renderAdminData(data) {
+        function renderDash(data) {
             const s = data.summary;
             document.getElementById('statOccupancy').innerText = s.occupancyRate || "0%";
-            document.getElementById('statRoomCounts').innerText = `${s.occupiedRooms} / ${s.totalRooms} Rooms Occupied`;
-            document.getElementById('statGrandTotal').innerText = `₹${(s.grandTotalRevenue || 0).toLocaleString('en-IN')}`;
-            document.getElementById('statRoomRevenue').innerText = `₹${(s.totalRoomRevenue || 0).toLocaleString('en-IN')}`;
-            document.getElementById('statFoodRevenue').innerText = `₹${(s.totalFoodRevenue || 0).toLocaleString('en-IN')}`;
+            document.getElementById('statGrandRev').innerText = `₹${(s.grandTotalRev || 0).toLocaleString('en-IN')}`;
+            document.getElementById('statRoomRev').innerText = `₹${(s.totalRoomRev || 0).toLocaleString('en-IN')}`;
+            document.getElementById('statFoodRev').innerText = `₹${(s.totalFoodRev || 0).toLocaleString('en-IN')}`;
 
-            // Invoices
             const invBody = document.getElementById('invoiceTableBody');
             invBody.innerHTML = "";
             (data.invoices || []).forEach(inv => {
@@ -274,101 +187,40 @@
                     <tr class="hover:bg-neutral-50">
                         <td class="py-2 px-3 font-bold text-black">${inv.InvoiceId}</td>
                         <td class="py-2 px-3">${inv.RoomNo}</td>
-                        <td class="py-2 px-3 text-neutral-600">${inv.GuestName}</td>
+                        <td class="py-2 px-3">${inv.GuestName}</td>
                         <td class="py-2 px-3">₹${inv.RoomTotal}</td>
                         <td class="py-2 px-3">₹${inv.FoodTotal}</td>
-                        <td class="py-2 px-3 text-neutral-400">₹${inv.AdvancePaid}</td>
                         <td class="py-2 px-3 text-right font-bold text-maroon">₹${inv.FinalPaid}</td>
                     </tr>
                 `;
             });
 
-            // Bookings with ID view
-            const bookBody = document.getElementById('bookingTableBody');
-            bookBody.innerHTML = "";
+            const bBody = document.getElementById('bookingTableBody');
+            bBody.innerHTML = "";
             (data.recentBookings || []).forEach(b => {
-                let idAction = "<span class='text-neutral-400'>No Document</span>";
+                let docBtn = "<span class='text-neutral-400'>No Document</span>";
                 if (b.IdPhotoUrl) {
-                    idAction = `<button onclick="viewIdentity('${encodeURIComponent(b.GuestName)}', '${encodeURIComponent(b.IdPhotoUrl)}')" class="border border-neutral-300 hover:border-black text-black px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase transition-all">View Document</button>`;
+                    docBtn = `<button onclick="viewDoc('${b.IdPhotoUrl}')" class="border border-neutral-300 text-black px-2.5 py-1 rounded text-[10px] font-bold uppercase">View Document</button>`;
                 }
-
-                bookBody.innerHTML += `
+                bBody.innerHTML += `
                     <tr class="hover:bg-neutral-50">
                         <td class="py-2 px-3 font-bold text-black">${b.BookingId}</td>
                         <td class="py-2 px-3">${b.RoomNo}</td>
-                        <td class="py-2 px-3 text-neutral-600">${b.GuestName} <br><span class="text-[10px] text-neutral-400 font-mono">${b.Phone}</span></td>
+                        <td class="py-2 px-3">${b.GuestName} (${b.Phone})</td>
                         <td class="py-2 px-3 text-neutral-500">${b.CheckIn}</td>
-                        <td class="py-2 px-3"><span class="px-2 py-0.5 rounded text-[10px] uppercase font-bold ${b.Status === 'Active' ? 'bg-[#800020] text-white' : 'bg-neutral-200 text-neutral-700'}">${b.Status}</span></td>
-                        <td class="py-2 px-3 text-right">${idAction}</td>
+                        <td class="py-2 px-3 text-right">${docBtn}</td>
                     </tr>
                 `;
             });
-
-            // Feedback
-            const fbBox = document.getElementById('feedbackList');
-            fbBox.innerHTML = "";
-            (data.feedbacks || []).forEach(fb => {
-                fbBox.innerHTML += `
-                    <div class="border border-neutral-200 rounded-xl p-3 bg-neutral-50 space-y-2 text-xs">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <span class="font-bold text-black uppercase">${fb.GuestName}</span>
-                                <span class="text-[10px] text-neutral-400 block font-mono">Room ${fb.RoomNo} &bull; ${fb.Timestamp}</span>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-4 gap-1 text-center font-mono text-[10px]">
-                            <div class="bg-white border border-neutral-200 p-1 rounded">Clean: <b>${fb.Cleanliness}/5</b></div>
-                            <div class="bg-white border border-neutral-200 p-1 rounded">Staff: <b>${fb.Staff}/5</b></div>
-                            <div class="bg-white border border-neutral-200 p-1 rounded">Rooms: <b>${fb.Amenities}/5</b></div>
-                            <div class="bg-white border border-neutral-200 p-1 rounded">Food: <b>${fb.Food}/5</b></div>
-                        </div>
-                        ${fb.Comments ? `<p class="text-neutral-600 italic bg-white p-2 rounded border border-neutral-200 text-[11px]">"\${fb.Comments}"</p>` : ''}
-                    </div>
-                `;
-            });
         }
 
-        function renderFallbackAdminData() {
-            renderAdminData({
-                summary: {
-                    totalRooms: 10,
-                    occupiedRooms: 3,
-                    occupancyRate: "30%",
-                    totalRoomRevenue: 15000,
-                    totalFoodRevenue: 2400,
-                    grandTotalRevenue: 17400
-                },
-                invoices: [
-                    { InvoiceId: "INV-10928", RoomNo: "102", GuestName: "Arthur Pendelton", RoomTotal: 5000, FoodTotal: 850, AdvancePaid: 1000, FinalPaid: 4850 }
-                ],
-                recentBookings: [
-                    { BookingId: "BK-8821", RoomNo: "102", GuestName: "Arthur Pendelton", Phone: "9876543210", CheckIn: "10/10/2026 11:30", Status: "CheckedOut", IdPhotoUrl: "" }
-                ],
-                feedbacks: [
-                    { RoomNo: "102", GuestName: "Arthur Pendelton", Cleanliness: 5, Staff: 5, Amenities: 4, Food: 5, Comments: "Prompt service and hygienic room.", Timestamp: "12/10/2026 12:00" }
-                ]
-            });
-        }
-
-        function viewIdentity(name, rawUrl) {
-            document.getElementById('viewerGuestName').innerText = decodeURIComponent(name) + " - Document";
-            document.getElementById('viewerImage').src = decodeURIComponent(rawUrl);
-            document.getElementById('imageViewerModal').classList.remove('hidden-view');
-        }
-
-        function handleLogout() {
-            authenticatedPin = null;
-            document.getElementById('pinInput').value = "";
-            document.getElementById('dashboardContainer').classList.add('hidden-view');
-            document.getElementById('authContainer').classList.remove('hidden-view');
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).classList.add('hidden-view');
+        function viewDoc(url) {
+            document.getElementById('viewerImg').src = url;
+            document.getElementById('imagePanel').classList.remove('hidden-view');
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            verifyClientLicense();
+            if (client) document.getElementById('authPropLabel').innerText = client.name;
         });
     </script>
 </body>
