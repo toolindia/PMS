@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dining & Room Service - Ofbuzz PMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #FAF7F2; color: #111111; }
+        .text-maroon { color: #800020; }
+        .bg-maroon { background-color: #800020; }
+        .bg-maroon:hover { background-color: #650019; }
+        .border-maroon { border-color: #800020; }
+        .hidden-view { display: none !important; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-[#800020] selection:text-white">
+
+    <div id="toast" class="hidden-view fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-neutral-900 text-white px-5 py-2.5 rounded-xl text-xs font-mono border border-neutral-700"></div>
+
+    <div id="moduleBlockedView" class="hidden-view fixed inset-0 bg-[#FAF7F2] z-50 flex items-center justify-center p-6 text-center">
+        <div class="border border-maroon p-8 rounded-2xl max-w-md w-full bg-white space-y-3">
+            <h2 class="text-base font-bold uppercase text-maroon">Service Module Not Available</h2>
+            <p class="text-xs text-neutral-600">Dining operations have not been enabled for this establishment. Contact management.</p>
+        </div>
+    </div>
+
+    <main class="w-full max-w-5xl mx-auto p-4 sm:p-6 flex-1 space-y-6">
+
+        <header class="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h1 id="propTitle" class="text-xl sm:text-2xl font-black uppercase tracking-tight text-maroon">Kitchen & Dining Desk</h1>
+                <p class="text-xs font-semibold tracking-wider text-neutral-500 uppercase mt-0.5">Room Service Order Dispatch</p>
+            </div>
+            <button onclick="loadDiningData()" class="border border-neutral-300 text-black px-4 py-2 rounded-xl text-xs font-semibold">Sync Menu</button>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <!-- MENU SELECTION -->
+            <div class="md:col-span-2 space-y-4">
+                <div class="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs space-y-4">
+                    <div class="flex justify-between items-center border-b border-neutral-100 pb-3">
+                        <h2 class="text-xs font-bold uppercase tracking-wider text-black">Menu Catalogue</h2>
+                        <span id="menuCountLabel" class="text-[10px] font-mono text-neutral-400 uppercase">Live Sheet Inventory</span>
+                    </div>
+                    <div id="menuContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ORDER CART & ROOM ALLOCATION -->
+            <div class="space-y-4">
+                <div class="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs space-y-4">
+                    <h2 class="text-xs font-bold uppercase tracking-wider text-black border-b border-neutral-100 pb-3">Active Order Folio</h2>
+                    
+                    <div>
+                        <label class="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">Target Occupied Room</label>
+                        <select id="roomSelector" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs font-mono bg-white focus:outline-none focus:border-maroon">
+                            <option value="">Select Room</option>
+                        </select>
+                    </div>
+
+                    <div class="border border-neutral-200 rounded-xl p-3 bg-neutral-50 space-y-2 max-h-48 overflow-y-auto">
+                        <div id="cartItemsList" class="space-y-1.5 text-xs font-mono">
+                            <span class="text-neutral-400 text-[10px] uppercase block">No items selected</span>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center text-sm font-mono pt-1">
+                        <span class="font-bold text-black uppercase text-xs">Total Amount:</span>
+                        <span id="cartTotal" class="font-bold text-maroon">₹0</span>
+                    </div>
+
+                    <button onclick="dispatchFoodOrder()" id="btnDispatch" class="w-full bg-maroon text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider">
+                        Charge & Route to Kitchen
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RECENT KITCHEN ORDERS -->
+        <section class="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs space-y-4">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-black border-b border-neutral-100 pb-3">Recent Kitchen Dispatches</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs font-mono">
+                    <thead>
+                        <tr class="border-b border-neutral-200 text-neutral-400 uppercase text-[10px]">
+                            <th class="py-2 px-3">Order ID</th>
+                            <th class="py-2 px-3">Room</th>
+                            <th class="py-2 px-3">Summary Items</th>
+                            <th class="py-2 px-3">Amount</th>
+                            <th class="py-2 px-3 text-right">Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentOrdersBody" class="divide-y divide-neutral-100"></tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t border-neutral-200 py-6 mt-12 text-xs">
+        <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="https://i.pinimg.com/736x/bd/d0/5c/bdd05c94afb66b5a72f5e17a7a879ab3.jpg" alt="Ofbuzz Logo" class="w-7 h-7 rounded-full object-cover border border-neutral-300">
+                <div>
+                    <p class="font-bold uppercase tracking-wider text-black">Ofbuzz Technology</p>
+                    <p class="text-[10px] text-neutral-400 uppercase tracking-widest">Ofbuzz PMS &bull; An Indian Technology</p>
+                </div>
+            </div>
+            <a href="https://wa.me/917827201014" target="_blank" class="border border-neutral-300 text-black px-4 py-2 rounded-xl text-[11px] font-semibold">
+                Support Desk
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        const CLIENT_REGISTRY = {
+            "demo": {
+                name: "Grand Heritage Residency",
+                scriptUrl: "https://script.google.com/macros/s/AKfycbwYOUR_DEMO_SCRIPT_ID/exec",
+                expiryDate: "2027-10-12",
+                features: { dining: true, staff: true, feedback: true }
+            }
+        };
+
+        const slug = new URLSearchParams(window.location.search).get('hotel') || "demo";
+        const client = CLIENT_REGISTRY[slug];
+        let menuItems = [], activeRooms = [], cart = {};
+
+        function notify(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.remove('hidden-view');
+            setTimeout(() => t.classList.add('hidden-view'), 3000);
+        }
+
+        function checkModuleAccess() {
+            if (!client || !client.features || !client.features.dining) {
+                document.getElementById('moduleBlockedView').classList.remove('hidden-view');
+                return false;
+            }
+            document.getElementById('propTitle').innerText = `${client.name} - Dining`;
+            return true;
+        }
+
+        function loadDiningData() {
+            if (!client.scriptUrl || client.scriptUrl.includes("YOUR_DEMO")) {
+                menuItems = [
+                    { ItemId: "M101", Category: "Beverages", ItemName: "Masala Tea", Price: 30 },
+                    { ItemId: "M102", Category: "Breakfast", ItemName: "Club Sandwich", Price: 120 },
+                    { ItemId: "M103", Category: "Main Course", ItemName: "Paneer Butter Masala", Price: 260 }
+                ];
+                activeRooms = [{ RoomNo: "102", GuestName: "Arthur P", BookingId: "BK-102" }];
+                renderMenu();
+                renderRoomOptions();
+                return;
+            }
+
+            fetch(`${client.scriptUrl}?action=getDiningData&_ts=${Date.now()}`)
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success) {
+                        menuItems = res.menu || [];
+                        activeRooms = res.activeRooms || [];
+                        renderMenu();
+                        renderRoomOptions();
+                        renderRecentOrders(res.recentOrders || []);
+                    }
+                })
+                .catch(() => notify("Network connection timeout."));
+        }
+
+        function renderMenu() {
+            const el = document.getElementById('menuContainer');
+            el.innerHTML = "";
+            menuItems.forEach(item => {
+                el.innerHTML += `
+                    <div class="border border-neutral-200 p-3 rounded-xl flex justify-between items-center bg-neutral-50/40">
+                        <div>
+                            <span class="text-xs font-bold text-black block">${item.ItemName}</span>
+                            <span class="text-[10px] text-neutral-400 uppercase font-mono">${item.Category || "Kitchen"} &bull; ₹${item.Price}</span>
+                        </div>
+                        <button onclick="addToCart('${item.ItemId}', '${item.ItemName}', ${item.Price})" class="border border-neutral-300 hover:border-black text-black px-3 py-1 rounded-lg text-[10px] font-bold uppercase">
+                            Add
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        function renderRoomOptions() {
+            const sel = document.getElementById('roomSelector');
+            sel.innerHTML = '<option value="">Select Room</option>';
+            activeRooms.forEach(r => {
+                sel.innerHTML += `<option value="${r.RoomNo}" data-booking="${r.BookingId}">Room ${r.RoomNo} (${r.GuestName})</option>`;
+            });
+        }
+
+        function addToCart(id, name, price) {
+            if (cart[id]) cart[id].qty++;
+            else cart[id] = { name: name, price: price, qty: 1 };
+            renderCart();
+        }
+
+        function renderCart() {
+            const el = document.getElementById('cartItemsList');
+            el.innerHTML = "";
+            let sum = 0;
+            const keys = Object.keys(cart);
+            if (keys.length === 0) {
+                el.innerHTML = `<span class="text-neutral-400 text-[10px] uppercase block">No items selected</span>`;
+            } else {
+                keys.forEach(k => {
+                    const line = cart[k];
+                    const itemSum = line.qty * line.price;
+                    sum += itemSum;
+                    el.innerHTML += `
+                        <div class="flex justify-between items-center py-1 border-b border-neutral-200">
+                            <div><span>${line.name}</span> <span class="text-neutral-400">x${line.qty}</span></div>
+                            <span class="font-bold text-black">₹${itemSum}</span>
+                        </div>
+                    `;
+                });
+            }
+            document.getElementById('cartTotal').innerText = `₹${sum}`;
+        }
+
+        function dispatchFoodOrder() {
+            const sel = document.getElementById('roomSelector');
+            const roomNo = sel.value;
+            const bookingId = sel.options[sel.selectedIndex]?.getAttribute('data-booking') || "";
+            const keys = Object.keys(cart);
+
+            if (!roomNo || keys.length === 0) {
+                return notify("Specify target room and add minimum one menu selection.");
+            }
+
+            let summary = [], totalAmount = 0;
+            keys.forEach(k => {
+                summary.push(`${cart[k].name} (${cart[k].qty})`);
+                totalAmount += (cart[k].qty * cart[k].price);
+            });
+
+            const btn = document.getElementById('btnDispatch');
+            btn.disabled = true;
+            btn.innerText = "Dispatching...";
+
+            fetch(client.scriptUrl, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({
+                    action: "addFoodOrder",
+                    roomNo: roomNo,
+                    bookingId: bookingId,
+                    items: summary.join(", "),
+                    amount: totalAmount
+                })
+            })
+            .then(r => r.json())
+            .then(res => {
+                btn.disabled = false;
+                btn.innerText = "Charge & Route to Kitchen";
+                if (res.success) {
+                    cart = {};
+                    renderCart();
+                    notify("Kitchen Order Ticket recorded.");
+                    loadDiningData();
+                } else notify("Order could not be registered.");
+            })
+            .catch(() => {
+                btn.disabled = false;
+                btn.innerText = "Charge & Route to Kitchen";
+                notify("Transmission error.");
+            });
+        }
+
+        function renderRecentOrders(orders) {
+            const tbody = document.getElementById('recentOrdersBody');
+            tbody.innerHTML = "";
+            orders.forEach(o => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-neutral-50">
+                        <td class="py-2 px-3 font-bold text-black">${o.OrderId}</td>
+                        <td class="py-2 px-3">${o.RoomNo}</td>
+                        <td class="py-2 px-3 text-neutral-600">${o.Items}</td>
+                        <td class="py-2 px-3 font-bold text-maroon">₹${o.Amount}</td>
+                        <td class="py-2 px-3 text-right text-neutral-400">${o.Timestamp}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (checkModuleAccess()) loadDiningData();
+        });
+    </script>
+</body>
+</html>
