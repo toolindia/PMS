@@ -26,7 +26,7 @@
                 <p class="text-xs font-semibold tracking-wider text-neutral-500 uppercase mt-0.5">Ofbuzz Technology &bull; Multi-Tenant Control</p>
             </div>
             <span class="text-[10px] font-mono uppercase bg-neutral-100 text-neutral-600 px-3 py-1.5 rounded-xl border border-neutral-200 font-bold">
-                Automated Registry Engine
+                Automated Masterdata Engine
             </span>
         </header>
 
@@ -34,7 +34,7 @@
         <section class="bg-white border border-neutral-200 rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
             <div class="border-b border-neutral-100 pb-3">
                 <h2 class="text-xs font-bold uppercase tracking-wider text-black">Provision New Property</h2>
-                <p class="text-[10px] text-neutral-400 uppercase mt-0.5">Add or update tenant parameters and auto-generate code blocks</p>
+                <p class="text-[10px] text-neutral-400 uppercase mt-0.5">Define tenant credentials to generate masterdata.json</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -61,7 +61,7 @@
             </div>
 
             <div class="border-t border-neutral-100 pt-3 space-y-2">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-black block">Enabled Modules</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-black block">Enabled Functional Modules</span>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs font-mono">
                     <label class="flex items-center gap-2 p-2.5 border border-neutral-200 rounded-xl bg-neutral-50 cursor-pointer">
                         <input type="checkbox" id="chkDining" checked class="accent-[#800020]">
@@ -79,33 +79,26 @@
             </div>
 
             <div class="pt-2">
-                <button onclick="handleProvisionClient()" class="bg-maroon text-white font-bold py-3 px-6 rounded-xl text-xs uppercase tracking-wider transition-all">
-                    Save Property & Generate Code
+                <button onclick="handleSaveClient()" class="bg-maroon text-white font-bold py-3 px-6 rounded-xl text-xs uppercase tracking-wider transition-all">
+                    Update Registry & Generate JSON
                 </button>
             </div>
         </section>
 
-        <!-- CODE GENERATION PANELS -->
+        <!-- JSON FILE & PRODUCTION LINKS -->
         <section class="bg-white border border-neutral-200 rounded-2xl p-5 sm:p-6 shadow-xs space-y-5">
-            <div class="border-b border-neutral-100 pb-3 flex justify-between items-center">
+            <div class="flex justify-between items-center border-b border-neutral-100 pb-3">
                 <div>
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-maroon">Production Configuration Code</h3>
-                    <p class="text-[10px] font-mono text-neutral-400 uppercase mt-0.5">Copy and paste directly into your files</p>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-maroon">Updated masterdata.json Content</h3>
+                    <p class="text-[10px] font-mono text-neutral-400 uppercase mt-0.5">Copy and paste into your root masterdata.json file</p>
                 </div>
+                <button onclick="copyField('codeMasterData')" class="bg-maroon text-white text-[10px] uppercase font-bold px-3 py-1.5 rounded-lg">Copy JSON File</button>
             </div>
 
-            <!-- TAB 1: FOR CONFIG.JS (RECOMMENDED) -->
-            <div class="space-y-2">
-                <div class="flex justify-between items-center">
-                    <span class="text-xs font-bold text-black uppercase">Option A: Direct Content for <code class="text-maroon">config.js</code></span>
-                    <button onclick="copyField('codeConfigJs')" class="bg-maroon text-white text-[10px] uppercase font-bold px-3 py-1.5 rounded-lg transition-all">Copy config.js Code</button>
-                </div>
-                <textarea id="codeConfigJs" rows="12" readonly class="w-full p-3 bg-neutral-900 text-neutral-100 rounded-xl text-[11px] font-mono"></textarea>
-            </div>
+            <textarea id="codeMasterData" rows="12" readonly class="w-full p-3 bg-neutral-900 text-neutral-100 rounded-xl text-[11px] font-mono"></textarea>
 
-            <!-- ACTIVE PROPERTY DIRECT LINKS -->
-            <div id="linksBox" class="space-y-2.5 pt-4 border-t border-neutral-100">
-                <span class="text-xs font-bold text-black uppercase block">Production Web Links for Selected Property</span>
+            <div class="space-y-2.5 pt-4 border-t border-neutral-100">
+                <span class="text-xs font-bold text-black uppercase block">Live Access URLs for Selected Slug</span>
                 <div class="grid grid-cols-1 gap-2 font-mono text-xs">
                     <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center">
                         <div><span class="text-[10px] text-neutral-400 block uppercase">Reception</span><span id="linkReception" class="break-all">-</span></div>
@@ -131,24 +124,6 @@
             </div>
         </section>
 
-        <!-- REGISTERED PROPERTIES TABLE -->
-        <section class="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs space-y-4">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-black">Registered Property Portfolios</h2>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs font-mono">
-                    <thead>
-                        <tr class="border-b border-neutral-200 text-neutral-400 uppercase text-[10px]">
-                            <th class="py-2.5 px-3">Slug</th>
-                            <th class="py-2.5 px-3">Property Name</th>
-                            <th class="py-2.5 px-3">Expiry</th>
-                            <th class="py-2.5 px-3 text-right">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="registryTableBody" class="divide-y divide-neutral-100"></tbody>
-                </table>
-            </div>
-        </section>
-
     </main>
 
     <footer class="bg-white border-t border-neutral-200 py-6 mt-12 text-xs">
@@ -167,29 +142,20 @@
     </footer>
 
     <script>
-        // PRE-LOADED REGISTRY WITH ROYAL STAY AND DEMO
-        const MASTER_REGISTRY = {
+        let currentRegistry = {
             "demo": {
-                name: "Grand Heritage Residency",
-                scriptUrl: "https://script.google.com/macros/s/AKfycbwYOUR_DEMO_SCRIPT_ID/exec",
-                upiVpa: "merchant@bank",
-                expiryDate: "2027-10-12",
-                features: {
-                    dining: true,
-                    staff: true,
-                    feedback: true
-                }
+                "name": "Grand Heritage Residency",
+                "scriptUrl": "https://script.google.com/macros/s/AKfycbwYOUR_DEMO_SCRIPT_ID/exec",
+                "upiVpa": "merchant@bank",
+                "expiryDate": "2027-10-12",
+                "features": { "dining": true, "staff": true, "feedback": true }
             },
             "royalstay": {
-                name: "Royal Stay",
-                scriptUrl: "https://script.google.com/macros/s/AKfycbyyI9WyLb1ECpXMfI90ZWGGNlMucKUcLFvMNgJ_F1tr5CRGbpnxmkAgvBkpS5jnj_kX/exec",
-                upiVpa: "ofbuzz@ptyes",
-                expiryDate: "2027-10-12",
-                features: {
-                    dining: true,
-                    staff: true,
-                    feedback: true
-                }
+                "name": "Royal Stay",
+                "scriptUrl": "https://script.google.com/macros/s/AKfycbyyI9WyLb1ECpXMfI90ZWGGNlMucKUcLFvMNgJ_F1tr5CRGbpnxmkAgvBkpS5jnj_kX/exec",
+                "upiVpa": "ofbuzz@ptyes",
+                "expiryDate": "2027-10-12",
+                "features": { "dining": true, "staff": true, "feedback": true }
             }
         };
 
@@ -200,41 +166,30 @@
             setTimeout(() => el.classList.add('hidden-view'), 3000);
         }
 
-        function updateCodeOutputs(selectedSlug) {
-            // Generate exact content for config.js
-            const configCode = `// MASTER CENTRAL TENANT REGISTRY\nconst CLIENT_REGISTRY = ${JSON.stringify(MASTER_REGISTRY, null, 4)};\n\n// Alias for ofbuzz master admin\nconst MASTER_REGISTRY = CLIENT_REGISTRY;`;
-            document.getElementById('codeConfigJs').value = configCode;
+        async function loadExistingMasterData() {
+            try {
+                const res = await fetch(`masterdata.json?_ts=${Date.now()}`);
+                if (res.ok) {
+                    currentRegistry = await res.json();
+                }
+            } catch (e) {}
+            refreshOutputs("royalstay");
+        }
 
-            // Generate URLs for selected slug
-            const currentSlug = selectedSlug || "royalstay";
+        function refreshOutputs(selectedSlug) {
+            document.getElementById('codeMasterData').value = JSON.stringify(currentRegistry, null, 2);
+
+            const slug = selectedSlug || "royalstay";
             const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
             
-            document.getElementById('linkReception').innerText = `${baseUrl}/index.html?hotel=${currentSlug}`;
-            document.getElementById('linkDining').innerText = `${baseUrl}/food.html?hotel=${currentSlug}`;
-            document.getElementById('linkStaff').innerText = `${baseUrl}/staff.html?hotel=${currentSlug}`;
-            document.getElementById('linkAdmin').innerText = `${baseUrl}/admin.html?hotel=${currentSlug}`;
-            document.getElementById('linkCustomer').innerText = `${baseUrl}/customer.html?hotel=${currentSlug}`;
+            document.getElementById('linkReception').innerText = `${baseUrl}/index.html?hotel=${slug}`;
+            document.getElementById('linkDining').innerText = `${baseUrl}/food.html?hotel=${slug}`;
+            document.getElementById('linkStaff').innerText = `${baseUrl}/staff.html?hotel=${slug}`;
+            document.getElementById('linkAdmin').innerText = `${baseUrl}/admin.html?hotel=${slug}`;
+            document.getElementById('linkCustomer').innerText = `${baseUrl}/customer.html?hotel=${slug}`;
         }
 
-        function renderTable() {
-            const tbody = document.getElementById('registryTableBody');
-            tbody.innerHTML = "";
-            for (const slug in MASTER_REGISTRY) {
-                const item = MASTER_REGISTRY[slug];
-                tbody.innerHTML += `
-                    <tr class="hover:bg-neutral-50">
-                        <td class="py-2.5 px-3 font-bold text-black">${slug}</td>
-                        <td class="py-2.5 px-3">${item.name}</td>
-                        <td class="py-2.5 px-3 text-neutral-500">${item.expiryDate}</td>
-                        <td class="py-2.5 px-3 text-right">
-                            <button onclick="inspectClient('${slug}')" class="border border-neutral-300 px-2.5 py-1 rounded text-[10px] uppercase font-bold">Select</button>
-                        </td>
-                    </tr>
-                `;
-            }
-        }
-
-        function handleProvisionClient() {
+        function handleSaveClient() {
             const name = document.getElementById('inHotelName').value.trim();
             const slug = document.getElementById('inHotelSlug').value.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '');
             const scriptUrl = document.getElementById('inScriptUrl').value.trim();
@@ -245,10 +200,10 @@
                 return showNotification("All core fields must be provided.");
             }
 
-            MASTER_REGISTRY[slug] = {
+            currentRegistry[slug] = {
                 name: name,
                 scriptUrl: scriptUrl,
-                upiVpa: upiVpa || "merchant@bank",
+                upiVpa: upiVpa || "ofbuzz@ptyes",
                 expiryDate: expiryDate,
                 features: {
                     dining: document.getElementById('chkDining').checked,
@@ -257,24 +212,8 @@
                 }
             };
 
-            renderTable();
-            updateCodeOutputs(slug);
+            refreshOutputs(slug);
             showNotification(`Updated: ${name} (${slug})`);
-        }
-
-        function inspectClient(slug) {
-            const item = MASTER_REGISTRY[slug];
-            if (!item) return;
-            document.getElementById('inHotelName').value = item.name;
-            document.getElementById('inHotelSlug').value = slug;
-            document.getElementById('inScriptUrl').value = item.scriptUrl;
-            document.getElementById('inUpiVpa').value = item.upiVpa;
-            document.getElementById('inExpiryDate').value = item.expiryDate;
-            document.getElementById('chkDining').checked = !!(item.features && item.features.dining);
-            document.getElementById('chkStaff').checked = !!(item.features && item.features.staff);
-            document.getElementById('chkFeedback').checked = !!(item.features && item.features.feedback);
-            updateCodeOutputs(slug);
-            showNotification(`Loaded: ${item.name}`);
         }
 
         function copyField(id) {
@@ -286,8 +225,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             const d = new Date(); d.setFullYear(d.getFullYear() + 1);
             document.getElementById('inExpiryDate').value = d.toISOString().split('T')[0];
-            renderTable();
-            inspectClient("royalstay");
+            loadExistingMasterData();
         });
     </script>
 </body>
