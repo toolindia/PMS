@@ -16,9 +16,8 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased selection:bg-[#800020] selection:text-white">
 
-    <div id="toast" class="hidden-view fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-neutral-900 text-white px-5 py-2.5 rounded-xl text-xs font-mono border border-neutral-700"></div>
+    <div id="toast" class="hidden-view fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-neutral-900 text-white px-5 py-2.5 rounded-xl text-xs font-mono border border-neutral-700 shadow-xl"></div>
 
-    <!-- LICENSE EXPIRED WARNING -->
     <div id="licenseExpiredOverlay" class="hidden-view fixed inset-0 bg-[#FAF7F2] z-50 flex items-center justify-center p-6 text-center">
         <div class="border border-maroon p-8 rounded-2xl max-w-md w-full bg-white space-y-4">
             <h2 class="text-xl font-bold uppercase text-maroon">Subscription Inactive</h2>
@@ -53,7 +52,7 @@
             </div>
         </div>
 
-        <!-- ROOM MATRIX GRID (Direct from Sheet) -->
+        <!-- ROOM MATRIX GRID -->
         <section class="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs space-y-4">
             <div class="flex justify-between items-center border-b border-neutral-100 pb-3">
                 <h2 class="text-xs font-bold uppercase tracking-wider text-black">Live Inventory Matrix</h2>
@@ -66,7 +65,7 @@
             <div id="roomGrid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3"></div>
         </section>
 
-        <!-- INLINE CHECK-IN CARD -->
+        <!-- INLINE CHECK-IN PANEL -->
         <section id="checkInPanel" class="hidden-view bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs space-y-4">
             <div class="flex justify-between items-center border-b border-neutral-100 pb-2.5">
                 <h3 id="ciRoomTitle" class="text-sm font-bold uppercase text-maroon">Check-In Registration</h3>
@@ -97,7 +96,7 @@
             </div>
         </section>
 
-        <!-- INLINE CHECKOUT & SETTLEMENT CARD -->
+        <!-- INLINE CHECKOUT & SETTLEMENT PANEL -->
         <section id="checkOutPanel" class="hidden-view bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs space-y-4">
             <div class="flex justify-between items-center border-b border-neutral-100 pb-2.5">
                 <h3 id="coRoomTitle" class="text-sm font-bold uppercase text-maroon">Billing & Settlement</h3>
@@ -142,18 +141,9 @@
     </footer>
 
     <script>
-        const CLIENT_REGISTRY = {
-            "demo": {
-                name: "Grand Heritage Residency",
-                scriptUrl: "https://script.google.com/macros/s/AKfycbwYOUR_DEMO_SCRIPT_ID/exec",
-                upiVpa: "merchant@bank",
-                expiryDate: "2027-10-12",
-                features: { dining: true, staff: true, feedback: true }
-            }
-        };
-
-        const slug = new URLSearchParams(window.location.search).get('hotel') || "demo";
-        const client = CLIENT_REGISTRY[slug];
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentSlug = urlParams.get('hotel') || "royalstay";
+        let currentClient = null;
         let appData = { rooms: [], activeBookings: [], foodOrders: [] };
         let activeRoomTarget = null, activeBookingTarget = null, base64Compressed = "";
 
@@ -164,34 +154,39 @@
             setTimeout(() => t.classList.add('hidden-view'), 3000);
         }
 
-        function verifyLicense() {
-            if (!client) {
-                document.body.innerHTML = "<div class='p-12 text-center text-xs font-mono uppercase text-maroon'>Tenant configuration profile not recognized.</div>";
+        async function initTenant() {
+            try {
+                const cached = localStorage.getItem(`ofbuzz_tenant_${currentSlug}`);
+                if (cached) currentClient = JSON.parse(cached);
+
+                const res = await fetch(`masterdata.json?_ts=${Date.now()}`);
+                if (!res.ok) throw new Error();
+                const registry = await res.json();
+                currentClient = registry[currentSlug];
+
+                if (!currentClient) {
+                    document.body.innerHTML = "<div class='p-12 text-center text-xs font-mono uppercase text-[#800020]'>Tenant configuration profile not identified.</div>";
+                    return false;
+                }
+
+                localStorage.setItem(`ofbuzz_tenant_${currentSlug}`, JSON.stringify(currentClient));
+
+                document.getElementById('propTitle').innerText = `${currentClient.name} - Front Desk`;
+
+                if (Date.now() > new Date(currentClient.expiryDate + "T23:59:59").getTime()) {
+                    document.getElementById('licenseExpiredOverlay').classList.remove('hidden-view');
+                    return false;
+                }
+                return true;
+            } catch (e) {
+                if (currentClient) return true;
+                document.body.innerHTML = "<div class='p-12 text-center text-xs font-mono uppercase text-[#800020]'>Communication failure loading property parameters.</div>";
                 return false;
             }
-            document.getElementById('propTitle').innerText = `${client.name} - Front Desk`;
-            if (Date.now() > new Date(client.expiryDate + "T23:59:59").getTime()) {
-                document.getElementById('licenseExpiredOverlay').classList.remove('hidden-view');
-                return false;
-            }
-            return true;
         }
 
         function refreshData() {
-            if (!client.scriptUrl || client.scriptUrl.includes("YOUR_DEMO")) {
-                appData = {
-                    rooms: [
-                        { RoomNo: "101", RoomType: "Deluxe", Price: 2500, Status: "Vacant" },
-                        { RoomNo: "102", RoomType: "Deluxe", Price: 2500, Status: "Occupied" },
-                        { RoomNo: "103", RoomType: "Suite", Price: 4000, Status: "Cleaning" }
-                    ],
-                    activeBookings: [{ BookingId: "BK-102", RoomNo: "102", GuestName: "Arthur P", Advance: 500, Status: "Active" }],
-                    foodOrders: [{ BookingId: "BK-102", Amount: 240 }]
-                };
-                return renderRooms();
-            }
-
-            fetch(`${client.scriptUrl}?action=getReceptionData&_ts=${Date.now()}`)
+            fetch(`${currentClient.scriptUrl}?action=getReceptionData&_ts=${Date.now()}`)
                 .then(r => r.json())
                 .then(res => {
                     if (res.success) {
@@ -241,7 +236,6 @@
             document.getElementById('cntCleaning').innerText = c;
         }
 
-        // Canvas Client Compression
         document.getElementById('ciCameraInput').addEventListener('change', function(e) {
             const f = e.target.files[0];
             if (!f) return;
@@ -274,7 +268,6 @@
             base64Compressed = "";
             document.getElementById('checkOutPanel').classList.add('hidden-view');
             document.getElementById('checkInPanel').classList.remove('hidden-view');
-            window.scrollTo({ top: document.getElementById('checkInPanel').offsetTop - 20, behavior: 'smooth' });
         }
 
         function submitCheckIn() {
@@ -288,7 +281,7 @@
             btn.disabled = true;
             btn.innerText = "Processing...";
 
-            fetch(client.scriptUrl, {
+            fetch(currentClient.scriptUrl, {
                 method: "POST",
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify({ action: "checkIn", roomNo: activeRoomTarget, guestName: name, phone: phone, advance: adv, idPhotoBase64: base64Compressed })
@@ -329,12 +322,11 @@
             document.getElementById('coNetTotal').innerText = `₹${net}`;
 
             const upiNote = encodeURIComponent(`Bill Room ${rNo}`);
-            const upiStr = `upi://pay?pa=${client.upiVpa}&pn=${encodeURIComponent(client.name)}&am=${net}&cu=INR&tn=${upiNote}`;
+            const upiStr = `upi://pay?pa=${currentClient.upiVpa}&pn=${encodeURIComponent(currentClient.name)}&am=${net}&cu=INR&tn=${upiNote}`;
             document.getElementById('coQrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(upiStr)}`;
 
             document.getElementById('checkInPanel').classList.add('hidden-view');
             document.getElementById('checkOutPanel').classList.remove('hidden-view');
-            window.scrollTo({ top: document.getElementById('checkOutPanel').offsetTop - 20, behavior: 'smooth' });
         }
 
         function confirmCheckOut() {
@@ -342,7 +334,7 @@
             btn.disabled = true;
             btn.innerText = "Clearing...";
 
-            fetch(client.scriptUrl, {
+            fetch(currentClient.scriptUrl, {
                 method: "POST",
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify({ action: "checkOut", bookingId: activeBookingTarget.BookingId, roomNo: activeBookingTarget.RoomNo, paymentMode: "UPI" })
@@ -365,7 +357,7 @@
         }
 
         function markClean(rNo) {
-            fetch(client.scriptUrl, {
+            fetch(currentClient.scriptUrl, {
                 method: "POST",
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify({ action: "markRoomCleaned", roomNo: rNo })
@@ -378,8 +370,9 @@
             document.getElementById(id).classList.add('hidden-view');
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            if (verifyLicense()) refreshData();
+        window.addEventListener('DOMContentLoaded', async () => {
+            const ready = await initTenant();
+            if (ready) refreshData();
         });
     </script>
 </body>
