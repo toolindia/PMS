@@ -16,7 +16,7 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased selection:bg-[#800020] selection:text-white">
 
-    <div id="toast" class="hidden-view fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-neutral-900 text-white px-5 py-2.5 rounded-xl text-xs font-mono border border-neutral-700"></div>
+    <div id="toast" class="hidden-view fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-neutral-900 text-white px-5 py-2.5 rounded-xl text-xs font-mono border border-neutral-700 shadow-xl"></div>
 
     <div id="moduleBlockedView" class="hidden-view fixed inset-0 bg-[#FAF7F2] z-50 flex items-center justify-center p-6 text-center">
         <div class="border border-maroon p-8 rounded-2xl max-w-md w-full bg-white space-y-3">
@@ -37,20 +37,18 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-            <!-- MENU SELECTION -->
+            <!-- MENU ITEMS -->
             <div class="md:col-span-2 space-y-4">
                 <div class="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs space-y-4">
                     <div class="flex justify-between items-center border-b border-neutral-100 pb-3">
                         <h2 class="text-xs font-bold uppercase tracking-wider text-black">Menu Catalogue</h2>
                         <span id="menuCountLabel" class="text-[10px] font-mono text-neutral-400 uppercase">Live Sheet Inventory</span>
                     </div>
-                    <div id="menuContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <!-- Populated by JS -->
-                    </div>
+                    <div id="menuContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
                 </div>
             </div>
 
-            <!-- ORDER CART & ROOM ALLOCATION -->
+            <!-- CART & ROOM SELECTOR -->
             <div class="space-y-4">
                 <div class="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs space-y-4">
                     <h2 class="text-xs font-bold uppercase tracking-wider text-black border-b border-neutral-100 pb-3">Active Order Folio</h2>
@@ -118,17 +116,9 @@
     </footer>
 
     <script>
-        const CLIENT_REGISTRY = {
-            "demo": {
-                name: "Grand Heritage Residency",
-                scriptUrl: "https://script.google.com/macros/s/AKfycbwYOUR_DEMO_SCRIPT_ID/exec",
-                expiryDate: "2027-10-12",
-                features: { dining: true, staff: true, feedback: true }
-            }
-        };
-
-        const slug = new URLSearchParams(window.location.search).get('hotel') || "demo";
-        const client = CLIENT_REGISTRY[slug];
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentSlug = urlParams.get('hotel') || "royalstay";
+        let currentClient = null;
         let menuItems = [], activeRooms = [], cart = {};
 
         function notify(msg) {
@@ -138,29 +128,32 @@
             setTimeout(() => t.classList.add('hidden-view'), 3000);
         }
 
-        function checkModuleAccess() {
-            if (!client || !client.features || !client.features.dining) {
-                document.getElementById('moduleBlockedView').classList.remove('hidden-view');
+        async function initTenant() {
+            try {
+                const cached = localStorage.getItem(`ofbuzz_tenant_${currentSlug}`);
+                if (cached) currentClient = JSON.parse(cached);
+
+                const res = await fetch(`masterdata.json?_ts=${Date.now()}`);
+                if (!res.ok) throw new Error();
+                const registry = await res.json();
+                currentClient = registry[currentSlug];
+
+                if (!currentClient || !currentClient.features || !currentClient.features.dining) {
+                    document.getElementById('moduleBlockedView').classList.remove('hidden-view');
+                    return false;
+                }
+
+                localStorage.setItem(`ofbuzz_tenant_${currentSlug}`, JSON.stringify(currentClient));
+                document.getElementById('propTitle').innerText = `${currentClient.name} - Dining`;
+                return true;
+            } catch (e) {
+                if (currentClient) return true;
                 return false;
             }
-            document.getElementById('propTitle').innerText = `${client.name} - Dining`;
-            return true;
         }
 
         function loadDiningData() {
-            if (!client.scriptUrl || client.scriptUrl.includes("YOUR_DEMO")) {
-                menuItems = [
-                    { ItemId: "M101", Category: "Beverages", ItemName: "Masala Tea", Price: 30 },
-                    { ItemId: "M102", Category: "Breakfast", ItemName: "Club Sandwich", Price: 120 },
-                    { ItemId: "M103", Category: "Main Course", ItemName: "Paneer Butter Masala", Price: 260 }
-                ];
-                activeRooms = [{ RoomNo: "102", GuestName: "Arthur P", BookingId: "BK-102" }];
-                renderMenu();
-                renderRoomOptions();
-                return;
-            }
-
-            fetch(`${client.scriptUrl}?action=getDiningData&_ts=${Date.now()}`)
+            fetch(`${currentClient.scriptUrl}?action=getDiningData&_ts=${Date.now()}`)
                 .then(r => r.json())
                 .then(res => {
                     if (res.success) {
@@ -249,16 +242,10 @@
             btn.disabled = true;
             btn.innerText = "Dispatching...";
 
-            fetch(client.scriptUrl, {
+            fetch(currentClient.scriptUrl, {
                 method: "POST",
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify({
-                    action: "addFoodOrder",
-                    roomNo: roomNo,
-                    bookingId: bookingId,
-                    items: summary.join(", "),
-                    amount: totalAmount
-                })
+                body: JSON.stringify({ action: "addFoodOrder", roomNo: roomNo, bookingId: bookingId, items: summary.join(", "), amount: totalAmount })
             })
             .then(r => r.json())
             .then(res => {
@@ -294,8 +281,9 @@
             });
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            if (checkModuleAccess()) loadDiningData();
+        window.addEventListener('DOMContentLoaded', async () => {
+            const ok = await initTenant();
+            if (ok) loadDiningData();
         });
     </script>
 </body>
