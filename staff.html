@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Administration - Ofbuzz PMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #FAF7F2; color: #111111; }
+        .text-maroon { color: #800020; }
+        .bg-maroon { background-color: #800020; }
+        .bg-maroon:hover { background-color: #650019; }
+        .border-maroon { border-color: #800020; }
+        .hidden-view { display: none !important; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-[#800020] selection:text-white">
+
+    <div id="toast" class="hidden-view fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-neutral-900 text-white px-5 py-2.5 rounded-xl text-xs font-mono border border-neutral-700"></div>
+
+    <div id="moduleBlockedView" class="hidden-view fixed inset-0 bg-[#FAF7F2] z-50 flex items-center justify-center p-6 text-center">
+        <div class="border border-maroon p-8 rounded-2xl max-w-md w-full bg-white space-y-3">
+            <h2 class="text-base font-bold uppercase text-maroon">Module Resticted</h2>
+            <p class="text-xs text-neutral-600">Personnel records are not configured for this account. Contact property administration.</p>
+        </div>
+    </div>
+
+    <main class="w-full max-w-5xl mx-auto p-4 sm:p-6 flex-1 space-y-6">
+
+        <header class="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h1 id="propTitle" class="text-xl sm:text-2xl font-black uppercase tracking-tight text-maroon">Personnel & Shifts</h1>
+                <p class="text-xs font-semibold tracking-wider text-neutral-500 uppercase mt-0.5">Duty Allocation & Shift Register</p>
+            </div>
+            <button onclick="loadStaffData()" class="border border-neutral-300 text-black px-4 py-2 rounded-xl text-xs font-semibold">Refresh Roster</button>
+        </header>
+
+        <!-- STAFF DIRECTORY CARDS -->
+        <section class="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs space-y-4">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-black border-b border-neutral-100 pb-3">Active Duty Personnel</h2>
+            <div id="staffCardGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                <!-- Injected via JS -->
+            </div>
+        </section>
+
+        <!-- ATTENDANCE AUDIT LOG -->
+        <section class="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs space-y-4">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-black border-b border-neutral-100 pb-3">Duty Log Chronology</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs font-mono">
+                    <thead>
+                        <tr class="border-b border-neutral-200 text-neutral-400 uppercase text-[10px]">
+                            <th class="py-2 px-3">Log ID</th>
+                            <th class="py-2 px-3">Staff Member</th>
+                            <th class="py-2 px-3">Action</th>
+                            <th class="py-2 px-3 text-right">Recorded Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceLogBody" class="divide-y divide-neutral-100"></tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t border-neutral-200 py-6 mt-12 text-xs">
+        <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="https://i.pinimg.com/736x/bd/d0/5c/bdd05c94afb66b5a72f5e17a7a879ab3.jpg" alt="Ofbuzz Logo" class="w-7 h-7 rounded-full object-cover border border-neutral-300">
+                <div>
+                    <p class="font-bold uppercase tracking-wider text-black">Ofbuzz Technology</p>
+                    <p class="text-[10px] text-neutral-400 uppercase tracking-widest">Ofbuzz PMS &bull; An Indian Technology</p>
+                </div>
+            </div>
+            <a href="https://wa.me/917827201014" target="_blank" class="border border-neutral-300 text-black px-4 py-2 rounded-xl text-[11px] font-semibold">
+                Support Desk
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        const CLIENT_REGISTRY = {
+            "demo": {
+                name: "Grand Heritage Residency",
+                scriptUrl: "https://script.google.com/macros/s/AKfycbwYOUR_DEMO_SCRIPT_ID/exec",
+                expiryDate: "2027-10-12",
+                features: { dining: true, staff: true, feedback: true }
+            }
+        };
+
+        const slug = new URLSearchParams(window.location.search).get('hotel') || "demo";
+        const client = CLIENT_REGISTRY[slug];
+
+        function notify(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.classList.remove('hidden-view');
+            setTimeout(() => t.classList.add('hidden-view'), 3000);
+        }
+
+        function checkModuleAccess() {
+            if (!client || !client.features || !client.features.staff) {
+                document.getElementById('moduleBlockedView').classList.remove('hidden-view');
+                return false;
+            }
+            document.getElementById('propTitle').innerText = `${client.name} - Personnel`;
+            return true;
+        }
+
+        function loadStaffData() {
+            if (!client.scriptUrl || client.scriptUrl.includes("YOUR_DEMO")) {
+                renderStaffCards([
+                    { StaffId: "ST-01", FullName: "Ramesh Kumar", Role: "Front Desk", Phone: "9876500001", ShiftStatus: "On Duty" },
+                    { StaffId: "ST-02", FullName: "Sunil Verma", Role: "Housekeeping", Phone: "9876500002", ShiftStatus: "Off Duty" }
+                ]);
+                return;
+            }
+
+            fetch(`${client.scriptUrl}?action=getStaffData&_ts=${Date.now()}`)
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success) {
+                        renderStaffCards(res.staffList || []);
+                        renderAttendanceTable(res.attendance || []);
+                    }
+                })
+                .catch(() => notify("Network connection timeout."));
+        }
+
+        function renderStaffCards(list) {
+            const grid = document.getElementById('staffCardGrid');
+            grid.innerHTML = "";
+            list.forEach(s => {
+                const isOnDuty = s.ShiftStatus === "On Duty";
+                grid.innerHTML += `
+                    <div class="border border-neutral-200 p-4 rounded-xl bg-neutral-50/50 space-y-3">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-xs font-bold text-black uppercase block">${s.FullName}</span>
+                                <span class="text-[10px] text-neutral-400 font-mono">${s.Role} &bull; ${s.Phone}</span>
+                            </div>
+                            <span class="text-[9px] uppercase font-bold px-2 py-0.5 rounded ${isOnDuty ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-neutral-200 text-neutral-600'}">
+                                ${s.ShiftStatus}
+                            </span>
+                        </div>
+                        <div class="flex gap-2 pt-1 border-t border-neutral-200">
+                            <button onclick="toggleDuty('${s.StaffId}', '${s.FullName}', 'Check In')" class="w-1/2 border border-neutral-300 hover:border-black text-black py-1.5 rounded-lg text-[10px] font-bold uppercase">
+                                Duty Entry
+                            </button>
+                            <button onclick="toggleDuty('${s.StaffId}', '${s.FullName}', 'Check Out')" class="w-1/2 border border-neutral-300 hover:border-black text-black py-1.5 rounded-lg text-[10px] font-bold uppercase">
+                                Duty Exit
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function toggleDuty(id, name, act) {
+            fetch(client.scriptUrl, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({ action: "recordAttendance", staffId: id, staffName: name, dutyAction: act })
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (res.success) {
+                    notify(`Recorded: ${name} (${act})`);
+                    loadStaffData();
+                }
+            })
+            .catch(() => notify("Error writing record."));
+        }
+
+        function renderAttendanceTable(logs) {
+            const tbody = document.getElementById('attendanceLogBody');
+            tbody.innerHTML = "";
+            logs.forEach(l => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-neutral-50">
+                        <td class="py-2 px-3 font-bold text-black">${l.RecordId}</td>
+                        <td class="py-2 px-3">${l.StaffName}</td>
+                        <td class="py-2 px-3 uppercase font-bold ${l.Action === 'Check In' ? 'text-emerald-800' : 'text-neutral-500'}">${l.Action}</td>
+                        <td class="py-2 px-3 text-right text-neutral-400">${l.Timestamp}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (checkModuleAccess()) loadStaffData();
+        });
+    </script>
+</body>
+</html>
