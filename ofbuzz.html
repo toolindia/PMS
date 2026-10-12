@@ -16,7 +16,7 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased selection:bg-[#800020] selection:text-white">
 
-    <div id="inAppNotification" class="hidden-view fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-neutral-900 text-white px-5 py-2.5 rounded-xl text-xs font-mono shadow-lg border border-neutral-700"></div>
+    <div id="toast" class="hidden-view fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-neutral-900 text-white px-5 py-2.5 rounded-xl text-xs font-mono border border-neutral-700 shadow-xl"></div>
 
     <main class="w-full max-w-6xl mx-auto p-4 sm:p-6 flex-1 space-y-6">
 
@@ -26,25 +26,25 @@
                 <p class="text-xs font-semibold tracking-wider text-neutral-500 uppercase mt-0.5">Ofbuzz Technology &bull; Multi-Tenant Control</p>
             </div>
             <span class="text-[10px] font-mono uppercase bg-neutral-100 text-neutral-600 px-3 py-1.5 rounded-xl border border-neutral-200 font-bold">
-                Feature Delegation Engine
+                Automated Registry Engine
             </span>
         </header>
 
-        <!-- REGISTRATION & FEATURE ASSIGNMENT -->
+        <!-- ONBOARDING FORM -->
         <section class="bg-white border border-neutral-200 rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
             <div class="border-b border-neutral-100 pb-3">
                 <h2 class="text-xs font-bold uppercase tracking-wider text-black">Provision New Property</h2>
-                <p class="text-[10px] text-neutral-400 uppercase mt-0.5">Define access parameters, deployment URL and enabled modules</p>
+                <p class="text-[10px] text-neutral-400 uppercase mt-0.5">Add or update tenant parameters and auto-generate code blocks</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">Property Name (Display reference)</label>
-                    <input type="text" id="inHotelName" placeholder="e.g. Royal Palace Residency" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs focus:outline-none focus:border-maroon">
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">Property Name</label>
+                    <input type="text" id="inHotelName" placeholder="e.g. Royal Stay" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs focus:outline-none focus:border-maroon">
                 </div>
                 <div>
                     <label class="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">Tenant Slug Identifier</label>
-                    <input type="text" id="inHotelSlug" placeholder="e.g. royal-palace" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs font-mono focus:outline-none focus:border-maroon">
+                    <input type="text" id="inHotelSlug" placeholder="e.g. royalstay" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs font-mono focus:outline-none focus:border-maroon">
                 </div>
                 <div class="md:col-span-2">
                     <label class="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">Google Apps Script Web App Deployment URL</label>
@@ -52,7 +52,7 @@
                 </div>
                 <div>
                     <label class="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">Settlement Merchant UPI VPA</label>
-                    <input type="text" id="inUpiVpa" placeholder="merchant@bank" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs font-mono focus:outline-none focus:border-maroon">
+                    <input type="text" id="inUpiVpa" placeholder="ofbuzz@ptyes" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs font-mono focus:outline-none focus:border-maroon">
                 </div>
                 <div>
                     <label class="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">License Expiry Date (YYYY-MM-DD)</label>
@@ -60,9 +60,8 @@
                 </div>
             </div>
 
-            <!-- FEATURE SELECTION TOGGLES -->
             <div class="border-t border-neutral-100 pt-3 space-y-2">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-black block">Client Entitlements & Permissions</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-black block">Enabled Modules</span>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs font-mono">
                     <label class="flex items-center gap-2 p-2.5 border border-neutral-200 rounded-xl bg-neutral-50 cursor-pointer">
                         <input type="checkbox" id="chkDining" checked class="accent-[#800020]">
@@ -81,65 +80,68 @@
 
             <div class="pt-2">
                 <button onclick="handleProvisionClient()" class="bg-maroon text-white font-bold py-3 px-6 rounded-xl text-xs uppercase tracking-wider transition-all">
-                    Generate Provisioning Package
+                    Save Property & Generate Code
                 </button>
             </div>
         </section>
 
-        <!-- PROVISIONED LINKS & EMBEDS -->
-        <section id="provisionOutputSection" class="hidden-view bg-white border border-neutral-200 rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
+        <!-- CODE GENERATION PANELS -->
+        <section class="bg-white border border-neutral-200 rounded-2xl p-5 sm:p-6 shadow-xs space-y-5">
             <div class="border-b border-neutral-100 pb-3 flex justify-between items-center">
                 <div>
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-maroon">Production Portals</h3>
-                    <p id="outClientLabel" class="text-[10px] font-mono text-neutral-400 uppercase mt-0.5">Ready for Integration</p>
-                </div>
-                <span class="text-[10px] uppercase font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">Allocated</span>
-            </div>
-
-            <div class="grid grid-cols-1 gap-2.5 font-mono text-xs">
-                <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center">
-                    <div><span class="text-[10px] text-neutral-400 block uppercase">Reception Desk</span><span id="linkReception" class="break-all">-</span></div>
-                    <button onclick="copyField('linkReception')" class="border border-neutral-300 text-black px-3 py-1.5 rounded-lg text-[10px] uppercase font-bold">Copy</button>
-                </div>
-                <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center">
-                    <div><span class="text-[10px] text-neutral-400 block uppercase">Dining & POS</span><span id="linkDining" class="break-all">-</span></div>
-                    <button onclick="copyField('linkDining')" class="border border-neutral-300 text-black px-3 py-1.5 rounded-lg text-[10px] uppercase font-bold">Copy</button>
-                </div>
-                <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center">
-                    <div><span class="text-[10px] text-neutral-400 block uppercase">Staff Desk</span><span id="linkStaff" class="break-all">-</span></div>
-                    <button onclick="copyField('linkStaff')" class="border border-neutral-300 text-black px-3 py-1.5 rounded-lg text-[10px] uppercase font-bold">Copy</button>
-                </div>
-                <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center">
-                    <div><span class="text-[10px] text-neutral-400 block uppercase">Owner Administration</span><span id="linkAdmin" class="break-all">-</span></div>
-                    <button onclick="copyField('linkAdmin')" class="border border-neutral-300 text-black px-3 py-1.5 rounded-lg text-[10px] uppercase font-bold">Copy</button>
-                </div>
-                <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center">
-                    <div><span class="text-[10px] text-neutral-400 block uppercase">Customer Rating Portal</span><span id="linkCustomer" class="break-all">-</span></div>
-                    <button onclick="copyField('linkCustomer')" class="border border-neutral-300 text-black px-3 py-1.5 rounded-lg text-[10px] uppercase font-bold">Copy</button>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-maroon">Production Configuration Code</h3>
+                    <p class="text-[10px] font-mono text-neutral-400 uppercase mt-0.5">Copy and paste directly into your files</p>
                 </div>
             </div>
 
-            <div class="space-y-2 pt-2 border-t border-neutral-100">
+            <!-- TAB 1: FOR CONFIG.JS (RECOMMENDED) -->
+            <div class="space-y-2">
                 <div class="flex justify-between items-center">
-                    <label class="text-[10px] font-bold uppercase tracking-wider text-neutral-500">Registry Code Block (Embed in Client Scripts)</label>
-                    <button onclick="copyField('codeRegistryBlock')" class="text-[10px] font-bold uppercase text-maroon hover:underline">Copy Configuration</button>
+                    <span class="text-xs font-bold text-black uppercase">Option A: Direct Content for <code class="text-maroon">config.js</code></span>
+                    <button onclick="copyField('codeConfigJs')" class="bg-maroon text-white text-[10px] uppercase font-bold px-3 py-1.5 rounded-lg transition-all">Copy config.js Code</button>
                 </div>
-                <textarea id="codeRegistryBlock" rows="6" readonly class="w-full p-3 bg-neutral-900 text-neutral-100 rounded-xl text-[11px] font-mono"></textarea>
+                <textarea id="codeConfigJs" rows="12" readonly class="w-full p-3 bg-neutral-900 text-neutral-100 rounded-xl text-[11px] font-mono"></textarea>
+            </div>
+
+            <!-- ACTIVE PROPERTY DIRECT LINKS -->
+            <div id="linksBox" class="space-y-2.5 pt-4 border-t border-neutral-100">
+                <span class="text-xs font-bold text-black uppercase block">Production Web Links for Selected Property</span>
+                <div class="grid grid-cols-1 gap-2 font-mono text-xs">
+                    <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center">
+                        <div><span class="text-[10px] text-neutral-400 block uppercase">Reception</span><span id="linkReception" class="break-all">-</span></div>
+                        <button onclick="copyField('linkReception')" class="border border-neutral-300 text-black px-3 py-1 rounded text-[10px] uppercase font-bold">Copy</button>
+                    </div>
+                    <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center">
+                        <div><span class="text-[10px] text-neutral-400 block uppercase">Dining Desk</span><span id="linkDining" class="break-all">-</span></div>
+                        <button onclick="copyField('linkDining')" class="border border-neutral-300 text-black px-3 py-1 rounded text-[10px] uppercase font-bold">Copy</button>
+                    </div>
+                    <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center">
+                        <div><span class="text-[10px] text-neutral-400 block uppercase">Staff Portal</span><span id="linkStaff" class="break-all">-</span></div>
+                        <button onclick="copyField('linkStaff')" class="border border-neutral-300 text-black px-3 py-1 rounded text-[10px] uppercase font-bold">Copy</button>
+                    </div>
+                    <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center">
+                        <div><span class="text-[10px] text-neutral-400 block uppercase">Admin / Owner</span><span id="linkAdmin" class="break-all">-</span></div>
+                        <button onclick="copyField('linkAdmin')" class="border border-neutral-300 text-black px-3 py-1 rounded text-[10px] uppercase font-bold">Copy</button>
+                    </div>
+                    <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center">
+                        <div><span class="text-[10px] text-neutral-400 block uppercase">Customer Rating</span><span id="linkCustomer" class="break-all">-</span></div>
+                        <button onclick="copyField('linkCustomer')" class="border border-neutral-300 text-black px-3 py-1 rounded text-[10px] uppercase font-bold">Copy</button>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- REGISTRY TABLE -->
+        <!-- REGISTERED PROPERTIES TABLE -->
         <section class="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs space-y-4">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-black">Active Tenant Directory</h2>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-black">Registered Property Portfolios</h2>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs font-mono">
                     <thead>
                         <tr class="border-b border-neutral-200 text-neutral-400 uppercase text-[10px]">
                             <th class="py-2.5 px-3">Slug</th>
                             <th class="py-2.5 px-3">Property Name</th>
-                            <th class="py-2.5 px-3">Entitlements</th>
                             <th class="py-2.5 px-3">Expiry</th>
-                            <th class="py-2.5 px-3 text-right">Inspect</th>
+                            <th class="py-2.5 px-3 text-right">Action</th>
                         </tr>
                     </thead>
                     <tbody id="registryTableBody" class="divide-y divide-neutral-100"></tbody>
@@ -158,28 +160,60 @@
                     <p class="text-[10px] text-neutral-400 uppercase tracking-widest">Ofbuzz PMS &bull; An Indian Technology</p>
                 </div>
             </div>
-            <a href="https://wa.me/917827201014" target="_blank" class="border border-neutral-300 hover:border-black text-black px-4 py-2 rounded-xl text-[11px] font-semibold tracking-wider">
+            <a href="https://wa.me/917827201014" target="_blank" class="border border-neutral-300 text-black px-4 py-2 rounded-xl text-[11px] font-semibold">
                 Support Desk
             </a>
         </div>
     </footer>
 
     <script>
+        // PRE-LOADED REGISTRY WITH ROYAL STAY AND DEMO
         const MASTER_REGISTRY = {
             "demo": {
                 name: "Grand Heritage Residency",
                 scriptUrl: "https://script.google.com/macros/s/AKfycbwYOUR_DEMO_SCRIPT_ID/exec",
                 upiVpa: "merchant@bank",
                 expiryDate: "2027-10-12",
-                features: { dining: true, staff: true, feedback: true }
+                features: {
+                    dining: true,
+                    staff: true,
+                    feedback: true
+                }
+            },
+            "royalstay": {
+                name: "Royal Stay",
+                scriptUrl: "https://script.google.com/macros/s/AKfycbyyI9WyLb1ECpXMfI90ZWGGNlMucKUcLFvMNgJ_F1tr5CRGbpnxmkAgvBkpS5jnj_kX/exec",
+                upiVpa: "ofbuzz@ptyes",
+                expiryDate: "2027-10-12",
+                features: {
+                    dining: true,
+                    staff: true,
+                    feedback: true
+                }
             }
         };
 
         function showNotification(msg) {
-            const el = document.getElementById('inAppNotification');
+            const el = document.getElementById('toast');
             el.innerText = msg;
             el.classList.remove('hidden-view');
             setTimeout(() => el.classList.add('hidden-view'), 3000);
+        }
+
+        function updateCodeOutputs(selectedSlug) {
+            // Generate exact content for config.js
+            const configCode = `// MASTER CENTRAL TENANT REGISTRY\nconst CLIENT_REGISTRY = ${JSON.stringify(MASTER_REGISTRY, null, 4)};\n\n// Alias for ofbuzz master admin\nconst MASTER_REGISTRY = CLIENT_REGISTRY;`;
+            document.getElementById('codeConfigJs').value = configCode;
+
+            // Generate URLs for selected slug
+            const currentSlug = selectedSlug || "royalstay";
+            const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+            
+            document.getElementById('linkReception').innerText = `${baseUrl}/index.html?hotel=${currentSlug}`;
+            document.getElementById('linkDining').innerText = `${baseUrl}/food.html?hotel=${currentSlug}`;
+            document.getElementById('linkStaff').innerText = `${baseUrl}/staff.html?hotel=${currentSlug}`;
+            document.getElementById('linkAdmin').innerText = `${baseUrl}/admin.html?hotel=${currentSlug}`;
+            document.getElementById('linkCustomer').innerText = `${baseUrl}/customer.html?hotel=${currentSlug}`;
         }
 
         function renderTable() {
@@ -187,12 +221,10 @@
             tbody.innerHTML = "";
             for (const slug in MASTER_REGISTRY) {
                 const item = MASTER_REGISTRY[slug];
-                const feats = Object.keys(item.features || {}).filter(k => item.features[k]).join(", ");
                 tbody.innerHTML += `
                     <tr class="hover:bg-neutral-50">
                         <td class="py-2.5 px-3 font-bold text-black">${slug}</td>
                         <td class="py-2.5 px-3">${item.name}</td>
-                        <td class="py-2.5 px-3 text-[10px] uppercase text-neutral-500">${feats}</td>
                         <td class="py-2.5 px-3 text-neutral-500">${item.expiryDate}</td>
                         <td class="py-2.5 px-3 text-right">
                             <button onclick="inspectClient('${slug}')" class="border border-neutral-300 px-2.5 py-1 rounded text-[10px] uppercase font-bold">Select</button>
@@ -225,18 +257,9 @@
                 }
             };
 
-            const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
-            document.getElementById('outClientLabel').innerText = `${name} (${slug})`;
-            document.getElementById('linkReception').innerText = `${baseUrl}/index.html?hotel=${slug}`;
-            document.getElementById('linkDining').innerText = `${baseUrl}/food.html?hotel=${slug}`;
-            document.getElementById('linkStaff').innerText = `${baseUrl}/staff.html?hotel=${slug}`;
-            document.getElementById('linkAdmin').innerText = `${baseUrl}/admin.html?hotel=${slug}`;
-            document.getElementById('linkCustomer').innerText = `${baseUrl}/customer.html?hotel=${slug}`;
-
-            document.getElementById('codeRegistryBlock').value = `const CLIENT_REGISTRY = ${JSON.stringify(MASTER_REGISTRY, null, 4)};`;
-            document.getElementById('provisionOutputSection').classList.remove('hidden-view');
             renderTable();
-            showNotification("Client credentials generated.");
+            updateCodeOutputs(slug);
+            showNotification(`Updated: ${name} (${slug})`);
         }
 
         function inspectClient(slug) {
@@ -250,7 +273,8 @@
             document.getElementById('chkDining').checked = !!(item.features && item.features.dining);
             document.getElementById('chkStaff').checked = !!(item.features && item.features.staff);
             document.getElementById('chkFeedback').checked = !!(item.features && item.features.feedback);
-            handleProvisionClient();
+            updateCodeOutputs(slug);
+            showNotification(`Loaded: ${item.name}`);
         }
 
         function copyField(id) {
@@ -263,6 +287,7 @@
             const d = new Date(); d.setFullYear(d.getFullYear() + 1);
             document.getElementById('inExpiryDate').value = d.toISOString().split('T')[0];
             renderTable();
+            inspectClient("royalstay");
         });
     </script>
 </body>
