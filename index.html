@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reception Desk - Ofbuzz PMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #FAF7F2; color: #111111; }
+        .text-maroon { color: #800020; }
+        .bg-maroon { background-color: #800020; }
+        .bg-maroon:hover { background-color: #650019; }
+        .border-maroon { border-color: #800020; }
+        .hidden-view { display: none !important; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-[#800020] selection:text-white">
+
+    <!-- LICENSE EXPIRED OVERLAY -->
+    <div id="licenseExpiredOverlay" class="hidden-view fixed inset-0 bg-[#FAF7F2] z-50 flex flex-col items-center justify-center p-6 text-center">
+        <div class="border border-maroon p-8 rounded-2xl max-w-md w-full bg-white shadow-sm space-y-4">
+            <h2 class="text-xl font-bold uppercase tracking-wider text-maroon">Subscription Required</h2>
+            <p class="text-xs text-neutral-600 leading-relaxed">
+                The operational license for this property has expired. Please contact technology support to renew your service.
+            </p>
+            <a href="https://wa.me/917827201014?text=Hello%20Ofbuzz%20Technology,%20license%20renewal%20inquiry." target="_blank" class="block bg-maroon text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider">
+                Contact Support Desk
+            </a>
+        </div>
+    </div>
+
+    <!-- MAIN APP WRAPPER -->
+    <div id="mainApp" class="w-full max-w-6xl mx-auto p-4 sm:p-6 flex-1 space-y-6">
+
+        <!-- HEADER -->
+        <header class="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h1 id="propertyTitle" class="text-xl sm:text-2xl font-black uppercase tracking-tight text-maroon">Property Reception</h1>
+                <p class="text-xs font-semibold tracking-wider text-neutral-500 uppercase mt-0.5">Ofbuzz PMS Operational Desk</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="refreshData()" class="border border-neutral-300 hover:border-black text-black font-semibold text-xs px-4 py-2.5 rounded-xl transition-all">
+                    Sync Records
+                </button>
+            </div>
+        </header>
+
+        <!-- STATUS COUNTERS -->
+        <div class="grid grid-cols-3 gap-3 sm:gap-4">
+            <div class="bg-white border border-neutral-200 p-4 rounded-xl text-center">
+                <span class="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">Vacant Rooms</span>
+                <span id="countVacant" class="text-lg sm:text-2xl font-black text-black font-mono">0</span>
+            </div>
+            <div class="bg-white border border-neutral-200 p-4 rounded-xl text-center">
+                <span class="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">Occupied</span>
+                <span id="countOccupied" class="text-lg sm:text-2xl font-black text-maroon font-mono">0</span>
+            </div>
+            <div class="bg-white border border-neutral-200 p-4 rounded-xl text-center">
+                <span class="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">Under Cleaning</span>
+                <span id="countCleaning" class="text-lg sm:text-2xl font-black text-neutral-600 font-mono">0</span>
+            </div>
+        </div>
+
+        <!-- ROOM MATRIX GRID -->
+        <section class="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs space-y-4">
+            <div class="flex justify-between items-center border-b border-neutral-100 pb-3">
+                <h2 class="text-xs font-bold uppercase tracking-wider text-black">Room Availability Matrix</h2>
+                <div class="flex gap-4 text-[10px] font-bold uppercase tracking-wider">
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span> Vacant</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#800020]"></span> Occupied</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Cleaning</span>
+                </div>
+            </div>
+            <div id="roomGrid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                <!-- Injected via JavaScript -->
+            </div>
+        </section>
+
+    </div>
+
+    <!-- MODAL: CHECK-IN -->
+    <div id="checkInModal" class="hidden-view fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-40">
+        <div class="bg-white border border-neutral-200 rounded-2xl p-5 sm:p-6 max-w-md w-full space-y-4">
+            <div class="flex justify-between items-start border-b border-neutral-100 pb-2.5">
+                <div>
+                    <h3 class="text-sm font-bold uppercase text-maroon">Guest Registration</h3>
+                    <p id="checkInRoomLabel" class="text-xs text-neutral-500 font-mono mt-0.5">Room Allocation</p>
+                </div>
+                <button onclick="closeModal('checkInModal')" class="text-neutral-400 hover:text-black font-bold text-lg">&times;</button>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">Primary Guest Full Name</label>
+                    <input type="text" id="guestNameInput" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs focus:outline-none focus:border-maroon">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">Contact Phone Number</label>
+                    <input type="tel" id="guestPhoneInput" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs font-mono focus:outline-none focus:border-maroon">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">Advance Amount Received</label>
+                    <input type="number" id="guestAdvanceInput" value="0" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs font-mono focus:outline-none focus:border-maroon">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">Identity Document Capture</label>
+                    <input type="file" id="idCameraInput" accept="image/*" capture="camera" class="w-full text-xs text-neutral-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-neutral-100 file:text-black cursor-pointer">
+                    <img id="idPreview" class="hidden-view mt-2 max-h-28 rounded-lg border border-neutral-200 object-contain mx-auto">
+                </div>
+            </div>
+            <div class="flex gap-2 pt-2">
+                <button onclick="closeModal('checkInModal')" class="w-1/2 border border-neutral-200 text-neutral-700 py-2.5 rounded-xl text-xs font-semibold">Cancel</button>
+                <button onclick="submitCheckIn()" id="btnSubmitCheckIn" class="w-1/2 bg-maroon text-white py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider">Confirm Entry</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ACTIVE OCCUPIED ROOM ACTION -->
+    <div id="roomActionModal" class="hidden-view fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-40">
+        <div class="bg-white border border-neutral-200 rounded-2xl p-5 sm:p-6 max-w-md w-full space-y-4">
+            <div class="flex justify-between items-start border-b border-neutral-100 pb-2.5">
+                <div>
+                    <h3 id="occupiedRoomTitle" class="text-sm font-bold uppercase text-maroon">Room Folio</h3>
+                    <p id="occupiedGuestSubtitle" class="text-xs text-neutral-500 mt-0.5">Current Guest Information</p>
+                </div>
+                <button onclick="closeModal('roomActionModal')" class="text-neutral-400 hover:text-black font-bold text-lg">&times;</button>
+            </div>
+            
+            <div class="bg-neutral-50 border border-neutral-200 rounded-xl p-3 text-xs space-y-1.5 font-mono">
+                <div class="flex justify-between"><span class="text-neutral-400">Booking ID:</span><span id="folioBookingId" class="font-bold text-black">-</span></div>
+                <div class="flex justify-between"><span class="text-neutral-400">Check-in Time:</span><span id="folioCheckInTime">-</span></div>
+                <div class="flex justify-between"><span class="text-neutral-400">Advance Paid:</span><span id="folioAdvance">-</span></div>
+                <div class="flex justify-between"><span class="text-neutral-400">Restaurant Running:</span><span id="folioFoodSum" class="text-maroon font-bold">₹0</span></div>
+            </div>
+
+            <!-- RESTAURANT POS PUNCH -->
+            <div class="border-t border-neutral-100 pt-3 space-y-2">
+                <p class="text-[10px] font-bold uppercase tracking-wider text-black">Punch Dining Charge</p>
+                <div class="flex gap-2">
+                    <input type="text" id="foodItemInput" placeholder="Item description" class="w-2/3 px-3 py-2 border border-neutral-200 rounded-xl text-xs">
+                    <input type="number" id="foodAmountInput" placeholder="Amount" class="w-1/3 px-3 py-2 border border-neutral-200 rounded-xl text-xs font-mono">
+                </div>
+                <button onclick="submitFoodOrder()" class="w-full border border-neutral-300 hover:border-black text-black font-bold py-2 rounded-xl text-[11px] uppercase tracking-wider">
+                    Add Charge to Room
+                </button>
+            </div>
+
+            <div class="flex gap-2 pt-2 border-t border-neutral-100">
+                <button onclick="closeModal('roomActionModal')" class="w-1/2 border border-neutral-200 text-neutral-700 py-2.5 rounded-xl text-xs font-semibold">Close</button>
+                <button onclick="proceedCheckOut()" class="w-1/2 bg-maroon text-white py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider">Proceed Settlement</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CHECKOUT & SETTLEMENT -->
+    <div id="checkOutModal" class="hidden-view fixed inset-0 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 z-40">
+        <div class="bg-white border border-neutral-200 rounded-2xl p-5 sm:p-6 max-w-sm w-full space-y-4">
+            <div class="flex justify-between items-start border-b border-neutral-100 pb-2.5">
+                <div>
+                    <h3 class="text-sm font-bold uppercase text-maroon">Final Settlement</h3>
+                    <p id="coRoomLabel" class="text-xs text-neutral-500 font-mono mt-0.5">Billing Clearance</p>
+                </div>
+                <button onclick="closeModal('checkOutModal')" class="text-neutral-400 hover:text-black font-bold text-lg">&times;</button>
+            </div>
+            
+            <div class="bg-neutral-50 border border-neutral-200 rounded-xl p-3.5 space-y-2 text-xs">
+                <div class="flex justify-between"><span class="text-neutral-500">Room Rent Total:</span><span id="coRoomRent" class="font-mono font-semibold">₹0</span></div>
+                <div class="flex justify-between"><span class="text-neutral-500">Restaurant Total:</span><span id="coFoodTotal" class="font-mono font-semibold">₹0</span></div>
+                <div class="flex justify-between text-neutral-400"><span class="text-neutral-500">Less Advance:</span><span id="coAdvanceLess" class="font-mono font-semibold">-₹0</span></div>
+                <div class="flex justify-between border-t border-neutral-200 pt-2 font-bold text-sm">
+                    <span class="text-black uppercase">Net Payable</span>
+                    <span id="coNetPayable" class="text-maroon font-mono">₹0</span>
+                </div>
+            </div>
+
+            <!-- DYNAMIC UPI QR DISPLAY -->
+            <div class="flex flex-col items-center justify-center p-3 border border-neutral-200 rounded-xl bg-white space-y-2">
+                <div class="w-32 h-32 bg-neutral-100 border border-neutral-200 rounded-lg flex items-center justify-center p-1">
+                    <img id="coQrImage" src="" alt="Payment QR" class="w-full h-full object-contain">
+                </div>
+                <span class="text-[9px] uppercase font-mono text-neutral-400 tracking-wider">Dynamic Payment Code</span>
+            </div>
+
+            <div class="flex gap-2">
+                <button onclick="closeModal('checkOutModal')" class="w-1/2 border border-neutral-200 text-neutral-700 py-2.5 rounded-xl text-xs font-semibold">Return</button>
+                <button onclick="confirmFinalSettlement()" id="btnConfirmSettlement" class="w-1/2 bg-maroon text-white py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider">Complete Exit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- STANDARDIZED LUXURY FOOTER -->
+    <footer class="bg-white border-t border-neutral-200 py-6 mt-12 text-xs">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="https://i.pinimg.com/736x/bd/d0/5c/bdd05c94afb66b5a72f5e17a7a879ab3.jpg" alt="Ofbuzz Logo" class="w-7 h-7 rounded-full object-cover border border-neutral-300">
+                <div>
+                    <p class="font-bold uppercase tracking-wider text-black">Ofbuzz Technology</p>
+                    <p class="text-[10px] text-neutral-400 uppercase tracking-widest">Ofbuzz PMS &bull; An Indian Technology</p>
+                </div>
+            </div>
+            <div>
+                <a href="https://wa.me/917827201014" target="_blank" class="border border-neutral-300 hover:border-black text-black px-4 py-2 rounded-xl text-[11px] font-semibold tracking-wider transition-all inline-flex items-center gap-2">
+                    Help & Support Desk
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- CENTRAL CLIENT REGISTRY & CONTROLLER LOGIC -->
+    <script>
+        // Central Client Registry (Configured directly in code)
+        const CLIENT_REGISTRY = {
+            "demo": {
+                name: "Heritage Grand Hotel",
+                scriptUrl: "https://script.google.com/macros/s/AKfycbwYOUR_DEMO_SCRIPT_ID/exec",
+                upiVpa: "merchant@bank",
+                expiryDate: "2027-10-12"
+            }
+        };
+
+        // Determine Tenant via URL Query Parameter ?hotel=
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentSlug = urlParams.get('hotel') || "demo";
+        const currentClient = CLIENT_REGISTRY[currentSlug];
+
+        // Global State Variables
+        let activeData = { rooms: [], activeBookings: [], foodOrders: [] };
+        let selectedRoomForCheckIn = null;
+        let selectedActiveBooking = null;
+        let compressedBase64Image = "";
+
+        // Verify Operational Expiry Engine
+        function verifyClientLicense() {
+            if (!currentClient) {
+                document.body.innerHTML = "<div class='p-12 text-center text-xs font-mono uppercase text-maroon'>Property configuration profile not identified.</div>";
+                return false;
+            }
+            document.getElementById('propertyTitle').innerText = currentClient.name;
+
+            const expiryTimestamp = new Date(currentClient.expiryDate + "T23:59:59").getTime();
+            if (Date.now() > expiryTimestamp) {
+                document.getElementById('licenseExpiredOverlay').classList.remove('hidden-view');
+                return false;
+            }
+            return true;
+        }
+
+        // Fetch Reception Operational Records
+        function refreshData() {
+            if (!currentClient.scriptUrl || currentClient.scriptUrl.includes("YOUR_DEMO")) {
+                console.warn("Connected with sample layout configuration.");
+                return renderFallbackData();
+            }
+
+            fetch(`${currentClient.scriptUrl}?action=getReceptionData&_ts=${Date.now()}`)
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success) {
+                        activeData = res;
+                        renderRoomMatrix();
+                    } else {
+                        alert(res.error || "Failed to retrieve status records.");
+                    }
+                })
+                .catch(() => alert("Network communication timeout."));
+        }
+
+        function renderFallbackData() {
+            activeData = {
+                rooms: [
+                    { RoomNo: "101", RoomType: "Deluxe", Price: 2500, Status: "Vacant" },
+                    { RoomNo: "102", RoomType: "Deluxe", Price: 2500, Status: "Occupied" },
+                    { RoomNo: "103", RoomType: "Suite", Price: 4000, Status: "Cleaning" },
+                    { RoomNo: "104", RoomType: "Standard", Price: 1800, Status: "Vacant" }
+                ],
+                activeBookings: [
+                    { BookingId: "BK-9912", RoomNo: "102", GuestName: "Alexander Wright", Phone: "9876543210", CheckIn: "12/10/2026 14:00", Advance: 1000, Status: "Active" }
+                ],
+                foodOrders: [
+                    { OrderId: "ORD-1", RoomNo: "102", BookingId: "BK-9912", Items: "Coffee & Club Sandwich", Amount: 320 }
+                ]
+            };
+            renderRoomMatrix();
+        }
+
+        // Render Room Matrix Grid
+        function renderRoomMatrix() {
+            const grid = document.getElementById('roomGrid');
+            grid.innerHTML = "";
+
+            let vacantCount = 0, occupiedCount = 0, cleaningCount = 0;
+
+            activeData.rooms.forEach(room => {
+                const rNo = room.RoomNo.toString();
+                let statusClass = "", actionCall = "";
+
+                if (room.Status === "Vacant") {
+                    vacantCount++;
+                    statusClass = "border-emerald-200 bg-emerald-50/40 hover:border-emerald-600 text-emerald-950";
+                    actionCall = `onclick="openCheckInModal('${rNo}')"`;
+                } else if (room.Status === "Occupied") {
+                    occupiedCount++;
+                    statusClass = "border-neutral-300 bg-white hover:border-maroon text-black";
+                    actionCall = `onclick="openRoomActionModal('${rNo}')"`;
+                } else {
+                    cleaningCount++;
+                    statusClass = "border-amber-200 bg-amber-50/50 hover:border-amber-500 text-amber-950";
+                    actionCall = `onclick="markCleaned('${rNo}')"`;
+                }
+
+                grid.innerHTML += `
+                    <div ${actionCall} class="border p-4 rounded-xl cursor-pointer transition-all flex flex-col justify-between h-24 ${statusClass}">
+                        <div class="flex justify-between items-start">
+                            <span class="text-base font-black font-mono tracking-tight">${rNo}</span>
+                            <span class="text-[9px] uppercase font-bold tracking-wider opacity-75">${room.Status}</span>
+                        </div>
+                        <div class="text-[10px] uppercase font-semibold text-neutral-400">
+                            ${room.RoomType || "Standard"} &bull; ₹${room.Price || 0}
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('countVacant').innerText = vacantCount;
+            document.getElementById('countOccupied').innerText = occupiedCount;
+            document.getElementById('countCleaning').innerText = cleaningCount;
+        }
+
+        // Canvas Client-Side Image Compression (800px Width, 65% Quality)
+        document.getElementById('idCameraInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    let w = img.width, h = img.height;
+                    const maxW = 800;
+                    if (w > maxW) {
+                        h = Math.round((h * maxW) / w);
+                        w = maxW;
+                    }
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    compressedBase64Image = canvas.toDataURL('image/jpeg', 0.65);
+                    
+                    const preview = document.getElementById('idPreview');
+                    preview.src = compressedBase64Image;
+                    preview.classList.remove('hidden-view');
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Check-In Actions
+        function openCheckInModal(roomNo) {
+            selectedRoomForCheckIn = roomNo;
+            document.getElementById('checkInRoomLabel').innerText = `Room Allocation: ${roomNo}`;
+            document.getElementById('guestNameInput').value = "";
+            document.getElementById('guestPhoneInput').value = "";
+            document.getElementById('guestAdvanceInput').value = "0";
+            document.getElementById('idCameraInput').value = "";
+            document.getElementById('idPreview').classList.add('hidden-view');
+            compressedBase64Image = "";
+            document.getElementById('checkInModal').classList.remove('hidden-view');
+        }
+
+        function submitCheckIn() {
+            const name = document.getElementById('guestNameInput').value.trim();
+            const phone = document.getElementById('guestPhoneInput').value.trim();
+            const advance = document.getElementById('guestAdvanceInput').value.trim();
+
+            if (!name || !phone) return alert("Guest name and contact number are required.");
+
+            const btn = document.getElementById('btnSubmitCheckIn');
+            btn.disabled = true;
+            btn.innerText = "Registering...";
+
+            const payload = {
+                action: "checkIn",
+                roomNo: selectedRoomForCheckIn,
+                guestName: name,
+                phone: phone,
+                advance: advance,
+                idPhotoBase64: compressedBase64Image
+            };
+
+            fetch(currentClient.scriptUrl, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(payload)
+            })
+            .then(r => r.json())
+            .then(res => {
+                btn.disabled = false;
+                btn.innerText = "Confirm Entry";
+                if (res.success) {
+                    closeModal('checkInModal');
+                    refreshData();
+                } else alert(res.error || "Unable to register guest.");
+            })
+            .catch(() => {
+                btn.disabled = false;
+                btn.innerText = "Confirm Entry";
+                alert("Transaction network error.");
+            });
+        }
+
+        // Room Folio Actions (Dining & Billing)
+        function openRoomActionModal(roomNo) {
+            const booking = activeData.activeBookings.find(b => b.RoomNo.toString() === roomNo.toString());
+            if (!booking) return;
+
+            selectedActiveBooking = booking;
+            document.getElementById('occupiedRoomTitle').innerText = `Room ${roomNo}`;
+            document.getElementById('occupiedGuestSubtitle').innerText = booking.GuestName;
+            document.getElementById('folioBookingId').innerText = booking.BookingId;
+            document.getElementById('folioCheckInTime').innerText = booking.CheckIn;
+            document.getElementById('folioAdvance').innerText = `₹${booking.Advance || 0}`;
+
+            const roomFoodOrders = activeData.foodOrders.filter(f => f.BookingId === booking.BookingId);
+            const foodTotal = roomFoodOrders.reduce((sum, f) => sum + (Number(f.Amount) || 0), 0);
+            document.getElementById('folioFoodSum').innerText = `₹${foodTotal}`;
+
+            document.getElementById('roomActionModal').classList.remove('hidden-view');
+        }
+
+        function submitFoodOrder() {
+            const item = document.getElementById('foodItemInput').value.trim();
+            const amount = document.getElementById('foodAmountInput').value.trim();
+            if (!item || !amount) return alert("Specify item description and price.");
+
+            const payload = {
+                action: "addFoodOrder",
+                roomNo: selectedActiveBooking.RoomNo,
+                bookingId: selectedActiveBooking.BookingId,
+                items: item,
+                amount: amount
+            };
+
+            fetch(currentClient.scriptUrl, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(payload)
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (res.success) {
+                    document.getElementById('foodItemInput').value = "";
+                    document.getElementById('foodAmountInput').value = "";
+                    closeModal('roomActionModal');
+                    refreshData();
+                } else alert(res.error || "Failed to record charge.");
+            });
+        }
+
+        // Settlement & Check-Out
+        function proceedCheckOut() {
+            closeModal('roomActionModal');
+
+            const room = activeData.rooms.find(r => r.RoomNo.toString() === selectedActiveBooking.RoomNo.toString());
+            const roomRent = Number(room.Price) || 0;
+            const roomFoodOrders = activeData.foodOrders.filter(f => f.BookingId === selectedActiveBooking.BookingId);
+            const foodTotal = roomFoodOrders.reduce((sum, f) => sum + (Number(f.Amount) || 0), 0);
+            const advance = Number(selectedActiveBooking.Advance) || 0;
+            const netPayable = (roomRent + foodTotal) - advance;
+
+            document.getElementById('coRoomLabel').innerText = `Room ${selectedActiveBooking.RoomNo} &bull; ${selectedActiveBooking.GuestName}`;
+            document.getElementById('coRoomRent').innerText = `₹${roomRent}`;
+            document.getElementById('coFoodTotal').innerText = `₹${foodTotal}`;
+            document.getElementById('coAdvanceLess').innerText = `-₹${advance}`;
+            document.getElementById('coNetPayable').innerText = `₹${netPayable}`;
+
+            // Generate Dynamic UPI QR Code
+            const upiNote = encodeURIComponent(`Bill Room ${selectedActiveBooking.RoomNo}`);
+            const upiString = `upi://pay?pa=${currentClient.upiVpa}&pn=${encodeURIComponent(currentClient.name)}&am=${netPayable}&cu=INR&tn=${upiNote}`;
+            document.getElementById('coQrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiString)}`;
+
+            document.getElementById('checkOutModal').classList.remove('hidden-view');
+        }
+
+        function confirmFinalSettlement() {
+            const btn = document.getElementById('btnConfirmSettlement');
+            btn.disabled = true;
+            btn.innerText = "Processing...";
+
+            const payload = {
+                action: "checkOut",
+                bookingId: selectedActiveBooking.BookingId,
+                roomNo: selectedActiveBooking.RoomNo,
+                paymentMode: "UPI"
+            };
+
+            fetch(currentClient.scriptUrl, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(payload)
+            })
+            .then(r => r.json())
+            .then(res => {
+                btn.disabled = false;
+                btn.innerText = "Complete Exit";
+                if (res.success) {
+                    closeModal('checkOutModal');
+                    refreshData();
+                } else alert(res.error || "Unable to complete check-out.");
+            })
+            .catch(() => {
+                btn.disabled = false;
+                btn.innerText = "Complete Exit";
+                alert("Network timeout.");
+            });
+        }
+
+        function markCleaned(roomNo) {
+            if (!confirm(`Mark Room ${roomNo} as cleaned and ready for booking?`)) return;
+
+            fetch(currentClient.scriptUrl, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({ action: "markRoomCleaned", roomNo: roomNo })
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (res.success) refreshData();
+            });
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden-view');
+        }
+
+        // Initialize Operational Desk on Load
+        window.addEventListener('DOMContentLoaded', () => {
+            if (verifyClientLicense()) {
+                refreshData();
+            }
+        });
+    </script>
+</body>
+</html>
