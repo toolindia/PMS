@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guest Experience - Ofbuzz PMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #FAF7F2; color: #111111; }
+        .text-maroon { color: #800020; }
+        .bg-maroon { background-color: #800020; }
+        .bg-maroon:hover { background-color: #650019; }
+        .border-maroon { border-color: #800020; }
+        .hidden-view { display: none !important; }
+        .rating-btn.active {
+            background-color: #800020;
+            color: #ffffff;
+            border-color: #800020;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-[#800020] selection:text-white">
+
+    <!-- EXPIRY OVERLAY -->
+    <div id="licenseExpiredOverlay" class="hidden-view fixed inset-0 bg-[#FAF7F2] z-50 flex flex-col items-center justify-center p-6 text-center">
+        <div class="border border-maroon p-8 rounded-2xl max-w-md w-full bg-white shadow-sm space-y-4">
+            <h2 class="text-xl font-bold uppercase tracking-wider text-maroon">Service Inactive</h2>
+            <p class="text-xs text-neutral-600 leading-relaxed">
+                Guest feedback submission is temporarily unavailable for this property. Please contact the front desk.
+            </p>
+        </div>
+    </div>
+
+    <!-- MAIN GUEST CONTAINER -->
+    <main class="w-full max-w-lg mx-auto p-4 sm:p-6 flex-1 space-y-5">
+
+        <!-- HEADER -->
+        <header class="bg-white border border-neutral-200 rounded-2xl p-5 text-center shadow-xs space-y-1">
+            <h1 id="customerPropertyTitle" class="text-lg sm:text-xl font-black uppercase tracking-tight text-maroon">Property Feedback</h1>
+            <p class="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Stay Evaluation & Experience Desk</p>
+        </header>
+
+        <!-- SUBMISSION FORM CONTAINER -->
+        <div id="feedbackFormCard" class="bg-white border border-neutral-200 rounded-2xl p-5 sm:p-6 shadow-xs space-y-5">
+
+            <!-- ROOM & NAME IDENTIFIERS -->
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">Room Allocation</label>
+                    <input type="text" id="custRoomInput" placeholder="Room No" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs font-mono focus:outline-none focus:border-maroon">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">Guest Full Name</label>
+                    <input type="text" id="custNameInput" placeholder="Full Name" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs focus:outline-none focus:border-maroon">
+                </div>
+            </div>
+
+            <!-- RATING SECTION 1: CLEANLINESS -->
+            <div class="space-y-2 border-t border-neutral-100 pt-3">
+                <div class="flex justify-between items-center">
+                    <label class="text-xs font-bold uppercase text-black">Cleanliness & Hygiene</label>
+                    <span id="labelScoreCleanliness" class="text-[10px] font-mono text-neutral-400 uppercase">5 / 5 Standard</span>
+                </div>
+                <div class="grid grid-cols-5 gap-2" data-metric="cleanliness">
+                    <button type="button" onclick="setMetricScore('cleanliness', 1)" class="rating-btn border border-neutral-200 py-2 rounded-xl text-xs font-mono font-bold">1</button>
+                    <button type="button" onclick="setMetricScore('cleanliness', 2)" class="rating-btn border border-neutral-200 py-2 rounded-xl text-xs font-mono font-bold">2</button>
+                    <button type="button" onclick="setMetricScore('cleanliness', 3)" class="rating-btn border border-neutral-200 py-2 rounded-xl text-xs font-mono font-bold">3</button>
+                    <button type="button" onclick="setMetricScore('cleanliness', 4)" class="rating-btn border border-neutral-200 py-2 rounded-xl text-xs font-mono font-bold">4</button>
+                    <button type="button" onclick="setMetricScore('cleanliness', 5)" class="rating-btn active border border-neutral-200 py-2 rounded-xl text-xs font-mono font-bold">5</button>
+                </div>
+            </div>
+
+            <!-- RATING SECTION 2: STAFF BEHAVIOUR -->
+            <div class="space-y-2 border-t border-neutral-100 pt-3">
+                <div class="flex justify-between items-center">
+                    <label class="text-xs font-bold uppercase text-black">Staff Courtesy & Hospitality</label>
+                    <span id="labelScoreStaff" class="text-[10px] font-mono text-neutral-400 uppercase">5 / 5 Standard</span>
+                </div>
+                <div class="grid grid-cols-5 gap-2" data-metric="staff">
+                    <button type="button" onclick="setMetricScore('staff', 1)" class="rating-btn border border-neutral-200 py-2 rounded-xl text-xs font-mono font-bold">1</button>
+                    <button type="button" onclick="setMetricScore('staff', 2)" class="rating-btn border border-neutral-200 py-2 rounded-xl text-xs font-mono font-bold">2</button>
+                    <button type="button" onclick="setMetricScore('staff', 3)" class="rating-btn border border-neutral-200 py-2 rounded-xl text-xs font-mono font-bold">3</button>
+                    <button type="button" onclick="setMetricScore('staff', 4)" class="rating-btn border border-neutral-200 py-2 rounded-xl text-xs font-mono font-bold">4</button>
+                    <button type="button" onclick="setMetricScore('staff', 5)" class="rating-btn active border border-neutral-200 py-2 rounded-xl text-xs font-mono font-bold">5</button>
+                </div>
+            </div>
+
+            <!-- RATING SECTION 3: ROOM AMENITIES -->
+            <div class="space-y-2 border-t border-neutral-100 pt-3">
+                <div class="flex justify-between items-center">
+                    <label class="text-xs font-bold uppercase text-black">Room Amenities & Comfort</label>
+                    <span id="labelScoreAmenities" class="text-[10px] font-mono text-neutral-400 uppercase">5 / 5 Standard</span>
+                </div>
+                <div class="grid grid-cols-5 gap-2" data-metric="amenities">
+                    <button type="button" onclick="setMetricScore('amenities', 1)" class="rating-btn border border-neutral-200 py-2 rounded-xl text-xs font-mono font-bold">1</button>
+                    <button type="button" onclick="setMetricScore('amenities', 2)" class="rating-btn border border-neutral-200 py-2 rounded-xl text-xs font-mono font-bold">2</button>
+                    <button type="button" onclick="setMetricScore('amenities', 3)" class="rating-btn border border-neutral-200 py-2 rounded-xl text-xs font-mono font-bold">3</button>
+                    <button type="button" onclick="setMetricScore('amenities', 4)" class="rating-btn border border-neutral-200 py-2 rounded-xl text-xs font-mono font-bold">4</button>
+                    <button type="button" onclick="setMetricScore('amenities', 5)" class="rating-btn active border border-neutral-200 py-2 rounded-xl text-xs font-mono font-bold">5</button>
+                </div>
+            </div>
+
+            <!-- RATING SECTION 4: FOOD / DINING -->
+            <div class="space-y-2 border-t border-neutral-100 pt-3">
+                <div class="flex justify-between items-center">
+                    <label class="text-xs font-bold uppercase text-black">Dining & Food Quality</label>
+                    <span id="labelScoreFood" class="text-[10px] font-mono text-neutral-400 uppercase">5 / 5 Standard</span>
+                </div>
+                <div class="grid grid-cols-5 gap-2" data-metric="food">
+                    <button type="button" onclick="setMetricScore('food', 1)" class="rating-btn border border-neutral-200 py-2 rounded-xl text-xs font-mono font-bold">1</button>
+                    <button type="button" onclick="setMetricScore('food', 2)" class="rating-btn border border-neutral-200 py-2 rounded-xl text-xs font-mono font-bold">2</button>
+                    <button type="button" onclick="setMetricScore('food', 3)" class="rating-btn border border-neutral-200 py-2 rounded-xl text-xs font-mono font-bold">3</button>
+                    <button type="button" onclick="setMetricScore('food', 4)" class="rating-btn border border-neutral-200 py-2 rounded-xl text-xs font-mono font-bold">4</button>
+                    <button type="button" onclick="setMetricScore('food', 5)" class="rating-btn active border border-neutral-200 py-2 rounded-xl text-xs font-mono font-bold">5</button>
+                </div>
+            </div>
+
+            <!-- COMMENTS & SUGGESTIONS -->
+            <div class="border-t border-neutral-100 pt-3">
+                <label class="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">Additional Observations / Notes</label>
+                <textarea id="custCommentsInput" rows="3" placeholder="Share specific thoughts regarding your stay..." class="w-full px-3 py-2 border border-neutral-200 rounded-xl text-xs focus:outline-none focus:border-maroon"></textarea>
+            </div>
+
+            <!-- SUBMIT BUTTON -->
+            <button onclick="submitGuestFeedback()" id="btnSubmitFeedback" class="w-full bg-maroon text-white font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider transition-all">
+                Submit Stay Evaluation
+            </button>
+        </div>
+
+        <!-- SUCCESS SCREEN -->
+        <div id="feedbackSuccessCard" class="hidden-view bg-white border border-neutral-200 rounded-2xl p-8 text-center shadow-xs space-y-4">
+            <h2 class="text-lg font-bold uppercase tracking-tight text-maroon">Evaluation Received</h2>
+            <p class="text-xs text-neutral-600 leading-relaxed">
+                Thank you for taking the time to share your review. Your observations assist management in maintaining quality standards.
+            </p>
+            <div class="pt-2">
+                <button onclick="location.reload()" class="border border-neutral-300 text-black px-5 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider">
+                    Submit Another Evaluation
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- STANDARDIZED LUXURY FOOTER -->
+    <footer class="bg-white border-t border-neutral-200 py-6 mt-12 text-xs">
+        <div class="max-w-lg mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="https://i.pinimg.com/736x/bd/d0/5c/bdd05c94afb66b5a72f5e17a7a879ab3.jpg" alt="Ofbuzz Logo" class="w-7 h-7 rounded-full object-cover border border-neutral-300">
+                <div>
+                    <p class="font-bold uppercase tracking-wider text-black">Ofbuzz Technology</p>
+                    <p class="text-[10px] text-neutral-400 uppercase tracking-widest">Ofbuzz PMS &bull; An Indian Technology</p>
+                </div>
+            </div>
+            <div>
+                <a href="https://wa.me/917827201014" target="_blank" class="border border-neutral-300 hover:border-black text-black px-4 py-2 rounded-xl text-[11px] font-semibold tracking-wider transition-all inline-flex items-center gap-2">
+                    Help & Support Desk
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- LOGIC SCRIPT -->
+    <script>
+        const CLIENT_REGISTRY = {
+            "demo": {
+                name: "Heritage Grand Hotel",
+                scriptUrl: "https://script.google.com/macros/s/AKfycbwYOUR_DEMO_SCRIPT_ID/exec",
+                expiryDate: "2027-10-12"
+            }
+        };
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentSlug = urlParams.get('hotel') || "demo";
+        const prefilledRoom = urlParams.get('room') || "";
+        const currentClient = CLIENT_REGISTRY[currentSlug];
+
+        const scores = {
+            cleanliness: 5,
+            staff: 5,
+            amenities: 5,
+            food: 5
+        };
+
+        function verifyClientLicense() {
+            if (!currentClient) {
+                document.body.innerHTML = "<div class='p-12 text-center text-xs font-mono uppercase text-maroon'>Property configuration profile not identified.</div>";
+                return false;
+            }
+            document.getElementById('customerPropertyTitle').innerText = `${currentClient.name} - Guest Portal`;
+
+            const expiryTimestamp = new Date(currentClient.expiryDate + "T23:59:59").getTime();
+            if (Date.now() > expiryTimestamp) {
+                document.getElementById('licenseExpiredOverlay').classList.remove('hidden-view');
+                return false;
+            }
+            return true;
+        }
+
+        function setMetricScore(metric, val) {
+            scores[metric] = val;
+            
+            const container = document.querySelector(`[data-metric="${metric}"]`);
+            const buttons = container.querySelectorAll('.rating-btn');
+            buttons.forEach((btn, index) => {
+                if (index + 1 === val) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            const labelMap = {
+                cleanliness: 'labelScoreCleanliness',
+                staff: 'labelScoreStaff',
+                amenities: 'labelScoreAmenities',
+                food: 'labelScoreFood'
+            };
+            document.getElementById(labelMap[metric]).innerText = `${val} / 5 Score`;
+        }
+
+        function submitGuestFeedback() {
+            const room = document.getElementById('custRoomInput').value.trim();
+            const name = document.getElementById('custNameInput').value.trim();
+            const comments = document.getElementById('custCommentsInput').value.trim();
+
+            if (!room || !name) {
+                return alert("Please enter your Room Number and Name to authenticate the feedback.");
+            }
+
+            const btn = document.getElementById('btnSubmitFeedback');
+            btn.disabled = true;
+            btn.innerText = "Transmitting Evaluation...";
+
+            const payload = {
+                action: "submitFeedback",
+                roomNo: room,
+                guestName: name,
+                cleanliness: scores.cleanliness,
+                staff: scores.staff,
+                amenities: scores.amenities,
+                food: scores.food,
+                comments: comments
+            };
+
+            if (!currentClient.scriptUrl || currentClient.scriptUrl.includes("YOUR_DEMO")) {
+                setTimeout(() => {
+                    document.getElementById('feedbackFormCard').classList.add('hidden-view');
+                    document.getElementById('feedbackSuccessCard').classList.remove('hidden-view');
+                }, 800);
+                return;
+            }
+
+            fetch(currentClient.scriptUrl, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify(payload)
+            })
+            .then(r => r.json())
+            .then(res => {
+                btn.disabled = false;
+                btn.innerText = "Submit Stay Evaluation";
+                if (res.success) {
+                    document.getElementById('feedbackFormCard').classList.add('hidden-view');
+                    document.getElementById('feedbackSuccessCard').classList.remove('hidden-view');
+                } else {
+                    alert(res.error || "Unable to register review.");
+                }
+            })
+            .catch(() => {
+                btn.disabled = false;
+                btn.innerText = "Submit Stay Evaluation";
+                alert("Network communication error.");
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (verifyClientLicense()) {
+                if (prefilledRoom) {
+                    document.getElementById('custRoomInput').value = prefilledRoom;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
