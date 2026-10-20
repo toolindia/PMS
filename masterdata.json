@@ -21,4 +21,38 @@
       "feedback": true
     }
   }
+ {
+  "demo": {
+    "name": "Grand Heritage Residency",
+    "scriptUrl": "https://script.google.com/macros/s/AKfycbwYOUR_DEMO_SCRIPT_ID/exec",
+    "upiVpa": "merchant@bank",
+    "expiryDate": "2027-10-12",
+    "features": {
+      "dining": true,
+      "staff": true,
+      "feedback": true
+    }
+  },
+  "royalstay": {
+    "name": "Royal Stay",
+    "scriptUrl": "https://script.google.com/macros/s/AKfycbyyI9WyLb1ECpXMfI90ZWGGNlMucKUcLFvMNgJ_F1tr5CRGbpnxmkAgvBkpS5jnj_kX/exec",
+    "upiVpa": "ofbuzz@ptyes",
+    "expiryDate": "2027-10-12",
+    "features": {
+      "dining": true,
+      "staff": true,
+      "feedback": true
+    }
+  },
+  "satyam": {
+    "name": "Satyam's Appartements",
+    "scriptUrl": "https://script.google.com/macros/s/AKfycby-9FIrjFrkLIiTymiAijAxc-9qesA5NhKPI0fnn1JH3-9pDr0xXuR46eg_BdwF9aQ/exec",
+    "upiVpa": "ofbuzz@ptyes",
+    "expiryDate": "2027-10-20",
+    "features": {
+      "dining": true,
+      "staff": true,
+      "feedback": true
+    }
+  }
 }
