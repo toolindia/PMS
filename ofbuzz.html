@@ -40,46 +40,46 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">Property Name</label>
-                    <input type="text" id="inHotelName" placeholder="e.g. Royal Stay" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs focus:outline-none focus:border-maroon">
+                    <input type="text" id="inHotelName" placeholder="e.g. Royal Stay" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs focus:outline-none focus:border-maroon transition-colors">
                 </div>
                 <div>
                     <label class="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">Tenant Slug Identifier</label>
-                    <input type="text" id="inHotelSlug" placeholder="e.g. royalstay" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs font-mono focus:outline-none focus:border-maroon">
+                    <input type="text" id="inHotelSlug" placeholder="e.g. royalstay" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs font-mono focus:outline-none focus:border-maroon transition-colors">
                 </div>
                 <div class="md:col-span-2">
                     <label class="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">Google Apps Script Web App Deployment URL</label>
-                    <input type="url" id="inScriptUrl" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs font-mono focus:outline-none focus:border-maroon">
+                    <input type="url" id="inScriptUrl" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs font-mono focus:outline-none focus:border-maroon transition-colors">
                 </div>
                 <div>
                     <label class="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">Settlement Merchant UPI VPA</label>
-                    <input type="text" id="inUpiVpa" placeholder="ofbuzz@ptyes" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs font-mono focus:outline-none focus:border-maroon">
+                    <input type="text" id="inUpiVpa" placeholder="ofbuzz@ptyes" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs font-mono focus:outline-none focus:border-maroon transition-colors">
                 </div>
                 <div>
                     <label class="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">License Expiry Date (YYYY-MM-DD)</label>
-                    <input type="date" id="inExpiryDate" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs font-mono focus:outline-none focus:border-maroon">
+                    <input type="date" id="inExpiryDate" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs font-mono focus:outline-none focus:border-maroon transition-colors">
                 </div>
             </div>
 
             <div class="border-t border-neutral-100 pt-3 space-y-2">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-black block">Enabled Functional Modules</span>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs font-mono">
-                    <label class="flex items-center gap-2 p-2.5 border border-neutral-200 rounded-xl bg-neutral-50 cursor-pointer">
-                        <input type="checkbox" id="chkDining" checked class="accent-[#800020]">
+                    <label class="flex items-center gap-2 p-2.5 border border-neutral-200 rounded-xl bg-neutral-50 cursor-pointer hover:bg-neutral-100 transition-colors">
+                        <input type="checkbox" id="chkDining" checked class="accent-[#800020] cursor-pointer">
                         <span>Dining / Food POS</span>
                     </label>
-                    <label class="flex items-center gap-2 p-2.5 border border-neutral-200 rounded-xl bg-neutral-50 cursor-pointer">
-                        <input type="checkbox" id="chkStaff" checked class="accent-[#800020]">
+                    <label class="flex items-center gap-2 p-2.5 border border-neutral-200 rounded-xl bg-neutral-50 cursor-pointer hover:bg-neutral-100 transition-colors">
+                        <input type="checkbox" id="chkStaff" checked class="accent-[#800020] cursor-pointer">
                         <span>Staff Management</span>
                     </label>
-                    <label class="flex items-center gap-2 p-2.5 border border-neutral-200 rounded-xl bg-neutral-50 cursor-pointer">
-                        <input type="checkbox" id="chkFeedback" checked class="accent-[#800020]">
+                    <label class="flex items-center gap-2 p-2.5 border border-neutral-200 rounded-xl bg-neutral-50 cursor-pointer hover:bg-neutral-100 transition-colors">
+                        <input type="checkbox" id="chkFeedback" checked class="accent-[#800020] cursor-pointer">
                         <span>Customer Ratings</span>
                     </label>
                 </div>
             </div>
 
             <div class="pt-2">
-                <button onclick="handleSaveClient()" class="bg-maroon text-white font-bold py-3 px-6 rounded-xl text-xs uppercase tracking-wider transition-all">
+                <button onclick="handleSaveClient()" class="bg-maroon text-white font-bold py-3 px-6 rounded-xl text-xs uppercase tracking-wider transition-all hover:opacity-90 active:scale-95 shadow-md cursor-pointer">
                     Update Registry & Generate JSON
                 </button>
             </div>
@@ -92,7 +92,7 @@
                     <h3 class="text-xs font-bold uppercase tracking-wider text-maroon">Updated masterdata.json Content</h3>
                     <p class="text-[10px] font-mono text-neutral-400 uppercase mt-0.5">Copy and paste into your root masterdata.json file</p>
                 </div>
-                <button onclick="copyField('codeMasterData')" class="bg-maroon text-white text-[10px] uppercase font-bold px-3 py-1.5 rounded-lg">Copy JSON File</button>
+                <button onclick="copyField('codeMasterData')" class="bg-maroon text-white text-[10px] uppercase font-bold px-3 py-1.5 rounded-lg hover:opacity-90 active:scale-95 transition-all cursor-pointer shadow-sm">Copy JSON File</button>
             </div>
 
             <textarea id="codeMasterData" rows="12" readonly class="w-full p-3 bg-neutral-900 text-neutral-100 rounded-xl text-[11px] font-mono"></textarea>
@@ -100,25 +100,25 @@
             <div class="space-y-2.5 pt-4 border-t border-neutral-100">
                 <span class="text-xs font-bold text-black uppercase block">Live Access URLs for Selected Slug</span>
                 <div class="grid grid-cols-1 gap-2 font-mono text-xs">
-                    <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center">
+                    <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center hover:bg-white transition-colors">
                         <div><span class="text-[10px] text-neutral-400 block uppercase">Reception</span><span id="linkReception" class="break-all">-</span></div>
-                        <button onclick="copyField('linkReception')" class="border border-neutral-300 text-black px-3 py-1 rounded text-[10px] uppercase font-bold">Copy</button>
+                        <button onclick="copyField('linkReception')" class="border border-neutral-300 text-black px-3 py-1 rounded text-[10px] uppercase font-bold hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">Copy</button>
                     </div>
-                    <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center">
+                    <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center hover:bg-white transition-colors">
                         <div><span class="text-[10px] text-neutral-400 block uppercase">Dining Desk</span><span id="linkDining" class="break-all">-</span></div>
-                        <button onclick="copyField('linkDining')" class="border border-neutral-300 text-black px-3 py-1 rounded text-[10px] uppercase font-bold">Copy</button>
+                        <button onclick="copyField('linkDining')" class="border border-neutral-300 text-black px-3 py-1 rounded text-[10px] uppercase font-bold hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">Copy</button>
                     </div>
-                    <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center">
+                    <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center hover:bg-white transition-colors">
                         <div><span class="text-[10px] text-neutral-400 block uppercase">Staff Portal</span><span id="linkStaff" class="break-all">-</span></div>
-                        <button onclick="copyField('linkStaff')" class="border border-neutral-300 text-black px-3 py-1 rounded text-[10px] uppercase font-bold">Copy</button>
+                        <button onclick="copyField('linkStaff')" class="border border-neutral-300 text-black px-3 py-1 rounded text-[10px] uppercase font-bold hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">Copy</button>
                     </div>
-                    <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center">
+                    <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center hover:bg-white transition-colors">
                         <div><span class="text-[10px] text-neutral-400 block uppercase">Admin / Owner</span><span id="linkAdmin" class="break-all">-</span></div>
-                        <button onclick="copyField('linkAdmin')" class="border border-neutral-300 text-black px-3 py-1 rounded text-[10px] uppercase font-bold">Copy</button>
+                        <button onclick="copyField('linkAdmin')" class="border border-neutral-300 text-black px-3 py-1 rounded text-[10px] uppercase font-bold hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">Copy</button>
                     </div>
-                    <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center">
+                    <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center hover:bg-white transition-colors">
                         <div><span class="text-[10px] text-neutral-400 block uppercase">Customer Rating</span><span id="linkCustomer" class="break-all">-</span></div>
-                        <button onclick="copyField('linkCustomer')" class="border border-neutral-300 text-black px-3 py-1 rounded text-[10px] uppercase font-bold">Copy</button>
+                        <button onclick="copyField('linkCustomer')" class="border border-neutral-300 text-black px-3 py-1 rounded text-[10px] uppercase font-bold hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">Copy</button>
                     </div>
                 </div>
             </div>
@@ -135,7 +135,7 @@
                     <p class="text-[10px] text-neutral-400 uppercase tracking-widest">Ofbuzz PMS &bull; An Indian Technology</p>
                 </div>
             </div>
-            <a href="https://wa.me/917827201014" target="_blank" class="border border-neutral-300 text-black px-4 py-2 rounded-xl text-[11px] font-semibold">
+            <a href="https://wa.me/917827201014" target="_blank" class="border border-neutral-300 text-black px-4 py-2 rounded-xl text-[11px] font-semibold hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">
                 Support Desk
             </a>
         </div>
