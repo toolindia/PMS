@@ -3,414 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reception Desk - Ofbuzz PMS</title>
+    <title>Reception - Ofbuzz PMS</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #FAF7F2; color: #111111; }
-        .text-maroon { color: #800020; }
-        .bg-maroon { background-color: #800020; }
-        .bg-maroon:hover { background-color: #650019; }
-        .border-maroon { border-color: #800020; }
-        .hidden-view { display: none !important; }
-    </style>
+    <style>body { background-color: #F3F4F6; color: #111; } .hidden-view{display:none !important;}</style>
 </head>
-<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-[#800020] selection:text-white">
-
-    <div id="toast" class="hidden-view fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-neutral-900 text-white px-5 py-2.5 rounded-xl text-xs font-mono border border-neutral-700 shadow-xl"></div>
-
-    <div id="licenseExpiredOverlay" class="hidden-view fixed inset-0 bg-[#FAF7F2] z-50 flex items-center justify-center p-6 text-center">
-        <div class="border border-maroon p-8 rounded-2xl max-w-md w-full bg-white space-y-4">
-            <h2 class="text-xl font-bold uppercase text-maroon">Subscription Inactive</h2>
-            <p class="text-xs text-neutral-600">The operational license for this property has expired. Contact administration.</p>
-            <a href="https://wa.me/917827201014" target="_blank" class="block bg-maroon text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider hover:opacity-90 active:scale-95 transition-all shadow-md cursor-pointer">Contact Technology Support</a>
+<body class="min-h-screen flex flex-col p-4 font-sans">
+    
+    <!-- LOGIN BOX -->
+    <div id="authBox" class="fixed inset-0 bg-gray-900 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-xl shadow-2xl text-center max-w-sm w-full">
+            <h2 class="text-2xl font-black mb-2 text-indigo-600">Ofbuzz PMS</h2>
+            <p class="text-xs text-gray-500 mb-6">Enter Shop ID</p>
+            <input type="password" id="pinInput" class="w-full text-center text-3xl tracking-widest p-3 border rounded-lg mb-4" placeholder="••••">
+            <button onclick="login()" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700">Login</button>
         </div>
     </div>
 
-    <!-- RECEPTION LOGIN (SHOP ID) -->
-    <div id="authBox" class="flex-1 flex items-center justify-center p-4">
-        <div class="bg-white border border-neutral-200 rounded-2xl p-6 sm:p-8 max-w-sm w-full space-y-4 text-center shadow-xs">
-            <h2 class="text-lg font-black uppercase text-maroon tracking-tight">Ofbuzz Technology</h2>
-            <p class="text-xs text-neutral-400 uppercase tracking-widest">Software Dashboard Login</p>
-            <input type="password" id="pinInput" maxlength="4" placeholder="••••" class="w-full text-center text-2xl font-mono tracking-widest py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:border-maroon transition-colors">
-            <button onclick="loginReception()" id="btnAuth" class="w-full bg-maroon text-white font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider hover:opacity-90 active:scale-95 transition-all shadow-md cursor-pointer">Verify Shop ID</button>
-        </div>
-    </div>
-
-    <!-- MAIN DASHBOARD (HIDDEN UNTIL LOGIN) -->
-    <main id="dashBox" class="hidden-view w-full max-w-6xl mx-auto p-4 sm:p-6 flex-1 space-y-6">
-
-        <header class="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-                <h1 id="propTitle" class="text-xl sm:text-2xl font-black uppercase tracking-tight text-maroon">Reception Operational Desk</h1>
-                <p class="text-xs font-semibold tracking-wider text-neutral-500 uppercase mt-0.5">Live Property Console</p>
-            </div>
-            <button onclick="refreshData()" class="border border-neutral-300 text-black font-semibold text-xs px-4 py-2.5 rounded-xl hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">Sync Status</button>
+    <!-- MAIN DASHBOARD -->
+    <main id="dashBox" class="hidden-view max-w-7xl w-full mx-auto space-y-6">
+        <header class="bg-white p-4 rounded-xl shadow flex justify-between items-center">
+            <h1 class="text-xl font-bold text-gray-800">Front Desk Control</h1>
+            <button onclick="fetchData()" class="bg-gray-100 px-4 py-2 rounded-lg text-sm font-bold">Sync</button>
         </header>
 
-        <!-- LIVE COUNTERS -->
-        <div class="grid grid-cols-3 gap-3 sm:gap-4">
-            <div class="bg-white border border-neutral-200 p-4 rounded-xl text-center">
-                <span class="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">Vacant</span>
-                <span id="cntVacant" class="text-xl sm:text-2xl font-black text-black font-mono">0</span>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- ROOMS GRID -->
+            <div class="lg:col-span-2 bg-white p-5 rounded-xl shadow">
+                <h2 class="text-sm font-bold uppercase mb-4 text-gray-500">Live Inventory Matrix</h2>
+                <div id="roomGrid" class="grid grid-cols-3 sm:grid-cols-4 gap-3"></div>
             </div>
-            <div class="bg-white border border-neutral-200 p-4 rounded-xl text-center">
-                <span class="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">Occupied</span>
-                <span id="cntOccupied" class="text-xl sm:text-2xl font-black text-maroon font-mono">0</span>
-            </div>
-            <div class="bg-white border border-neutral-200 p-4 rounded-xl text-center">
-                <span class="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">Cleaning</span>
-                <span id="cntCleaning" class="text-xl sm:text-2xl font-black text-neutral-600 font-mono">0</span>
+
+            <!-- FOOD APPROVAL QUEUE -->
+            <div class="bg-white p-5 rounded-xl shadow border-l-4 border-orange-500">
+                <h2 class="text-sm font-bold uppercase mb-4 text-orange-600">Food Order Approvals</h2>
+                <div id="approvalQueue" class="space-y-3 text-sm"></div>
             </div>
         </div>
-
-        <!-- ROOM MATRIX GRID -->
-        <section class="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs space-y-4">
-            <div class="flex justify-between items-center border-b border-neutral-100 pb-3">
-                <h2 class="text-xs font-bold uppercase tracking-wider text-black">Live Inventory Matrix</h2>
-                <div class="flex gap-4 text-[10px] font-bold uppercase tracking-wider">
-                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span> Vacant</span>
-                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#800020]"></span> Occupied</span>
-                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Cleaning</span>
-                </div>
-            </div>
-            <div id="roomGrid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3"></div>
-        </section>
-
-        <!-- INLINE CHECK-IN PANEL -->
-        <section id="checkInPanel" class="hidden-view bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs space-y-4">
-            <div class="flex justify-between items-center border-b border-neutral-100 pb-2.5">
-                <h3 id="ciRoomTitle" class="text-sm font-bold uppercase text-maroon">Check-In Registration</h3>
-                <button onclick="closePanel('checkInPanel')" class="text-neutral-400 hover:text-red-600 font-bold text-lg cursor-pointer transition-colors">&times;</button>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                    <label class="text-[10px] font-bold uppercase text-neutral-500 block mb-1">Guest Full Name</label>
-                    <input type="text" id="ciGuestName" class="w-full px-3 py-2 border border-neutral-200 rounded-xl text-xs focus:outline-none focus:border-maroon">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold uppercase text-neutral-500 block mb-1">Contact Phone</label>
-                    <input type="tel" id="ciGuestPhone" class="w-full px-3 py-2 border border-neutral-200 rounded-xl text-xs font-mono focus:outline-none focus:border-maroon">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold uppercase text-neutral-500 block mb-1">Advance Amount Received</label>
-                    <input type="number" id="ciAdvance" value="0" class="w-full px-3 py-2 border border-neutral-200 rounded-xl text-xs font-mono focus:outline-none focus:border-maroon">
-                </div>
-                <div class="sm:col-span-3">
-                    <label class="text-[10px] font-bold uppercase text-neutral-500 block mb-1">Identity Document (Camera / Upload)</label>
-                    <input type="file" id="ciCameraInput" accept="image/*" capture="camera" class="w-full text-xs text-neutral-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:bg-neutral-100 cursor-pointer">
-                    <img id="ciPreview" class="hidden-view mt-2 max-h-24 rounded border border-neutral-200 object-contain">
-                </div>
-            </div>
-            <div class="flex justify-end gap-2 pt-2 border-t border-neutral-100">
-                <button onclick="closePanel('checkInPanel')" class="border border-neutral-200 px-4 py-2 rounded-xl text-xs font-semibold hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">Cancel</button>
-                <button onclick="submitCheckIn()" id="btnCheckIn" class="bg-maroon text-white px-5 py-2 rounded-xl text-xs font-bold uppercase hover:opacity-90 active:scale-95 transition-all cursor-pointer shadow-md">Confirm Check-In</button>
-            </div>
-        </section>
-
-        <!-- INLINE CHECKOUT & SETTLEMENT PANEL -->
-        <section id="checkOutPanel" class="hidden-view bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs space-y-4">
-            <div class="flex justify-between items-center border-b border-neutral-100 pb-2.5">
-                <h3 id="coRoomTitle" class="text-sm font-bold uppercase text-maroon">Billing & Settlement</h3>
-                <button onclick="closePanel('checkOutPanel')" class="text-neutral-400 hover:text-red-600 font-bold text-lg cursor-pointer transition-colors">&times;</button>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="space-y-2 bg-neutral-50 p-3.5 rounded-xl border border-neutral-200 text-xs font-mono">
-                    <div class="flex justify-between"><span>Room Tariff:</span><span id="coRoomRent">₹0</span></div>
-                    <div class="flex justify-between"><span>Dining Orders:</span><span id="coFoodTotal">₹0</span></div>
-                    <div class="flex justify-between text-neutral-400"><span>Advance Received:</span><span id="coAdvanceLess">-₹0</span></div>
-                    <div class="flex justify-between border-t border-neutral-200 pt-2 font-bold text-sm">
-                        <span class="text-black uppercase">Net Balance:</span>
-                        <span id="coNetTotal" class="text-maroon">₹0</span>
-                    </div>
-                </div>
-                <div class="flex flex-col items-center justify-center p-3 border border-neutral-200 rounded-xl bg-white space-y-1">
-                    <img id="coQrImage" src="" alt="Payment QR" class="w-28 h-28 object-contain">
-                    <span class="text-[9px] uppercase font-mono text-neutral-400">Scan to Pay via UPI</span>
-                </div>
-            </div>
-            <div class="flex justify-end gap-2 pt-2 border-t border-neutral-100">
-                <button onclick="closePanel('checkOutPanel')" class="border border-neutral-200 px-4 py-2 rounded-xl text-xs font-semibold hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">Return</button>
-                <button onclick="confirmCheckOut()" id="btnCheckOut" class="bg-maroon text-white px-5 py-2 rounded-xl text-xs font-bold uppercase hover:opacity-90 active:scale-95 transition-all cursor-pointer shadow-md">Confirm Clearance & Exit</button>
-            </div>
-        </section>
-
     </main>
 
-    <footer class="bg-white border-t border-neutral-200 py-6 mt-12 text-xs">
-        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <img src="https://i.pinimg.com/736x/bd/d0/5c/bdd05c94afb66b5a72f5e17a7a879ab3.jpg" alt="Ofbuzz Logo" class="w-7 h-7 rounded-full object-cover border border-neutral-300">
-                <div>
-                    <p class="font-bold uppercase tracking-wider text-black">Ofbuzz Technology</p>
-                    <p class="text-[10px] text-neutral-400 uppercase tracking-widest">Ofbuzz PMS &bull; An Indian Technology</p>
-                </div>
+    <!-- CHECK-IN MODAL -->
+    <div id="ciModal" class="hidden-view fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-40">
+        <div class="bg-white p-6 rounded-xl w-full max-w-md space-y-4">
+            <h3 class="font-bold text-lg border-b pb-2">Check-In: Room <span id="ciRoomText"></span></h3>
+            <input type="text" id="ciName" placeholder="Guest Name (Leave blank to trigger alert)" class="w-full border p-2 rounded">
+            <input type="text" id="ciPhone" placeholder="Phone Number" class="w-full border p-2 rounded">
+            <input type="number" id="ciAdvance" placeholder="Advance Payment (₹)" class="w-full border p-2 rounded">
+            
+            <div class="bg-gray-50 p-3 rounded text-sm">
+                <p class="font-bold mb-2">Provided Essentials:</p>
+                <label class="flex items-center gap-2"><input type="checkbox" id="chkSoap" class="essentials"> Soap & Shampoo</label>
+                <label class="flex items-center gap-2"><input type="checkbox" id="chkTowel" class="essentials"> Fresh Towels</label>
+                <label class="flex items-center gap-2"><input type="checkbox" id="chkWater" class="essentials"> Water Bottles</label>
             </div>
-            <a href="https://wa.me/917827201014" target="_blank" class="border border-neutral-300 text-black px-4 py-2 rounded-xl text-[11px] font-semibold hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">
-                Support Desk
-            </a>
+            
+            <div class="flex gap-2">
+                <button onclick="document.getElementById('ciModal').classList.add('hidden-view')" class="flex-1 border py-2 rounded font-bold">Cancel</button>
+                <button onclick="doCheckIn()" class="flex-1 bg-green-600 text-white py-2 rounded font-bold">Check-In</button>
+            </div>
         </div>
-    </footer>
+    </div>
+
+    <!-- CHECK-OUT MODAL (HTML Calculations) -->
+    <div id="coModal" class="hidden-view fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-40">
+        <div class="bg-white p-6 rounded-xl w-full max-w-sm space-y-4 font-mono text-sm">
+            <h3 class="font-sans font-bold text-lg border-b pb-2 text-red-600">Checkout: Room <span id="coRoomText"></span></h3>
+            <div class="flex justify-between"><span>Room Tariff:</span> <span id="coTariff">₹0</span></div>
+            <div class="flex justify-between"><span>Food Orders:</span> <span id="coFood">₹0</span></div>
+            <div class="flex justify-between text-red-500"><span>Advance Paid:</span> <span id="coAdvance">-₹0</span></div>
+            <hr>
+            <div class="flex justify-between font-bold text-lg"><span>Final Payable:</span> <span id="coFinal">₹0</span></div>
+            <select id="coMode" class="w-full border p-2 rounded mt-2 font-sans">
+                <option value="Cash">Cash</option><option value="UPI">UPI</option><option value="Card">Card</option>
+            </select>
+            <div class="flex gap-2 mt-4 font-sans">
+                <button onclick="document.getElementById('coModal').classList.add('hidden-view')" class="flex-1 border py-2 rounded font-bold">Close</button>
+                <button onclick="doCheckOut()" class="flex-1 bg-red-600 text-white py-2 rounded font-bold">Settle & Checkout</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const currentSlug = urlParams.get('hotel') || "royalstay";
-        let currentClient = null;
-        let appData = { rooms: [], activeBookings: [], foodOrders: [] };
-        let activeRoomTarget = null, activeBookingTarget = null, base64Compressed = "";
-        let savedPin = "";
+        const slug = urlParams.get('hotel');
+        let client = null;
+        let activeRoom = null;
+        let activeBooking = null;
+        let appData = { rooms: [], activeBookings: [], foodOrders: [], pendingOrders: [] };
 
-        function notify(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = msg;
-            t.classList.remove('hidden-view');
-            setTimeout(() => t.classList.add('hidden-view'), 3000);
+        async function init() {
+            const res = await fetch(`masterdata.json?_ts=${Date.now()}`);
+            const data = await res.json();
+            client = data[slug];
         }
 
-        async function initTenant() {
-            try {
-                const cached = localStorage.getItem(`ofbuzz_tenant_${currentSlug}`);
-                if (cached) currentClient = JSON.parse(cached);
-
-                const res = await fetch(`masterdata.json?_ts=${Date.now()}`);
-                if (!res.ok) throw new Error();
-                const registry = await res.json();
-                currentClient = registry[currentSlug];
-
-                if (!currentClient) {
-                    document.body.innerHTML = "<div class='p-12 text-center text-xs font-mono uppercase text-[#800020]'>Tenant configuration profile not identified.</div>";
-                    return false;
-                }
-
-                localStorage.setItem(`ofbuzz_tenant_${currentSlug}`, JSON.stringify(currentClient));
-
-                if (Date.now() > new Date(currentClient.expiryDate + "T23:59:59").getTime()) {
-                    document.getElementById('licenseExpiredOverlay').classList.remove('hidden-view');
-                    return false;
-                }
-                return true;
-            } catch (e) {
-                if (currentClient) return true;
-                document.body.innerHTML = "<div class='p-12 text-center text-xs font-mono uppercase text-[#800020]'>Communication failure loading property parameters.</div>";
-                return false;
-            }
-        }
-
-        function loginReception() {
-            savedPin = document.getElementById('pinInput').value.trim();
-            if (!savedPin) return notify("Enter Shop ID.");
-            
-            const btn = document.getElementById('btnAuth');
-            btn.innerText = "Verifying...";
-            
-            fetch(`${currentClient.scriptUrl}?action=getReceptionData&pin=${encodeURIComponent(savedPin)}&_ts=${Date.now()}`)
-                .then(r => r.json())
-                .then(res => {
-                    btn.innerText = "Unlock Dashboard";
-                    if (res.success) {
+        function login() {
+            const pin = document.getElementById('pinInput').value;
+            fetch(`${client.scriptUrl}?action=getReceptionData&pin=${pin}`)
+                .then(r=>r.json()).then(res => {
+                    if(res.success) {
+                        appData = res;
                         document.getElementById('authBox').classList.add('hidden-view');
                         document.getElementById('dashBox').classList.remove('hidden-view');
-                        document.getElementById('propTitle').innerText = `${res.propertyName || currentClient.name} - Front Desk`;
-                        appData = res;
                         renderRooms();
-                    } else {
-                        notify(res.error || "Invalid Shop ID.");
-                    }
-                })
-                .catch(() => {
-                    btn.innerText = "Unlock Dashboard";
-                    notify("Network connection timeout.");
+                        renderApprovals();
+                    } else alert(res.error);
                 });
         }
 
-        function refreshData() {
-            if(!savedPin) return;
-            fetch(`${currentClient.scriptUrl}?action=getReceptionData&pin=${encodeURIComponent(savedPin)}&_ts=${Date.now()}`)
-                .then(r => r.json())
-                .then(res => {
-                    if (res.success) {
-                        appData = res;
-                        renderRooms();
-                        notify("Data refreshed.");
-                    }
-                });
-        }
+        function fetchData() { login(); }
 
         function renderRooms() {
             const grid = document.getElementById('roomGrid');
             grid.innerHTML = "";
-            let v = 0, o = 0, c = 0;
-
             appData.rooms.forEach(r => {
-                const rNo = r.RoomNo.toString();
-                let cls = "", act = "";
-
-                if (r.Status === "Vacant") {
-                    v++;
-                    cls = "border-emerald-200 bg-emerald-50/40 text-emerald-950 hover:bg-emerald-100";
-                    act = `onclick="openCheckIn('${rNo}')"`;
-                } else if (r.Status === "Occupied") {
-                    o++;
-                    cls = "border-neutral-300 bg-white text-black hover:bg-neutral-50";
-                    act = `onclick="openCheckOut('${rNo}')"`;
-                } else {
-                    c++;
-                    cls = "border-amber-200 bg-amber-50/50 text-amber-950 hover:bg-amber-100";
-                    act = `onclick="markClean('${rNo}')"`;
-                }
-
-                grid.innerHTML += `
-                    <div ${act} class="border p-4 rounded-xl cursor-pointer flex flex-col justify-between h-24 transition-colors active:scale-95 shadow-sm ${cls}">
-                        <div class="flex justify-between items-start">
-                            <span class="text-base font-black font-mono">${rNo}</span>
-                            <span class="text-[9px] uppercase font-bold opacity-75">${r.Status}</span>
-                        </div>
-                        <div class="text-[10px] text-neutral-400 font-mono">₹${r.Price || 0}</div>
-                    </div>
-                `;
+                let color = r.Status === "Vacant" ? "bg-green-100 border-green-300 text-green-800" : 
+                            r.Status === "Occupied" ? "bg-red-100 border-red-300 text-red-800" : "bg-yellow-100 border-yellow-300 text-yellow-800";
+                
+                let onclick = r.Status === "Vacant" ? `openCheckIn('${r.RoomNo}')` : 
+                              r.Status === "Occupied" ? `openCheckOut('${r.RoomNo}', ${r.Price})` : `alert('Room is cleaning')`;
+                
+                grid.innerHTML += `<div onclick="${onclick}" class="p-4 border rounded-lg cursor-pointer ${color} hover:shadow-md transition">
+                    <div class="font-bold text-lg">${r.RoomNo}</div>
+                    <div class="text-[10px] uppercase font-bold">${r.Status}</div>
+                </div>`;
             });
-
-            document.getElementById('cntVacant').innerText = v;
-            document.getElementById('cntOccupied').innerText = o;
-            document.getElementById('cntCleaning').innerText = c;
         }
-
-        document.getElementById('ciCameraInput').addEventListener('change', function(e) {
-            const f = e.target.files[0];
-            if (!f) return;
-            const r = new FileReader();
-            r.onload = function(evt) {
-                const img = new Image();
-                img.onload = function() {
-                    const c = document.createElement('canvas');
-                    let w = img.width, h = img.height;
-                    if (w > 800) { h = Math.round((h * 800) / w); w = 800; }
-                    c.width = w; c.height = h;
-                    c.getContext('2d').drawImage(img, 0, 0, w, h);
-                    base64Compressed = c.toDataURL('image/jpeg', 0.65);
-                    const p = document.getElementById('ciPreview');
-                    p.src = base64Compressed;
-                    p.classList.remove('hidden-view');
-                };
-                img.src = evt.target.result;
-            };
-            r.readAsDataURL(f);
-        });
 
         function openCheckIn(rNo) {
-            activeRoomTarget = rNo;
-            document.getElementById('ciRoomTitle').innerText = `Register Guest: Room ${rNo}`;
-            document.getElementById('ciGuestName').value = "";
-            document.getElementById('ciGuestPhone').value = "";
-            document.getElementById('ciAdvance').value = "0";
-            document.getElementById('ciPreview').classList.add('hidden-view');
-            base64Compressed = "";
-            document.getElementById('checkOutPanel').classList.add('hidden-view');
-            document.getElementById('checkInPanel').classList.remove('hidden-view');
+            activeRoom = rNo;
+            document.getElementById('ciRoomText').innerText = rNo;
+            document.querySelectorAll('.essentials').forEach(cb => cb.checked = false);
+            document.getElementById('ciModal').classList.remove('hidden-view');
         }
 
-        function submitCheckIn() {
-            const name = document.getElementById('ciGuestName').value.trim();
-            const phone = document.getElementById('ciGuestPhone').value.trim();
-            const adv = document.getElementById('ciAdvance').value.trim();
+        function doCheckIn() {
+            const name = document.getElementById('ciName').value;
+            const phone = document.getElementById('ciPhone').value;
+            let ess = [];
+            if(document.getElementById('chkSoap').checked) ess.push("Soap");
+            if(document.getElementById('chkTowel').checked) ess.push("Towel");
+            if(document.getElementById('chkWater').checked) ess.push("Water");
+            
+            // RED ALERT TRIGGER: If missing name/phone, idMissing flag is true
+            const isMissing = (!name || !phone);
 
-            if (!name || !phone) return notify("Guest details required.");
-
-            const btn = document.getElementById('btnCheckIn');
-            btn.disabled = true;
-            btn.innerText = "Processing...";
-
-            fetch(currentClient.scriptUrl, {
+            fetch(client.scriptUrl, {
                 method: "POST",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify({ action: "checkIn", roomNo: activeRoomTarget, guestName: name, phone: phone, advance: adv, idPhotoBase64: base64Compressed })
-            })
-            .then(r => r.json())
-            .then(res => {
-                btn.disabled = false;
-                btn.innerText = "Confirm Check-In";
-                if (res.success) {
-                    closePanel('checkInPanel');
-                    refreshData();
-                    notify("Check-in complete.");
-                }
-            })
-            .catch(() => {
-                btn.disabled = false;
-                btn.innerText = "Confirm Check-In";
-                notify("Transmission failure.");
+                body: JSON.stringify({ action: "checkIn", roomNo: activeRoom, guestName: name || "Unknown", phone: phone || "N/A", advance: document.getElementById('ciAdvance').value || 0, essentials: ess.join(","), idMissing: isMissing })
+            }).then(()=> { document.getElementById('ciModal').classList.add('hidden-view'); fetchData(); });
+        }
+
+        function openCheckOut(rNo, price) {
+            activeBooking = appData.activeBookings.find(b => b.RoomNo == rNo);
+            if(!activeBooking) return;
+            
+            document.getElementById('coRoomText').innerText = rNo;
+            
+            // HTML Calculations
+            const tariff = Number(price);
+            const food = appData.foodOrders.filter(o => o.RoomNo == rNo && o.Status == "Approved").reduce((a,b)=>a+Number(b.Amount),0);
+            const adv = Number(activeBooking.Advance || 0);
+            const final = (tariff + food) - adv;
+
+            document.getElementById('coTariff').innerText = `₹${tariff}`;
+            document.getElementById('coFood').innerText = `₹${food}`;
+            document.getElementById('coAdvance').innerText = `-₹${adv}`;
+            document.getElementById('coFinal').innerText = `₹${final}`;
+            
+            activeBooking.calcData = { tariff, food, adv, final };
+            document.getElementById('coModal').classList.remove('hidden-view');
+        }
+
+        function doCheckOut() {
+            fetch(client.scriptUrl, {
+                method: "POST",
+                body: JSON.stringify({ 
+                    action: "checkOut", bookingId: activeBooking.BookingId, roomNo: activeBooking.RoomNo,
+                    roomTotal: activeBooking.calcData.tariff, foodTotal: activeBooking.calcData.food, 
+                    advance: activeBooking.calcData.adv, finalPaid: activeBooking.calcData.final,
+                    paymentMode: document.getElementById('coMode').value
+                })
+            }).then(()=> { document.getElementById('coModal').classList.add('hidden-view'); fetchData(); });
+        }
+
+        function renderApprovals() {
+            const list = document.getElementById('approvalQueue');
+            list.innerHTML = appData.pendingOrders.length ? "" : "<p class='text-gray-400'>No pending orders.</p>";
+            appData.pendingOrders.forEach(o => {
+                list.innerHTML += `<div class="p-3 border rounded bg-gray-50 flex justify-between items-center">
+                    <div><b>Room ${o.RoomNo}</b><br><span class="text-xs text-gray-600">${o.Items} (₹${o.Amount})</span></div>
+                    <button onclick="approveOrder('${o.OrderId}')" class="bg-orange-500 text-white px-3 py-1 rounded text-xs font-bold">Approve</button>
+                </div>`;
             });
         }
 
-        function openCheckOut(rNo) {
-            const b = appData.activeBookings.find(x => x.RoomNo.toString() === rNo.toString());
-            if (!b) return;
-            activeBookingTarget = b;
-
-            const room = appData.rooms.find(x => x.RoomNo.toString() === rNo.toString());
-            const roomRent = Number(room?.Price) || 0;
-            const foodOrders = appData.foodOrders.filter(f => f.BookingId === b.BookingId);
-            const foodTotal = foodOrders.reduce((sum, f) => sum + (Number(f.Amount) || 0), 0);
-            const advance = Number(b.Advance) || 0;
-            const net = (roomRent + foodTotal) - advance;
-
-            document.getElementById('coRoomTitle').innerText = `Settlement: Room ${rNo} (${b.GuestName})`;
-            document.getElementById('coRoomRent').innerText = `₹${roomRent}`;
-            document.getElementById('coFoodTotal').innerText = `₹${foodTotal}`;
-            document.getElementById('coAdvanceLess').innerText = `-₹${advance}`;
-            document.getElementById('coNetTotal').innerText = `₹${net}`;
-
-            const upiNote = encodeURIComponent(`Bill Room ${rNo}`);
-            const upiStr = `upi://pay?pa=${currentClient.upiVpa}&pn=${encodeURIComponent(currentClient.name)}&am=${net}&cu=INR&tn=${upiNote}`;
-            document.getElementById('coQrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(upiStr)}`;
-
-            document.getElementById('checkInPanel').classList.add('hidden-view');
-            document.getElementById('checkOutPanel').classList.remove('hidden-view');
+        function approveOrder(id) {
+            fetch(client.scriptUrl, { method:"POST", body: JSON.stringify({ action: "approveOrder", orderId: id }) })
+            .then(()=> fetchData());
         }
 
-        function confirmCheckOut() {
-            const btn = document.getElementById('btnCheckOut');
-            btn.disabled = true;
-            btn.innerText = "Clearing...";
-
-            fetch(currentClient.scriptUrl, {
-                method: "POST",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify({ action: "checkOut", bookingId: activeBookingTarget.BookingId, roomNo: activeBookingTarget.RoomNo, paymentMode: "UPI" })
-            })
-            .then(r => r.json())
-            .then(res => {
-                btn.disabled = false;
-                btn.innerText = "Confirm Clearance & Exit";
-                if (res.success) {
-                    closePanel('checkOutPanel');
-                    refreshData();
-                    notify("Check-out finalized. Room marked for cleaning.");
-                }
-            })
-            .catch(() => {
-                btn.disabled = false;
-                btn.innerText = "Confirm Clearance & Exit";
-                notify("Transmission failure.");
-            });
-        }
-
-        function markClean(rNo) {
-            fetch(currentClient.scriptUrl, {
-                method: "POST",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify({ action: "markRoomCleaned", roomNo: rNo })
-            })
-            .then(r => r.json())
-            .then(res => { if (res.success) { refreshData(); notify(`Room ${rNo} is now vacant.`); } });
-        }
-
-        function closePanel(id) {
-            document.getElementById(id).classList.add('hidden-view');
-        }
-
-        window.addEventListener('DOMContentLoaded', async () => {
-            await initTenant();
-        });
+        init();
     </script>
 </body>
 </html>
