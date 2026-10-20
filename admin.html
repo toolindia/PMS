@@ -11,8 +11,10 @@
         .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
         @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
         .alert-pulse { animation: pulse-red 2s infinite; border-left: 5px solid #ef4444; }
-        /* Mock Chart Bars */
         .bar { width: 12%; background: #6366f1; border-radius: 4px 4px 0 0; transition: height 0.5s; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4f46e5; border-radius: 4px; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
@@ -29,7 +31,7 @@
 
     <!-- LOGIN -->
     <div id="authBox" class="fixed inset-0 bg-slate-900 flex items-center justify-center z-50">
-        <div class="glass-panel p-8 rounded-2xl w-96 text-center">
+        <div class="glass-panel p-8 rounded-2xl w-96 text-center m-4">
             <h2 class="text-2xl font-black text-white mb-1">BI Console</h2>
             <p class="text-xs text-indigo-400 mb-6 uppercase tracking-widest">Authorized Personnel Only</p>
             <input type="password" id="pinInput" placeholder="••••" class="w-full text-center text-3xl font-mono p-3 bg-slate-800 border-none text-white rounded-xl mb-4 focus:ring-2 focus:ring-indigo-500 outline-none">
@@ -50,112 +52,122 @@
     </aside>
 
     <!-- MAIN CONTENT -->
-    <main id="mainContent" class="hidden-view flex-1 overflow-y-auto p-8 relative">
-        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 pointer-events-none"></div>
+    <div id="mainWrapper" class="hidden-view flex-1 flex flex-col relative bg-slate-900">
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 pointer-events-none z-0"></div>
         
-        <header class="flex justify-between items-center mb-8 relative z-10">
-            <div>
-                <h1 class="text-3xl font-black text-white">Performance Dashboard</h1>
-                <p class="text-slate-400 text-sm">Real-time metrics and operational insights.</p>
-            </div>
-            <button onclick="fetchData()" class="bg-indigo-600 hover:bg-indigo-500 px-5 py-2.5 rounded-lg text-sm font-bold text-white shadow-lg transition">Sync Data</button>
-        </header>
+        <main class="flex-1 overflow-y-auto p-8 relative z-10">
+            <header class="flex justify-between items-center mb-8">
+                <div>
+                    <!-- HOTEL NAME DYNAMICALLY ADDED HERE -->
+                    <h1 id="propTitle" class="text-3xl font-black text-white uppercase tracking-tight">Performance Dashboard</h1>
+                    <p class="text-slate-400 text-sm">Real-time metrics and operational insights.</p>
+                </div>
+                <button onclick="fetchData()" class="bg-indigo-600 hover:bg-indigo-500 px-5 py-2.5 rounded-lg text-sm font-bold text-white shadow-lg transition">Sync Data</button>
+            </header>
 
-        <!-- DASHBOARD TAB -->
-        <div id="tab-dashboard" class="space-y-6 relative z-10">
-            
-            <!-- TOP METRICS -->
-            <div class="grid grid-cols-4 gap-6">
-                <div class="glass-panel p-6 rounded-2xl relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-16 h-16 bg-green-500 opacity-20 blur-2xl"></div>
-                    <p class="text-xs uppercase font-bold text-slate-400 tracking-wider">Gross Revenue</p>
-                    <p id="mRev" class="text-4xl font-black text-white mt-2">₹0</p>
-                    <p class="text-xs text-green-400 font-bold mt-3 flex items-center gap-1"><span class="text-lg leading-none">↑</span> All-time settled</p>
-                </div>
-                <div class="glass-panel p-6 rounded-2xl relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-16 h-16 bg-indigo-500 opacity-20 blur-2xl"></div>
-                    <p class="text-xs uppercase font-bold text-slate-400 tracking-wider">Room Revenue</p>
-                    <p id="mRoom" class="text-4xl font-black text-indigo-400 mt-2">₹0</p>
-                </div>
-                <div class="glass-panel p-6 rounded-2xl relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-16 h-16 bg-orange-500 opacity-20 blur-2xl"></div>
-                    <p class="text-xs uppercase font-bold text-slate-400 tracking-wider">F&B Revenue</p>
-                    <p id="mFood" class="text-4xl font-black text-orange-400 mt-2">₹0</p>
-                </div>
-                <div class="glass-panel p-6 rounded-2xl relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-16 h-16 bg-blue-500 opacity-20 blur-2xl"></div>
-                    <p class="text-xs uppercase font-bold text-slate-400 tracking-wider">Total Checkouts</p>
-                    <p id="mInvoices" class="text-4xl font-black text-blue-400 mt-2">0</p>
-                </div>
-            </div>
-
-            <!-- MIDDLE SECTION: CHARTS & ALERTS -->
-            <div class="grid grid-cols-3 gap-6">
-                <!-- Visual Trend Mockup -->
-                <div class="col-span-2 glass-panel p-6 rounded-2xl">
-                    <h3 class="text-sm font-bold text-slate-300 uppercase tracking-widest mb-6">Revenue Trend Visualization</h3>
-                    <div class="h-48 flex items-end justify-between gap-2 border-b border-slate-700 pb-2">
-                        <div class="bar" style="height: 30%;"></div>
-                        <div class="bar" style="height: 50%;"></div>
-                        <div class="bar" style="height: 40%;"></div>
-                        <div class="bar" style="height: 70%;"></div>
-                        <div class="bar" style="height: 60%; background:#818cf8;"></div>
-                        <div class="bar" style="height: 90%; background:#4f46e5;"></div>
-                        <div class="bar" style="height: 80%; background:#4338ca;"></div>
+            <!-- DASHBOARD TAB -->
+            <div id="tab-dashboard" class="space-y-6">
+                <!-- TOP METRICS -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div class="glass-panel p-6 rounded-2xl relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-16 h-16 bg-green-500 opacity-20 blur-2xl"></div>
+                        <p class="text-xs uppercase font-bold text-slate-400 tracking-wider">Gross Revenue</p>
+                        <p id="mRev" class="text-4xl font-black text-white mt-2">₹0</p>
+                        <p class="text-xs text-green-400 font-bold mt-3 flex items-center gap-1"><span class="text-lg leading-none">↑</span> All-time settled</p>
                     </div>
-                    <div class="flex justify-between text-[10px] text-slate-500 mt-2 uppercase font-mono">
-                        <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                    <div class="glass-panel p-6 rounded-2xl relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-16 h-16 bg-indigo-500 opacity-20 blur-2xl"></div>
+                        <p class="text-xs uppercase font-bold text-slate-400 tracking-wider">Room Revenue</p>
+                        <p id="mRoom" class="text-4xl font-black text-indigo-400 mt-2">₹0</p>
+                    </div>
+                    <div class="glass-panel p-6 rounded-2xl relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-16 h-16 bg-orange-500 opacity-20 blur-2xl"></div>
+                        <p class="text-xs uppercase font-bold text-slate-400 tracking-wider">F&B Revenue</p>
+                        <p id="mFood" class="text-4xl font-black text-orange-400 mt-2">₹0</p>
+                    </div>
+                    <div class="glass-panel p-6 rounded-2xl relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-16 h-16 bg-blue-500 opacity-20 blur-2xl"></div>
+                        <p class="text-xs uppercase font-bold text-slate-400 tracking-wider">Total Checkouts</p>
+                        <p id="mInvoices" class="text-4xl font-black text-blue-400 mt-2">0</p>
                     </div>
                 </div>
 
-                <!-- Active Alerts -->
-                <div class="glass-panel p-6 rounded-2xl border-t-4 border-red-500">
-                    <h3 class="text-sm font-bold text-red-400 uppercase tracking-widest mb-4">Live Threat Monitor</h3>
-                    <div id="alertsContainer" class="space-y-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar"></div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Visual Trend Mockup -->
+                    <div class="lg:col-span-2 glass-panel p-6 rounded-2xl">
+                        <h3 class="text-sm font-bold text-slate-300 uppercase tracking-widest mb-6">Revenue Trend Visualization</h3>
+                        <div class="h-48 flex items-end justify-between gap-2 border-b border-slate-700 pb-2">
+                            <div class="bar" style="height: 30%;"></div>
+                            <div class="bar" style="height: 50%;"></div>
+                            <div class="bar" style="height: 40%;"></div>
+                            <div class="bar" style="height: 70%;"></div>
+                            <div class="bar" style="height: 60%; background:#818cf8;"></div>
+                            <div class="bar" style="height: 90%; background:#4f46e5;"></div>
+                            <div class="bar" style="height: 80%; background:#4338ca;"></div>
+                        </div>
+                        <div class="flex justify-between text-[10px] text-slate-500 mt-2 uppercase font-mono">
+                            <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+                        </div>
+                    </div>
+
+                    <!-- Active Alerts -->
+                    <div class="glass-panel p-6 rounded-2xl border-t-4 border-red-500">
+                        <h3 class="text-sm font-bold text-red-400 uppercase tracking-widest mb-4">Live Threat Monitor</h3>
+                        <div id="alertsContainer" class="space-y-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar"></div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- STAFF TAB -->
-        <div id="tab-staff" class="hidden-view space-y-6 relative z-10">
-            <div class="glass-panel p-6 rounded-2xl">
-                <h3 class="text-lg font-bold text-white mb-4">Onboard Resource</h3>
-                <div class="flex gap-4">
-                    <input type="text" id="stfName" placeholder="Full Name" class="flex-1 bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm text-white outline-none focus:border-indigo-500">
-                    <input type="text" id="stfRole" placeholder="Department" class="flex-1 bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm text-white outline-none focus:border-indigo-500">
-                    <input type="text" id="stfPhone" placeholder="Contact" class="flex-1 bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm text-white outline-none focus:border-indigo-500">
-                    <button onclick="addStaff()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg transition">Deploy</button>
+            <!-- STAFF TAB -->
+            <div id="tab-staff" class="hidden-view space-y-6">
+                <div class="glass-panel p-6 rounded-2xl">
+                    <h3 class="text-lg font-bold text-white mb-4">Onboard Resource</h3>
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <input type="text" id="stfName" placeholder="Full Name" class="flex-1 bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm text-white outline-none focus:border-indigo-500">
+                        <input type="text" id="stfRole" placeholder="Department" class="flex-1 bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm text-white outline-none focus:border-indigo-500">
+                        <input type="text" id="stfPhone" placeholder="Contact" class="flex-1 bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm text-white outline-none focus:border-indigo-500">
+                        <button onclick="addStaff()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg transition">Deploy</button>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6 rounded-2xl overflow-x-auto">
+                    <h3 class="text-lg font-bold text-white mb-4 border-b border-slate-800 pb-2">Active Workforce Directory</h3>
+                    <table class="w-full text-left text-sm min-w-max">
+                        <thead><tr class="text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-800"><th class="py-3">ID</th><th>Resource Name</th><th>Dept</th><th>Contact</th><th class="text-right">Action</th></tr></thead>
+                        <tbody id="staffListTable" class="divide-y divide-slate-800 text-slate-300"></tbody>
+                    </table>
                 </div>
             </div>
 
-            <div class="glass-panel p-6 rounded-2xl">
-                <h3 class="text-lg font-bold text-white mb-4 border-b border-slate-800 pb-2">Active Workforce Directory</h3>
-                <table class="w-full text-left text-sm">
-                    <thead><tr class="text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-800"><th class="py-3">ID</th><th>Resource Name</th><th>Dept</th><th>Contact</th><th class="text-right">Action</th></tr></thead>
-                    <tbody id="staffListTable" class="divide-y divide-slate-800 text-slate-300"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- REPORTS TAB -->
-        <div id="tab-reports" class="hidden-view space-y-6 relative z-10">
-            <div class="glass-panel p-12 rounded-2xl text-center max-w-2xl mx-auto mt-10">
-                <div class="w-20 h-20 bg-indigo-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <svg class="w-10 h-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <!-- REPORTS TAB -->
+            <div id="tab-reports" class="hidden-view space-y-6">
+                <div class="glass-panel p-12 rounded-2xl text-center max-w-2xl mx-auto mt-10">
+                    <div class="w-20 h-20 bg-indigo-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-10 h-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <h2 class="text-3xl font-black text-white mb-2">Data Export Engine</h2>
+                    <p class="text-slate-400 text-sm mb-8">Generate a raw CSV payload of all historical settlements, revenue splits, and transactions for deep accounting analysis.</p>
+                    <button onclick="downloadCSV()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 px-10 rounded-xl shadow-lg transition transform hover:scale-105">Export Raw Dataset (CSV)</button>
                 </div>
-                <h2 class="text-3xl font-black text-white mb-2">Data Export Engine</h2>
-                <p class="text-slate-400 text-sm mb-8">Generate a raw CSV payload of all historical settlements, revenue splits, and transactions for deep accounting analysis.</p>
-                <button onclick="downloadCSV()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 px-10 rounded-xl shadow-lg transition transform hover:scale-105">Export Raw Dataset (CSV)</button>
             </div>
-        </div>
+        </main>
 
-    </main>
-
-    <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4f46e5; border-radius: 4px; }
-    </style>
+        <!-- ORIGINAL OFBUZZ FOOTER (Dark Theme adapted layout but exact content) -->
+        <footer class="bg-slate-900 border-t border-slate-800 py-6 text-xs w-full relative z-10">
+            <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="flex items-center gap-3">
+                    <img src="https://i.pinimg.com/736x/bd/d0/5c/bdd05c94afb66b5a72f5e17a7a879ab3.jpg" alt="Ofbuzz Logo" class="w-7 h-7 rounded-full object-cover border border-slate-700">
+                    <div>
+                        <p class="font-bold uppercase tracking-wider text-white">Ofbuzz Technology</p>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-widest">Ofbuzz PMS &bull; An Indian Technology</p>
+                    </div>
+                </div>
+                <a href="https://wa.me/917827201014" target="_blank" class="border border-slate-700 text-white px-4 py-2 rounded-xl text-[11px] font-semibold hover:bg-slate-800 active:scale-95 transition-all cursor-pointer">
+                    Support Desk
+                </a>
+            </div>
+        </footer>
+    </div>
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
@@ -179,9 +191,13 @@
                 .then(r=>r.json()).then(res => {
                     if(res.success) {
                         adminData = res;
+                        
+                        // HOTEL NAME ADDED TO HEADER HERE
+                        document.getElementById('propTitle').innerText = `${res.propertyName} - BI Dashboard`;
+
                         document.getElementById('authBox').classList.add('hidden-view');
                         document.getElementById('sidebar').classList.remove('hidden-view');
-                        document.getElementById('mainContent').classList.remove('hidden-view');
+                        document.getElementById('mainWrapper').classList.remove('hidden-view');
                         renderUI();
                     } else alert(res.error);
                 });
