@@ -27,13 +27,11 @@
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- ROOMS GRID -->
             <div class="lg:col-span-2 bg-white p-5 rounded-xl shadow">
                 <h2 class="text-sm font-bold uppercase mb-4 text-gray-500">Live Inventory Matrix</h2>
                 <div id="roomGrid" class="grid grid-cols-3 sm:grid-cols-4 gap-3"></div>
             </div>
 
-            <!-- FOOD APPROVAL QUEUE -->
             <div class="bg-white p-5 rounded-xl shadow border-l-4 border-orange-500">
                 <h2 class="text-sm font-bold uppercase mb-4 text-orange-600">Food Order Approvals</h2>
                 <div id="approvalQueue" class="space-y-3 text-sm"></div>
@@ -41,8 +39,28 @@
         </div>
     </main>
 
+    <!-- ROOM ACTION MODAL (Vacant Room Options) -->
+    <div id="actionModal" class="hidden-view fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-40">
+        <div class="bg-white p-6 rounded-xl w-full max-w-sm space-y-4 text-center">
+            <h3 class="font-bold text-lg border-b pb-2">Room <span id="actRoomText"></span></h3>
+            <button onclick="openCheckIn()" class="w-full bg-green-600 text-white py-3 rounded font-bold">Proceed to Check-In</button>
+            <button onclick="changeStatus('Maintenance')" class="w-full bg-gray-200 text-gray-800 py-3 rounded font-bold border">Mark Unavailable / Maintenance</button>
+            <button onclick="closeModals()" class="w-full py-2 text-sm text-gray-500 font-bold">Cancel</button>
+        </div>
+    </div>
+
+    <!-- RESTORE MODAL (Cleaning/Maintenance to Vacant) -->
+    <div id="restoreModal" class="hidden-view fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-40">
+        <div class="bg-white p-6 rounded-xl w-full max-w-sm space-y-4 text-center">
+            <h3 class="font-bold text-lg border-b pb-2">Room <span id="restRoomText"></span></h3>
+            <p class="text-sm text-gray-500">Is this room ready for guests?</p>
+            <button onclick="changeStatus('Vacant')" class="w-full bg-blue-600 text-white py-3 rounded font-bold">Mark as Available (Vacant)</button>
+            <button onclick="closeModals()" class="w-full py-2 text-sm text-gray-500 font-bold">Cancel</button>
+        </div>
+    </div>
+
     <!-- CHECK-IN MODAL -->
-    <div id="ciModal" class="hidden-view fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-40">
+    <div id="ciModal" class="hidden-view fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div class="bg-white p-6 rounded-xl w-full max-w-md space-y-4">
             <h3 class="font-bold text-lg border-b pb-2">Check-In: Room <span id="ciRoomText"></span></h3>
             <input type="text" id="ciName" placeholder="Guest Name (Leave blank to trigger alert)" class="w-full border p-2 rounded">
@@ -57,14 +75,14 @@
             </div>
             
             <div class="flex gap-2">
-                <button onclick="document.getElementById('ciModal').classList.add('hidden-view')" class="flex-1 border py-2 rounded font-bold">Cancel</button>
+                <button onclick="closeModals()" class="flex-1 border py-2 rounded font-bold">Cancel</button>
                 <button onclick="doCheckIn()" class="flex-1 bg-green-600 text-white py-2 rounded font-bold">Check-In</button>
             </div>
         </div>
     </div>
 
-    <!-- CHECK-OUT MODAL (HTML Calculations) -->
-    <div id="coModal" class="hidden-view fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-40">
+    <!-- CHECK-OUT MODAL -->
+    <div id="coModal" class="hidden-view fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
         <div class="bg-white p-6 rounded-xl w-full max-w-sm space-y-4 font-mono text-sm">
             <h3 class="font-sans font-bold text-lg border-b pb-2 text-red-600">Checkout: Room <span id="coRoomText"></span></h3>
             <div class="flex justify-between"><span>Room Tariff:</span> <span id="coTariff">₹0</span></div>
@@ -76,7 +94,7 @@
                 <option value="Cash">Cash</option><option value="UPI">UPI</option><option value="Card">Card</option>
             </select>
             <div class="flex gap-2 mt-4 font-sans">
-                <button onclick="document.getElementById('coModal').classList.add('hidden-view')" class="flex-1 border py-2 rounded font-bold">Close</button>
+                <button onclick="closeModals()" class="flex-1 border py-2 rounded font-bold">Close</button>
                 <button onclick="doCheckOut()" class="flex-1 bg-red-600 text-white py-2 rounded font-bold">Settle & Checkout</button>
             </div>
         </div>
@@ -85,9 +103,7 @@
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const slug = urlParams.get('hotel');
-        let client = null;
-        let activeRoom = null;
-        let activeBooking = null;
+        let client = null, activeRoom = null, activeBooking = null;
         let appData = { rooms: [], activeBookings: [], foodOrders: [], pendingOrders: [] };
 
         async function init() {
@@ -112,15 +128,20 @@
 
         function fetchData() { login(); }
 
+        function closeModals() {
+            ['actionModal', 'restoreModal', 'ciModal', 'coModal'].forEach(id => document.getElementById(id).classList.add('hidden-view'));
+        }
+
         function renderRooms() {
             const grid = document.getElementById('roomGrid');
             grid.innerHTML = "";
             appData.rooms.forEach(r => {
                 let color = r.Status === "Vacant" ? "bg-green-100 border-green-300 text-green-800" : 
-                            r.Status === "Occupied" ? "bg-red-100 border-red-300 text-red-800" : "bg-yellow-100 border-yellow-300 text-yellow-800";
+                            r.Status === "Occupied" ? "bg-red-100 border-red-300 text-red-800" : 
+                            r.Status === "Maintenance" ? "bg-gray-200 border-gray-400 text-gray-800" : "bg-yellow-100 border-yellow-300 text-yellow-800";
                 
-                let onclick = r.Status === "Vacant" ? `openCheckIn('${r.RoomNo}')` : 
-                              r.Status === "Occupied" ? `openCheckOut('${r.RoomNo}', ${r.Price})` : `alert('Room is cleaning')`;
+                let onclick = r.Status === "Vacant" ? `showActionOptions('${r.RoomNo}')` : 
+                              r.Status === "Occupied" ? `openCheckOut('${r.RoomNo}', ${r.Price})` : `showRestoreOptions('${r.RoomNo}')`;
                 
                 grid.innerHTML += `<div onclick="${onclick}" class="p-4 border rounded-lg cursor-pointer ${color} hover:shadow-md transition">
                     <div class="font-bold text-lg">${r.RoomNo}</div>
@@ -129,9 +150,26 @@
             });
         }
 
-        function openCheckIn(rNo) {
+        function showActionOptions(rNo) {
             activeRoom = rNo;
-            document.getElementById('ciRoomText').innerText = rNo;
+            document.getElementById('actRoomText').innerText = rNo;
+            document.getElementById('actionModal').classList.remove('hidden-view');
+        }
+
+        function showRestoreOptions(rNo) {
+            activeRoom = rNo;
+            document.getElementById('restRoomText').innerText = rNo;
+            document.getElementById('restoreModal').classList.remove('hidden-view');
+        }
+
+        function changeStatus(newStatus) {
+            fetch(client.scriptUrl, { method: "POST", body: JSON.stringify({ action: "changeRoomStatus", roomNo: activeRoom, newStatus: newStatus }) })
+            .then(()=> { closeModals(); fetchData(); });
+        }
+
+        function openCheckIn() {
+            closeModals();
+            document.getElementById('ciRoomText').innerText = activeRoom;
             document.querySelectorAll('.essentials').forEach(cb => cb.checked = false);
             document.getElementById('ciModal').classList.remove('hidden-view');
         }
@@ -143,47 +181,34 @@
             if(document.getElementById('chkSoap').checked) ess.push("Soap");
             if(document.getElementById('chkTowel').checked) ess.push("Towel");
             if(document.getElementById('chkWater').checked) ess.push("Water");
-            
-            // RED ALERT TRIGGER: If missing name/phone, idMissing flag is true
             const isMissing = (!name || !phone);
 
             fetch(client.scriptUrl, {
                 method: "POST",
                 body: JSON.stringify({ action: "checkIn", roomNo: activeRoom, guestName: name || "Unknown", phone: phone || "N/A", advance: document.getElementById('ciAdvance').value || 0, essentials: ess.join(","), idMissing: isMissing })
-            }).then(()=> { document.getElementById('ciModal').classList.add('hidden-view'); fetchData(); });
+            }).then(()=> { closeModals(); fetchData(); });
         }
 
         function openCheckOut(rNo, price) {
             activeBooking = appData.activeBookings.find(b => b.RoomNo == rNo);
             if(!activeBooking) return;
-            
             document.getElementById('coRoomText').innerText = rNo;
-            
-            // HTML Calculations
             const tariff = Number(price);
             const food = appData.foodOrders.filter(o => o.RoomNo == rNo && o.Status == "Approved").reduce((a,b)=>a+Number(b.Amount),0);
             const adv = Number(activeBooking.Advance || 0);
             const final = (tariff + food) - adv;
-
-            document.getElementById('coTariff').innerText = `₹${tariff}`;
-            document.getElementById('coFood').innerText = `₹${food}`;
-            document.getElementById('coAdvance').innerText = `-₹${adv}`;
-            document.getElementById('coFinal').innerText = `₹${final}`;
-            
+            document.getElementById('coTariff').innerText = `₹${tariff}`; document.getElementById('coFood').innerText = `₹${food}`;
+            document.getElementById('coAdvance').innerText = `-₹${adv}`; document.getElementById('coFinal').innerText = `₹${final}`;
             activeBooking.calcData = { tariff, food, adv, final };
             document.getElementById('coModal').classList.remove('hidden-view');
         }
 
         function doCheckOut() {
-            fetch(client.scriptUrl, {
-                method: "POST",
-                body: JSON.stringify({ 
+            fetch(client.scriptUrl, { method: "POST", body: JSON.stringify({ 
                     action: "checkOut", bookingId: activeBooking.BookingId, roomNo: activeBooking.RoomNo,
                     roomTotal: activeBooking.calcData.tariff, foodTotal: activeBooking.calcData.food, 
-                    advance: activeBooking.calcData.adv, finalPaid: activeBooking.calcData.final,
-                    paymentMode: document.getElementById('coMode').value
-                })
-            }).then(()=> { document.getElementById('coModal').classList.add('hidden-view'); fetchData(); });
+                    advance: activeBooking.calcData.adv, finalPaid: activeBooking.calcData.final, paymentMode: document.getElementById('coMode').value
+            })}).then(()=> { closeModals(); fetchData(); });
         }
 
         function renderApprovals() {
@@ -198,8 +223,7 @@
         }
 
         function approveOrder(id) {
-            fetch(client.scriptUrl, { method:"POST", body: JSON.stringify({ action: "approveOrder", orderId: id }) })
-            .then(()=> fetchData());
+            fetch(client.scriptUrl, { method:"POST", body: JSON.stringify({ action: "approveOrder", orderId: id }) }).then(()=> fetchData());
         }
 
         init();
