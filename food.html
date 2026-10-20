@@ -32,7 +32,7 @@
                 <h1 id="propTitle" class="text-xl sm:text-2xl font-black uppercase tracking-tight text-maroon">Kitchen & Dining Desk</h1>
                 <p class="text-xs font-semibold tracking-wider text-neutral-500 uppercase mt-0.5">Room Service Order Dispatch</p>
             </div>
-            <button onclick="loadDiningData()" class="border border-neutral-300 text-black px-4 py-2 rounded-xl text-xs font-semibold">Sync Menu</button>
+            <button onclick="loadDiningData()" class="border border-neutral-300 text-black px-4 py-2 rounded-xl text-xs font-semibold hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">Sync Menu</button>
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -55,7 +55,7 @@
                     
                     <div>
                         <label class="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">Target Occupied Room</label>
-                        <select id="roomSelector" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs font-mono bg-white focus:outline-none focus:border-maroon">
+                        <select id="roomSelector" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs font-mono bg-white focus:outline-none focus:border-maroon cursor-pointer">
                             <option value="">Select Room</option>
                         </select>
                     </div>
@@ -71,7 +71,7 @@
                         <span id="cartTotal" class="font-bold text-maroon">₹0</span>
                     </div>
 
-                    <button onclick="dispatchFoodOrder()" id="btnDispatch" class="w-full bg-maroon text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider">
+                    <button onclick="dispatchFoodOrder()" id="btnDispatch" class="w-full bg-maroon text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider hover:opacity-90 active:scale-95 transition-all shadow-md cursor-pointer">
                         Charge & Route to Kitchen
                     </button>
                 </div>
@@ -109,7 +109,7 @@
                     <p class="text-[10px] text-neutral-400 uppercase tracking-widest">Ofbuzz PMS &bull; An Indian Technology</p>
                 </div>
             </div>
-            <a href="https://wa.me/917827201014" target="_blank" class="border border-neutral-300 text-black px-4 py-2 rounded-xl text-[11px] font-semibold">
+            <a href="https://wa.me/917827201014" target="_blank" class="border border-neutral-300 text-black px-4 py-2 rounded-xl text-[11px] font-semibold hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">
                 Support Desk
             </a>
         </div>
@@ -172,12 +172,12 @@
             el.innerHTML = "";
             menuItems.forEach(item => {
                 el.innerHTML += `
-                    <div class="border border-neutral-200 p-3 rounded-xl flex justify-between items-center bg-neutral-50/40">
+                    <div class="border border-neutral-200 p-3 rounded-xl flex justify-between items-center bg-neutral-50/40 hover:bg-white transition-colors shadow-sm">
                         <div>
                             <span class="text-xs font-bold text-black block">${item.ItemName}</span>
                             <span class="text-[10px] text-neutral-400 uppercase font-mono">${item.Category || "Kitchen"} &bull; ₹${item.Price}</span>
                         </div>
-                        <button onclick="addToCart('${item.ItemId}', '${item.ItemName}', ${item.Price})" class="border border-neutral-300 hover:border-black text-black px-3 py-1 rounded-lg text-[10px] font-bold uppercase">
+                        <button onclick="addToCart('${item.ItemId}', '${item.ItemName}', ${item.Price})" class="border border-neutral-300 hover:border-maroon hover:bg-maroon hover:text-white text-black px-3 py-1 rounded-lg text-[10px] font-bold uppercase active:scale-95 transition-all cursor-pointer">
                             Add
                         </button>
                     </div>
@@ -270,7 +270,7 @@
             tbody.innerHTML = "";
             orders.forEach(o => {
                 tbody.innerHTML += `
-                    <tr class="hover:bg-neutral-50">
+                    <tr class="hover:bg-neutral-50 transition-colors">
                         <td class="py-2 px-3 font-bold text-black">${o.OrderId}</td>
                         <td class="py-2 px-3">${o.RoomNo}</td>
                         <td class="py-2 px-3 text-neutral-600">${o.Items}</td>
