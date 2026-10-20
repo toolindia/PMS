@@ -12,11 +12,12 @@
         .bg-maroon:hover { background-color: #650019; }
         .border-maroon { border-color: #800020; }
         .hidden-view { display: none !important; }
+        .btn-loading { opacity: 0.7; cursor: not-allowed; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between antialiased selection:bg-[#800020] selection:text-white">
 
-    <div id="toast" class="hidden-view fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-neutral-900 text-white px-5 py-2.5 rounded-xl text-xs font-mono border border-neutral-700 shadow-xl"></div>
+    <div id="toast" class="hidden-view fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-neutral-900 text-white px-5 py-2.5 rounded-xl text-xs font-mono border border-neutral-700 shadow-xl transition-all duration-300"></div>
 
     <main class="w-full max-w-6xl mx-auto p-4 sm:p-6 flex-1 space-y-6">
 
@@ -25,7 +26,7 @@
                 <h1 class="text-xl sm:text-2xl font-black uppercase tracking-tight text-maroon">Central Provisioning</h1>
                 <p class="text-xs font-semibold tracking-wider text-neutral-500 uppercase mt-0.5">Ofbuzz Technology &bull; Multi-Tenant Control</p>
             </div>
-            <span class="text-[10px] font-mono uppercase bg-neutral-100 text-neutral-600 px-3 py-1.5 rounded-xl border border-neutral-200 font-bold">
+            <span class="text-[10px] font-mono uppercase bg-neutral-100 text-neutral-600 px-3 py-1.5 rounded-xl border border-neutral-200 font-bold shadow-sm">
                 Automated Masterdata Engine
             </span>
         </header>
@@ -58,6 +59,11 @@
                     <label class="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">License Expiry Date (YYYY-MM-DD)</label>
                     <input type="date" id="inExpiryDate" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs font-mono focus:outline-none focus:border-maroon transition-colors">
                 </div>
+                <div class="md:col-span-2">
+                    <label class="text-[10px] font-bold uppercase tracking-wider text-maroon block mb-1">Data Backup Google Sheet ID (Optional)</label>
+                    <input type="text" id="inBackupId" placeholder="e.g. 1AbCdEfGhIjKlMnOpQrStUvWxYz" class="w-full px-3 py-2.5 border border-maroon/30 rounded-xl text-xs font-mono focus:outline-none focus:border-maroon transition-colors">
+                    <p class="text-[9px] text-neutral-400 mt-1">If provided, the Admin can sync live data to this separate sheet.</p>
+                </div>
             </div>
 
             <div class="border-t border-neutral-100 pt-3 space-y-2">
@@ -79,7 +85,7 @@
             </div>
 
             <div class="pt-2">
-                <button onclick="handleSaveClient()" class="bg-maroon text-white font-bold py-3 px-6 rounded-xl text-xs uppercase tracking-wider transition-all hover:opacity-90 active:scale-95 shadow-md cursor-pointer">
+                <button id="btnSaveClient" onclick="handleSaveClient()" class="bg-maroon text-white font-bold py-3 px-6 rounded-xl text-xs uppercase tracking-wider transition-all hover:shadow-lg active:scale-95 cursor-pointer">
                     Update Registry & Generate JSON
                 </button>
             </div>
@@ -92,33 +98,33 @@
                     <h3 class="text-xs font-bold uppercase tracking-wider text-maroon">Updated masterdata.json Content</h3>
                     <p class="text-[10px] font-mono text-neutral-400 uppercase mt-0.5">Copy and paste into your root masterdata.json file</p>
                 </div>
-                <button onclick="copyField('codeMasterData')" class="bg-maroon text-white text-[10px] uppercase font-bold px-3 py-1.5 rounded-lg hover:opacity-90 active:scale-95 transition-all cursor-pointer shadow-sm">Copy JSON File</button>
+                <button id="btnCopyJson" onclick="copyField('codeMasterData', 'btnCopyJson')" class="bg-maroon text-white text-[10px] uppercase font-bold px-4 py-2 rounded-lg hover:shadow-md active:scale-95 transition-all cursor-pointer">Copy JSON File</button>
             </div>
 
-            <textarea id="codeMasterData" rows="12" readonly class="w-full p-3 bg-neutral-900 text-neutral-100 rounded-xl text-[11px] font-mono"></textarea>
+            <textarea id="codeMasterData" rows="12" readonly class="w-full p-3 bg-neutral-900 text-neutral-100 rounded-xl text-[11px] font-mono outline-none"></textarea>
 
             <div class="space-y-2.5 pt-4 border-t border-neutral-100">
                 <span class="text-xs font-bold text-black uppercase block">Live Access URLs for Selected Slug</span>
                 <div class="grid grid-cols-1 gap-2 font-mono text-xs">
                     <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center hover:bg-white transition-colors">
                         <div><span class="text-[10px] text-neutral-400 block uppercase">Reception</span><span id="linkReception" class="break-all">-</span></div>
-                        <button onclick="copyField('linkReception')" class="border border-neutral-300 text-black px-3 py-1 rounded text-[10px] uppercase font-bold hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">Copy</button>
-                    </div>
-                    <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center hover:bg-white transition-colors">
-                        <div><span class="text-[10px] text-neutral-400 block uppercase">Dining Desk</span><span id="linkDining" class="break-all">-</span></div>
-                        <button onclick="copyField('linkDining')" class="border border-neutral-300 text-black px-3 py-1 rounded text-[10px] uppercase font-bold hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">Copy</button>
-                    </div>
-                    <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center hover:bg-white transition-colors">
-                        <div><span class="text-[10px] text-neutral-400 block uppercase">Staff Portal</span><span id="linkStaff" class="break-all">-</span></div>
-                        <button onclick="copyField('linkStaff')" class="border border-neutral-300 text-black px-3 py-1 rounded text-[10px] uppercase font-bold hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">Copy</button>
+                        <button onclick="copyField('linkReception', this)" class="border border-neutral-300 text-black px-3 py-1 rounded text-[10px] uppercase font-bold hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">Copy</button>
                     </div>
                     <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center hover:bg-white transition-colors">
                         <div><span class="text-[10px] text-neutral-400 block uppercase">Admin / Owner</span><span id="linkAdmin" class="break-all">-</span></div>
-                        <button onclick="copyField('linkAdmin')" class="border border-neutral-300 text-black px-3 py-1 rounded text-[10px] uppercase font-bold hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">Copy</button>
+                        <button onclick="copyField('linkAdmin', this)" class="border border-neutral-300 text-black px-3 py-1 rounded text-[10px] uppercase font-bold hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">Copy</button>
                     </div>
                     <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center hover:bg-white transition-colors">
-                        <div><span class="text-[10px] text-neutral-400 block uppercase">Customer Rating</span><span id="linkCustomer" class="break-all">-</span></div>
-                        <button onclick="copyField('linkCustomer')" class="border border-neutral-300 text-black px-3 py-1 rounded text-[10px] uppercase font-bold hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">Copy</button>
+                        <div><span class="text-[10px] text-neutral-400 block uppercase">Customer Portal (Menu & Feedback)</span><span id="linkCustomer" class="break-all">-</span></div>
+                        <button onclick="copyField('linkCustomer', this)" class="border border-neutral-300 text-black px-3 py-1 rounded text-[10px] uppercase font-bold hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">Copy</button>
+                    </div>
+                    <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center hover:bg-white transition-colors">
+                        <div><span class="text-[10px] text-neutral-400 block uppercase">Kitchen / Cafe Desk</span><span id="linkCafe" class="break-all">-</span></div>
+                        <button onclick="copyField('linkCafe', this)" class="border border-neutral-300 text-black px-3 py-1 rounded text-[10px] uppercase font-bold hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">Copy</button>
+                    </div>
+                    <div class="p-3 bg-neutral-50 border border-neutral-200 rounded-xl flex justify-between items-center hover:bg-white transition-colors">
+                        <div><span class="text-[10px] text-neutral-400 block uppercase">Online Booking Engine</span><span id="linkBooking" class="break-all">-</span></div>
+                        <button onclick="copyField('linkBooking', this)" class="border border-neutral-300 text-black px-3 py-1 rounded text-[10px] uppercase font-bold hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">Copy</button>
                     </div>
                 </div>
             </div>
@@ -126,7 +132,7 @@
 
     </main>
 
-    <footer class="bg-white border-t border-neutral-200 py-6 mt-12 text-xs">
+    <footer class="bg-white border-t border-neutral-200 py-6 mt-12 text-xs w-full">
         <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <img src="https://i.pinimg.com/736x/bd/d0/5c/bdd05c94afb66b5a72f5e17a7a879ab3.jpg" alt="Ofbuzz Logo" class="w-7 h-7 rounded-full object-cover border border-neutral-300">
@@ -135,13 +141,14 @@
                     <p class="text-[10px] text-neutral-400 uppercase tracking-widest">Ofbuzz PMS &bull; An Indian Technology</p>
                 </div>
             </div>
-            <a href="https://wa.me/917827201014" target="_blank" class="border border-neutral-300 text-black px-4 py-2 rounded-xl text-[11px] font-semibold hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">
+            <a href="mailto:ofbuzztechnologycare@gmail.com" target="_blank" class="border border-neutral-300 text-black px-4 py-2 rounded-xl text-[11px] font-semibold hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">
                 Support Desk
             </a>
         </div>
     </footer>
 
     <script>
+        // STRICT: Empty default registry so no dummy data goes into live site
         let currentRegistry = {};
 
         function showNotification(msg) {
@@ -169,49 +176,75 @@
             
             if (slug) {
                 document.getElementById('linkReception').innerText = `${baseUrl}/index.html?hotel=${slug}`;
-                document.getElementById('linkDining').innerText = `${baseUrl}/food.html?hotel=${slug}`;
-                document.getElementById('linkStaff').innerText = `${baseUrl}/staff.html?hotel=${slug}`;
                 document.getElementById('linkAdmin').innerText = `${baseUrl}/admin.html?hotel=${slug}`;
+                // Combined customer portal
                 document.getElementById('linkCustomer').innerText = `${baseUrl}/customer.html?hotel=${slug}`;
+                document.getElementById('linkCafe').innerText = `${baseUrl}/cafe.html?hotel=${slug}`;
+                document.getElementById('linkBooking').innerText = `${baseUrl}/pmsbooking.html?hotel=${slug}`;
             } else {
                 document.getElementById('linkReception').innerText = '-';
-                document.getElementById('linkDining').innerText = '-';
-                document.getElementById('linkStaff').innerText = '-';
                 document.getElementById('linkAdmin').innerText = '-';
                 document.getElementById('linkCustomer').innerText = '-';
+                document.getElementById('linkCafe').innerText = '-';
+                document.getElementById('linkBooking').innerText = '-';
             }
         }
 
         function handleSaveClient() {
-            const name = document.getElementById('inHotelName').value.trim();
-            const slug = document.getElementById('inHotelSlug').value.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '');
-            const scriptUrl = document.getElementById('inScriptUrl').value.trim();
-            const upiVpa = document.getElementById('inUpiVpa').value.trim();
-            const expiryDate = document.getElementById('inExpiryDate').value.trim();
+            const btn = document.getElementById('btnSaveClient');
+            btn.innerText = "Generating JSON...";
+            btn.classList.add('btn-loading');
 
-            if (!name || !slug || !scriptUrl || !expiryDate) {
-                return showNotification("All core fields must be provided.");
-            }
+            setTimeout(() => {
+                const name = document.getElementById('inHotelName').value.trim();
+                const slug = document.getElementById('inHotelSlug').value.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '');
+                const scriptUrl = document.getElementById('inScriptUrl').value.trim();
+                const upiVpa = document.getElementById('inUpiVpa').value.trim();
+                const expiryDate = document.getElementById('inExpiryDate').value.trim();
+                const backupId = document.getElementById('inBackupId').value.trim();
 
-            currentRegistry[slug] = {
-                name: name,
-                scriptUrl: scriptUrl,
-                upiVpa: upiVpa || "ofbuzz@ptyes",
-                expiryDate: expiryDate,
-                features: {
-                    dining: document.getElementById('chkDining').checked,
-                    staff: document.getElementById('chkStaff').checked,
-                    feedback: document.getElementById('chkFeedback').checked
+                if (!name || !slug || !scriptUrl || !expiryDate) {
+                    btn.innerText = "Update Registry & Generate JSON";
+                    btn.classList.remove('btn-loading');
+                    return showNotification("All core fields must be provided.");
                 }
-            };
 
-            refreshOutputs(slug);
-            showNotification(`Updated: ${name} (${slug})`);
+                currentRegistry[slug] = {
+                    name: name,
+                    scriptUrl: scriptUrl,
+                    upiVpa: upiVpa || "ofbuzz@ptyes",
+                    expiryDate: expiryDate,
+                    backupSheetId: backupId || "",
+                    features: {
+                        dining: document.getElementById('chkDining').checked,
+                        staff: document.getElementById('chkStaff').checked,
+                        feedback: document.getElementById('chkFeedback').checked
+                    }
+                };
+
+                refreshOutputs(slug);
+                showNotification(`Updated: ${name} (${slug})`);
+                
+                btn.innerText = "Update Registry & Generate JSON";
+                btn.classList.remove('btn-loading');
+            }, 500); // 500ms delay to show processing UI
         }
 
-        function copyField(id) {
+        function copyField(id, btnElem) {
             const el = document.getElementById(id);
-            navigator.clipboard.writeText(el.value || el.innerText);
+            const textToCopy = el.tagName === 'TEXTAREA' ? el.value : el.innerText;
+            navigator.clipboard.writeText(textToCopy);
+            
+            if(typeof btnElem === 'string') {
+                const b = document.getElementById(btnElem);
+                const originalText = b.innerText;
+                b.innerText = "Copied!";
+                setTimeout(()=> b.innerText = originalText, 2000);
+            } else if (btnElem) {
+                const originalText = btnElem.innerText;
+                btnElem.innerText = "Copied!";
+                setTimeout(()=> btnElem.innerText = originalText, 2000);
+            }
             showNotification("Copied to clipboard.");
         }
 
