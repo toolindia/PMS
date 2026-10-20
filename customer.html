@@ -21,6 +21,7 @@
     <main class="w-full max-w-lg mx-auto p-4 sm:p-6 flex-1 space-y-5">
 
         <header class="bg-white border border-neutral-200 rounded-2xl p-5 text-center shadow-xs space-y-1">
+            <!-- HOTEL NAME DYNAMICALLY ADDED HERE -->
             <h1 id="propTitle" class="text-lg sm:text-xl font-black uppercase tracking-tight text-maroon">Service Evaluation</h1>
             <p class="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Guest Stay Impressions</p>
         </header>
@@ -100,7 +101,8 @@
 
     </main>
 
-    <footer class="bg-white border-t border-neutral-200 py-6 mt-12 text-xs">
+    <!-- ORIGINAL OFBUZZ FOOTER -->
+    <footer class="bg-white border-t border-neutral-200 py-6 mt-12 text-xs w-full">
         <div class="max-w-lg mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <img src="https://i.pinimg.com/736x/bd/d0/5c/bdd05c94afb66b5a72f5e17a7a879ab3.jpg" alt="Ofbuzz Logo" class="w-7 h-7 rounded-full object-cover border border-neutral-300">
@@ -117,7 +119,7 @@
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const currentSlug = urlParams.get('hotel') || "royalstay";
+        const currentSlug = urlParams.get('hotel');
         let currentClient = null;
         const scores = { cleanliness: 5, staff: 5, amenities: 5, food: 5 };
 
@@ -135,6 +137,7 @@
                 const registry = await res.json();
                 currentClient = registry[currentSlug];
                 if (currentClient) {
+                    // HOTEL NAME SET HERE
                     document.getElementById('propTitle').innerText = `${currentClient.name} - Review`;
                 }
             } catch (e) {}
