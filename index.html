@@ -9,13 +9,15 @@
 </head>
 <body class="min-h-screen flex flex-col font-sans">
     
+    <div id="toast" class="hidden-view fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-gray-900 text-white px-5 py-3 rounded-xl text-sm font-bold shadow-2xl transition-all duration-300"></div>
+
     <!-- LOGIN BOX -->
     <div id="authBox" class="fixed inset-0 bg-gray-900 flex items-center justify-center z-50">
         <div class="bg-white p-8 rounded-xl shadow-2xl text-center max-w-sm w-full m-4">
             <h2 class="text-2xl font-black mb-2 text-indigo-600">Ofbuzz PMS</h2>
-            <p class="text-xs text-gray-500 mb-6">Enter Shop ID</p>
-            <input type="password" id="pinInput" class="w-full text-center text-3xl tracking-widest p-3 border rounded-lg mb-4" placeholder="••••">
-            <button onclick="login()" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700">Login</button>
+            <p class="text-xs text-gray-500 mb-6 uppercase tracking-widest">Enter Shop ID</p>
+            <input type="password" id="pinInput" class="w-full text-center text-3xl tracking-widest p-3 border rounded-lg mb-4 outline-none focus:border-indigo-500" placeholder="••••">
+            <button id="btnLogin" onclick="login()" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition">Unlock Terminal</button>
         </div>
     </div>
 
@@ -23,89 +25,94 @@
     <main id="dashBox" class="hidden-view max-w-7xl w-full mx-auto space-y-6 flex-1 p-4">
         <header class="bg-white p-5 rounded-xl shadow flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
-                <h1 id="propTitle" class="text-xl font-bold text-gray-800 uppercase tracking-tight">Front Desk Control</h1>
-                <p class="text-xs font-semibold tracking-wider text-gray-500 uppercase mt-0.5">Live Property Console</p>
+                <h1 id="propTitle" class="text-xl font-black text-gray-800 uppercase tracking-tight">Front Desk Control</h1>
+                <p class="text-xs font-bold tracking-wider text-gray-400 uppercase mt-1">Live Property Console <span id="networkStatus" class="text-green-500 ml-2">• Online</span></p>
             </div>
-            <button onclick="fetchData()" class="bg-gray-100 border px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-200">Sync Data</button>
+            <div class="flex gap-2">
+                <button id="btnBackup" onclick="triggerBackup(this)" class="bg-indigo-50 text-indigo-700 border border-indigo-200 px-4 py-2 rounded-lg text-sm font-bold hover:bg-indigo-100 transition">Sync Backup</button>
+                <button id="btnSync" onclick="fetchData()" class="bg-gray-100 border px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-200 transition">Refresh UI</button>
+            </div>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="lg:col-span-2 bg-white p-5 rounded-xl shadow">
-                <h2 class="text-sm font-bold uppercase mb-4 text-gray-500">Live Inventory Matrix</h2>
-                <div id="roomGrid" class="grid grid-cols-3 sm:grid-cols-4 gap-3"></div>
+                <h2 class="text-sm font-bold uppercase mb-4 text-gray-500 tracking-wider">Live Inventory Matrix</h2>
+                <div id="roomGrid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3"></div>
             </div>
 
-            <div class="bg-white p-5 rounded-xl shadow border-l-4 border-orange-500">
-                <h2 class="text-sm font-bold uppercase mb-4 text-orange-600">Food Order Approvals</h2>
+            <div class="bg-white p-5 rounded-xl shadow border-t-4 border-orange-500">
+                <h2 class="text-sm font-bold uppercase mb-4 text-orange-600 tracking-wider">Food Approvals</h2>
                 <div id="approvalQueue" class="space-y-3 text-sm"></div>
             </div>
         </div>
     </main>
 
-    <!-- ROOM ACTION MODAL (Vacant Room Options) -->
-    <div id="actionModal" class="hidden-view fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-40">
-        <div class="bg-white p-6 rounded-xl w-full max-w-sm space-y-4 text-center">
-            <h3 class="font-bold text-lg border-b pb-2">Room <span id="actRoomText"></span></h3>
-            <button onclick="openCheckIn()" class="w-full bg-green-600 text-white py-3 rounded font-bold">Proceed to Check-In</button>
-            <button onclick="changeStatus('Maintenance')" class="w-full bg-gray-200 text-gray-800 py-3 rounded font-bold border">Mark Unavailable / Maintenance</button>
-            <button onclick="closeModals()" class="w-full py-2 text-sm text-gray-500 font-bold">Cancel</button>
+    <!-- ROOM ACTION MODAL -->
+    <div id="actionModal" class="hidden-view fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-40">
+        <div class="bg-white p-6 rounded-xl w-full max-w-sm space-y-4 text-center shadow-2xl">
+            <h3 class="font-black text-xl border-b pb-3">Room <span id="actRoomText"></span></h3>
+            <button onclick="openCheckIn()" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold shadow-md hover:bg-green-700">Proceed to Check-In</button>
+            <button id="btnMaint" onclick="changeStatus('Maintenance', this)" class="w-full bg-gray-100 text-gray-800 py-3 rounded-lg font-bold border hover:bg-gray-200">Mark Maintenance</button>
+            <button onclick="closeModals()" class="w-full py-2 text-sm text-gray-500 font-bold uppercase tracking-widest hover:text-gray-800">Cancel</button>
         </div>
     </div>
 
-    <!-- RESTORE MODAL (Cleaning/Maintenance to Vacant) -->
-    <div id="restoreModal" class="hidden-view fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-40">
-        <div class="bg-white p-6 rounded-xl w-full max-w-sm space-y-4 text-center">
-            <h3 class="font-bold text-lg border-b pb-2">Room <span id="restRoomText"></span></h3>
-            <p class="text-sm text-gray-500">Is this room ready for guests?</p>
-            <button onclick="changeStatus('Vacant')" class="w-full bg-blue-600 text-white py-3 rounded font-bold">Mark as Available (Vacant)</button>
-            <button onclick="closeModals()" class="w-full py-2 text-sm text-gray-500 font-bold">Cancel</button>
+    <!-- RESTORE MODAL -->
+    <div id="restoreModal" class="hidden-view fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-40">
+        <div class="bg-white p-6 rounded-xl w-full max-w-sm space-y-4 text-center shadow-2xl">
+            <h3 class="font-black text-xl border-b pb-3">Room <span id="restRoomText"></span></h3>
+            <p class="text-sm font-bold text-gray-500">Is this room ready for guests?</p>
+            <button id="btnVacant" onclick="changeStatus('Vacant', this)" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold shadow-md hover:bg-blue-700">Mark Available (Vacant)</button>
+            <button onclick="closeModals()" class="w-full py-2 text-sm text-gray-500 font-bold uppercase tracking-widest hover:text-gray-800">Cancel</button>
         </div>
     </div>
 
     <!-- CHECK-IN MODAL -->
-    <div id="ciModal" class="hidden-view fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white p-6 rounded-xl w-full max-w-md space-y-4">
-            <h3 class="font-bold text-lg border-b pb-2">Check-In: Room <span id="ciRoomText"></span></h3>
-            <input type="text" id="ciName" placeholder="Guest Name (Leave blank to trigger alert)" class="w-full border p-2 rounded">
-            <input type="text" id="ciPhone" placeholder="Phone Number" class="w-full border p-2 rounded">
-            <input type="number" id="ciAdvance" placeholder="Advance Payment (₹)" class="w-full border p-2 rounded">
+    <div id="ciModal" class="hidden-view fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-xl w-full max-w-md space-y-4 shadow-2xl">
+            <h3 class="font-black text-xl border-b pb-3">Check-In: Room <span id="ciRoomText" class="text-indigo-600"></span></h3>
+            <input type="text" id="ciName" placeholder="Guest Full Name (Leave blank for Alert)" class="w-full border p-3 rounded-lg outline-none focus:border-indigo-500 font-semibold">
+            <input type="tel" id="ciPhone" placeholder="Mobile Number" class="w-full border p-3 rounded-lg outline-none focus:border-indigo-500 font-semibold">
+            <input type="number" id="ciAdvance" placeholder="Advance Payment (₹)" class="w-full border p-3 rounded-lg outline-none focus:border-indigo-500 font-mono">
             
-            <div class="bg-gray-50 p-3 rounded text-sm">
-                <p class="font-bold mb-2">Provided Essentials:</p>
-                <label class="flex items-center gap-2"><input type="checkbox" id="chkSoap" class="essentials"> Soap & Shampoo</label>
-                <label class="flex items-center gap-2"><input type="checkbox" id="chkTowel" class="essentials"> Fresh Towels</label>
-                <label class="flex items-center gap-2"><input type="checkbox" id="chkWater" class="essentials"> Water Bottles</label>
+            <div class="bg-gray-50 p-4 rounded-lg text-sm border">
+                <p class="font-bold mb-3 text-gray-600 uppercase tracking-wider text-xs">Provided Essentials:</p>
+                <div class="grid grid-cols-2 gap-2 font-semibold">
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="chkSoap" class="essentials w-4 h-4 text-indigo-600"> Soap Kit</label>
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="chkTowel" class="essentials w-4 h-4 text-indigo-600"> Fresh Towels</label>
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="chkWater" class="essentials w-4 h-4 text-indigo-600"> Water Bottles</label>
+                </div>
             </div>
             
-            <div class="flex gap-2">
-                <button onclick="closeModals()" class="flex-1 border py-2 rounded font-bold">Cancel</button>
-                <button onclick="doCheckIn()" class="flex-1 bg-green-600 text-white py-2 rounded font-bold">Check-In</button>
+            <div class="flex gap-3 pt-2">
+                <button onclick="closeModals()" class="flex-1 border py-3 rounded-lg font-bold text-gray-600 hover:bg-gray-50">Cancel</button>
+                <button id="btnCheckIn" onclick="doCheckIn()" class="flex-1 bg-green-600 text-white py-3 rounded-lg font-bold shadow-md hover:bg-green-700">Confirm Check-In</button>
             </div>
         </div>
     </div>
 
     <!-- CHECK-OUT MODAL -->
-    <div id="coModal" class="hidden-view fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-        <div class="bg-white p-6 rounded-xl w-full max-w-sm space-y-4 font-mono text-sm">
-            <h3 class="font-sans font-bold text-lg border-b pb-2 text-red-600">Checkout: Room <span id="coRoomText"></span></h3>
-            <div class="flex justify-between"><span>Room Tariff:</span> <span id="coTariff">₹0</span></div>
-            <div class="flex justify-between"><span>Food Orders:</span> <span id="coFood">₹0</span></div>
-            <div class="flex justify-between text-red-500"><span>Advance Paid:</span> <span id="coAdvance">-₹0</span></div>
-            <hr>
-            <div class="flex justify-between font-bold text-lg"><span>Final Payable:</span> <span id="coFinal">₹0</span></div>
-            <select id="coMode" class="w-full border p-2 rounded mt-2 font-sans">
+    <div id="coModal" class="hidden-view fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-xl w-full max-w-sm space-y-4 font-mono text-sm shadow-2xl">
+            <h3 class="font-sans font-black text-xl border-b pb-3 text-red-600">Checkout: Room <span id="coRoomText"></span></h3>
+            <div class="flex justify-between p-1"><span>Room Tariff:</span> <span id="coTariff" class="font-bold text-gray-800">₹0</span></div>
+            <div class="flex justify-between p-1"><span>Dining Orders:</span> <span id="coFood" class="font-bold text-gray-800">₹0</span></div>
+            <div class="flex justify-between p-1 text-red-500 bg-red-50 rounded"><span>Advance Paid:</span> <span id="coAdvance" class="font-bold">-₹0</span></div>
+            <hr class="border-gray-200">
+            <div class="flex justify-between font-black text-lg font-sans text-gray-900"><span>Final Payable:</span> <span id="coFinal" class="text-red-600">₹0</span></div>
+            <select id="coMode" class="w-full border p-3 rounded-lg mt-3 font-sans font-bold outline-none focus:border-red-500">
                 <option value="Cash">Cash</option><option value="UPI">UPI</option><option value="Card">Card</option>
             </select>
-            <div class="flex gap-2 mt-4 font-sans">
-                <button onclick="closeModals()" class="flex-1 border py-2 rounded font-bold">Close</button>
-                <button onclick="doCheckOut()" class="flex-1 bg-red-600 text-white py-2 rounded font-bold">Settle & Checkout</button>
+            <div class="flex gap-3 mt-5 font-sans">
+                <button onclick="closeModals()" class="flex-1 border py-3 rounded-lg font-bold text-gray-600 hover:bg-gray-50">Cancel</button>
+                <button id="btnCheckOut" onclick="doCheckOut()" class="flex-1 bg-red-600 text-white py-3 rounded-lg font-bold shadow-md hover:bg-red-700">Settle & Exit</button>
             </div>
         </div>
     </div>
 
-    <!-- ORIGINAL OFBUZZ FOOTER (DO NOT REMOVE) -->
-    <footer class="bg-white border-t border-gray-200 py-6 mt-12 text-xs w-full">
-        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+    <!-- OFBUZZ FOOTER -->
+    <footer class="bg-white border-t border-gray-200 py-6 mt-auto text-xs w-full">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <img src="https://i.pinimg.com/736x/bd/d0/5c/bdd05c94afb66b5a72f5e17a7a879ab3.jpg" alt="Ofbuzz Logo" class="w-7 h-7 rounded-full object-cover border border-gray-300">
                 <div>
@@ -113,7 +120,8 @@
                     <p class="text-[10px] text-gray-500 uppercase tracking-widest">Ofbuzz PMS &bull; An Indian Technology</p>
                 </div>
             </div>
-            <a href="https://wa.me/917827201014" target="_blank" class="border border-gray-300 text-black px-4 py-2 rounded-xl text-[11px] font-semibold hover:bg-gray-100 active:scale-95 transition-all cursor-pointer">
+            <!-- SUPPORT EMAIL UPDATED -->
+            <a href="mailto:ofbuzztechnologycare@gmail.com" target="_blank" class="border border-gray-300 text-black px-5 py-2.5 rounded-xl text-[11px] font-bold hover:bg-gray-100 active:scale-95 transition-all cursor-pointer shadow-sm">
                 Support Desk
             </a>
         </div>
@@ -129,30 +137,96 @@
             const res = await fetch(`masterdata.json?_ts=${Date.now()}`);
             const data = await res.json();
             client = data[slug];
+            syncOffline(); // Sync on load
         }
 
+        function notify(msg) {
+            const el = document.getElementById('toast');
+            el.innerText = msg;
+            el.classList.remove('hidden-view');
+            setTimeout(() => el.classList.add('hidden-view'), 3500);
+        }
+
+        // WRAPPER FOR OFFLINE SYNC & LOADING STATE
+        function apiCall(payload, btnElem, loadingText, callback) {
+            const originalText = btnElem ? btnElem.innerText : "";
+            if(btnElem) { btnElem.innerText = loadingText; btnElem.disabled = true; btnElem.classList.add('opacity-50', 'cursor-not-allowed'); }
+            
+            if(!navigator.onLine && payload.action !== 'getReceptionData') {
+                let queue = JSON.parse(localStorage.getItem('pms_offline_queue') || '[]');
+                queue.push(payload);
+                localStorage.setItem('pms_offline_queue', JSON.stringify(queue));
+                if(btnElem) { btnElem.innerText = originalText; btnElem.disabled = false; btnElem.classList.remove('opacity-50', 'cursor-not-allowed'); }
+                notify("Offline: Action saved locally. Will sync automatically when online.");
+                if(callback) callback({success: true, offline: true});
+                return;
+            }
+
+            fetch(client.scriptUrl, { method: "POST", body: JSON.stringify(payload) })
+            .then(r=>r.json()).then(res => {
+                if(btnElem) { btnElem.innerText = originalText; btnElem.disabled = false; btnElem.classList.remove('opacity-50', 'cursor-not-allowed'); }
+                if(callback) callback(res);
+            }).catch(err => {
+                if(btnElem) { btnElem.innerText = originalText; btnElem.disabled = false; btnElem.classList.remove('opacity-50', 'cursor-not-allowed'); }
+                notify("Network communication failed.");
+            });
+        }
+
+        function syncOffline() {
+            if(!navigator.onLine) { document.getElementById('networkStatus').innerHTML = "<span class='text-red-500'>• Offline</span>"; return; }
+            document.getElementById('networkStatus').innerHTML = "<span class='text-green-500'>• Online</span>";
+            let queue = JSON.parse(localStorage.getItem('pms_offline_queue') || '[]');
+            if(queue.length === 0) return;
+            
+            notify(`Syncing ${queue.length} offline actions...`);
+            fetch(client.scriptUrl, { method: "POST", body: JSON.stringify({ action: "syncOfflineData", payloads: queue }) })
+            .then(r=>r.json()).then(res => {
+                if(res.success) {
+                    localStorage.removeItem('pms_offline_queue');
+                    notify("All offline actions synced successfully!");
+                    fetchData(null);
+                }
+            });
+        }
+        window.addEventListener('online', syncOffline);
+        window.addEventListener('offline', () => document.getElementById('networkStatus').innerHTML = "<span class='text-red-500'>• Offline Mode</span>");
+
         function login() {
+            const btn = document.getElementById('btnLogin');
+            const orig = btn.innerText; btn.innerText = "Authenticating..."; btn.disabled = true; btn.classList.add('opacity-50');
+            
             const pin = document.getElementById('pinInput').value;
             fetch(`${client.scriptUrl}?action=getReceptionData&pin=${pin}`)
                 .then(r=>r.json()).then(res => {
+                    btn.innerText = orig; btn.disabled = false; btn.classList.remove('opacity-50');
                     if(res.success) {
                         appData = res;
-                        // HOTEL NAME ADDED TO HEADER HERE
-                        document.getElementById('propTitle').innerText = `${res.propertyName} - Front Desk`;
-                        
+                        document.getElementById('propTitle').innerText = `${client.name} - Front Desk`;
                         document.getElementById('authBox').classList.add('hidden-view');
                         document.getElementById('dashBox').classList.remove('hidden-view');
-                        renderRooms();
-                        renderApprovals();
-                    } else alert(res.error);
+                        renderRooms(); renderApprovals();
+                    } else alert(res.error || "Incorrect PIN");
+                }).catch(()=> { btn.innerText = orig; btn.disabled = false; btn.classList.remove('opacity-50'); notify("Connection timeout"); });
+        }
+
+        function fetchData(btn) {
+            const pin = document.getElementById('pinInput').value;
+            if(btn) { btn.innerText = "Syncing..."; btn.disabled = true; btn.classList.add('opacity-50'); }
+            fetch(`${client.scriptUrl}?action=getReceptionData&pin=${pin}`)
+                .then(r=>r.json()).then(res => {
+                    if(btn) { btn.innerText = "Refresh UI"; btn.disabled = false; btn.classList.remove('opacity-50'); }
+                    if(res.success) { appData = res; renderRooms(); renderApprovals(); }
                 });
         }
 
-        function fetchData() { login(); }
-
-        function closeModals() {
-            ['actionModal', 'restoreModal', 'ciModal', 'coModal'].forEach(id => document.getElementById(id).classList.add('hidden-view'));
+        function triggerBackup(btn) {
+            if(!client.backupSheetId) return notify("Backup Sheet ID not configured in Master Console.");
+            apiCall({ action: "syncBackup", backupId: client.backupSheetId }, btn, "Backing up...", res => {
+                notify(res.success ? res.message : res.error);
+            });
         }
+
+        function closeModals() { ['actionModal', 'restoreModal', 'ciModal', 'coModal'].forEach(id => document.getElementById(id).classList.add('hidden-view')); }
 
         function renderRooms() {
             const grid = document.getElementById('roomGrid');
@@ -165,50 +239,36 @@
                 let onclick = r.Status === "Vacant" ? `showActionOptions('${r.RoomNo}')` : 
                               r.Status === "Occupied" ? `openCheckOut('${r.RoomNo}', ${r.Price})` : `showRestoreOptions('${r.RoomNo}')`;
                 
-                grid.innerHTML += `<div onclick="${onclick}" class="p-4 border rounded-lg cursor-pointer ${color} hover:shadow-md transition">
-                    <div class="font-bold text-lg">${r.RoomNo}</div>
-                    <div class="text-[10px] uppercase font-bold">${r.Status}</div>
+                grid.innerHTML += `<div onclick="${onclick}" class="p-5 border-2 rounded-xl cursor-pointer ${color} hover:shadow-lg transition transform hover:-translate-y-1">
+                    <div class="font-black text-2xl mb-1">${r.RoomNo}</div>
+                    <div class="text-[10px] uppercase font-bold tracking-widest">${r.Status}</div>
                 </div>`;
             });
         }
 
-        function showActionOptions(rNo) {
-            activeRoom = rNo;
-            document.getElementById('actRoomText').innerText = rNo;
-            document.getElementById('actionModal').classList.remove('hidden-view');
-        }
+        function showActionOptions(rNo) { activeRoom = rNo; document.getElementById('actRoomText').innerText = rNo; document.getElementById('actionModal').classList.remove('hidden-view'); }
+        function showRestoreOptions(rNo) { activeRoom = rNo; document.getElementById('restRoomText').innerText = rNo; document.getElementById('restoreModal').classList.remove('hidden-view'); }
 
-        function showRestoreOptions(rNo) {
-            activeRoom = rNo;
-            document.getElementById('restRoomText').innerText = rNo;
-            document.getElementById('restoreModal').classList.remove('hidden-view');
-        }
-
-        function changeStatus(newStatus) {
-            fetch(client.scriptUrl, { method: "POST", body: JSON.stringify({ action: "changeRoomStatus", roomNo: activeRoom, newStatus: newStatus }) })
-            .then(()=> { closeModals(); fetchData(); });
+        function changeStatus(newStatus, btn) {
+            apiCall({ action: "changeRoomStatus", roomNo: activeRoom, newStatus: newStatus }, btn, "Updating...", res => { closeModals(); fetchData(null); });
         }
 
         function openCheckIn() {
-            closeModals();
-            document.getElementById('ciRoomText').innerText = activeRoom;
+            closeModals(); document.getElementById('ciRoomText').innerText = activeRoom;
             document.querySelectorAll('.essentials').forEach(cb => cb.checked = false);
             document.getElementById('ciModal').classList.remove('hidden-view');
         }
 
         function doCheckIn() {
-            const name = document.getElementById('ciName').value;
-            const phone = document.getElementById('ciPhone').value;
+            const name = document.getElementById('ciName').value.trim();
+            const phone = document.getElementById('ciPhone').value.trim();
             let ess = [];
             if(document.getElementById('chkSoap').checked) ess.push("Soap");
             if(document.getElementById('chkTowel').checked) ess.push("Towel");
             if(document.getElementById('chkWater').checked) ess.push("Water");
-            const isMissing = (!name || !phone);
-
-            fetch(client.scriptUrl, {
-                method: "POST",
-                body: JSON.stringify({ action: "checkIn", roomNo: activeRoom, guestName: name || "Unknown", phone: phone || "N/A", advance: document.getElementById('ciAdvance').value || 0, essentials: ess.join(","), idMissing: isMissing })
-            }).then(()=> { closeModals(); fetchData(); });
+            
+            const payload = { action: "checkIn", roomNo: activeRoom, guestName: name || "Unknown", phone: phone || "N/A", advance: document.getElementById('ciAdvance').value || 0, essentials: ess.join(","), idMissing: (!name || !phone) };
+            apiCall(payload, document.getElementById('btnCheckIn'), "Checking In...", res => { closeModals(); fetchData(null); });
         }
 
         function openCheckOut(rNo, price) {
@@ -226,29 +286,26 @@
         }
 
         function doCheckOut() {
-            fetch(client.scriptUrl, { method: "POST", body: JSON.stringify({ 
-                    action: "checkOut", bookingId: activeBooking.BookingId, roomNo: activeBooking.RoomNo,
-                    roomTotal: activeBooking.calcData.tariff, foodTotal: activeBooking.calcData.food, 
-                    advance: activeBooking.calcData.adv, finalPaid: activeBooking.calcData.final, paymentMode: document.getElementById('coMode').value
-            })}).then(()=> { closeModals(); fetchData(); });
+            const payload = { action: "checkOut", bookingId: activeBooking.BookingId, roomNo: activeBooking.RoomNo, roomTotal: activeBooking.calcData.tariff, foodTotal: activeBooking.calcData.food, advance: activeBooking.calcData.adv, finalPaid: activeBooking.calcData.final, paymentMode: document.getElementById('coMode').value };
+            apiCall(payload, document.getElementById('btnCheckOut'), "Settling...", res => { closeModals(); fetchData(null); });
         }
 
         function renderApprovals() {
             const list = document.getElementById('approvalQueue');
-            list.innerHTML = appData.pendingOrders.length ? "" : "<p class='text-gray-400'>No pending orders.</p>";
+            list.innerHTML = appData.pendingOrders.length ? "" : "<p class='text-gray-400 font-semibold p-4 bg-gray-50 rounded-lg border text-center border-dashed'>No pending food orders.</p>";
             appData.pendingOrders.forEach(o => {
-                list.innerHTML += `<div class="p-3 border rounded bg-gray-50 flex justify-between items-center">
-                    <div><b>Room ${o.RoomNo}</b><br><span class="text-xs text-gray-600">${o.Items} (₹${o.Amount})</span></div>
-                    <button onclick="approveOrder('${o.OrderId}')" class="bg-orange-500 text-white px-3 py-1 rounded text-xs font-bold">Approve</button>
+                list.innerHTML += `<div class="p-4 border rounded-xl bg-orange-50/50 flex justify-between items-center shadow-sm">
+                    <div><b class="text-lg text-gray-800">Room ${o.RoomNo}</b><br><span class="text-sm font-semibold text-gray-600">${o.Items} <span class="text-orange-600 ml-2">₹${o.Amount}</span></span></div>
+                    <button onclick="approveOrder('${o.OrderId}', this)" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider shadow transition">Approve</button>
                 </div>`;
             });
         }
 
-        function approveOrder(id) {
-            fetch(client.scriptUrl, { method:"POST", body: JSON.stringify({ action: "approveOrder", orderId: id }) }).then(()=> fetchData());
+        function approveOrder(id, btn) {
+            apiCall({ action: "approveOrder", orderId: id }, btn, "Approving...", res => { fetchData(null); });
         }
 
-        init();
+        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
