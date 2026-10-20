@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Control - Ofbuzz PMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>body { background-color: #f8fafc; color: #0f172a; } .hidden-view { display: none !important; }</style>
+</head>
+<body class="flex h-screen overflow-hidden font-sans">
+
+    <!-- LOGIN -->
+    <div id="authBox" class="fixed inset-0 bg-slate-900 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-96 text-center">
+            <h2 class="text-2xl font-black text-orange-600 mb-1">Cafe Portal</h2>
+            <p class="text-xs text-slate-500 mb-6 uppercase tracking-wider">Kitchen & Menu Management</p>
+            <input type="password" id="pinInput" placeholder="••••" class="w-full text-center text-3xl font-mono p-3 border rounded-xl mb-4 outline-none">
+            <button onclick="login()" class="w-full bg-orange-600 text-white font-bold py-3 rounded-xl hover:bg-orange-700">Enter Kitchen</button>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="hidden-view w-64 bg-orange-900 text-white flex flex-col">
+        <div class="p-6 font-black text-xl tracking-tight border-b border-orange-800">OFBUZZ<span class="text-orange-300">CAFE</span></div>
+        <nav class="flex-1 p-4 space-y-2 text-sm font-semibold text-orange-100">
+            <button onclick="switchTab('orders')" class="w-full text-left p-3 rounded-lg hover:bg-orange-800">Live Kitchen Orders</button>
+            <button onclick="switchTab('menu')" class="w-full text-left p-3 rounded-lg hover:bg-orange-800">Menu Management</button>
+            <button onclick="switchTab('settings')" class="w-full text-left p-3 rounded-lg hover:bg-orange-800">Restaurant Info</button>
+        </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main id="mainContent" class="hidden-view flex-1 overflow-y-auto p-8 bg-slate-50">
+        <header class="flex justify-between items-center mb-8">
+            <h1 class="text-2xl font-black text-slate-800">Kitchen Operations</h1>
+            <button onclick="fetchData()" class="bg-white border shadow-sm px-4 py-2 rounded-lg text-sm font-bold text-slate-700">Sync Kitchen</button>
+        </header>
+
+        <!-- LIVE ORDERS TAB -->
+        <div id="tab-orders" class="space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border-t-4 border-orange-500">
+                <h3 class="font-bold uppercase text-orange-600 text-sm mb-4">Approved Orders (To Prepare)</h3>
+                <div id="kitchenOrders" class="grid grid-cols-2 gap-4"></div>
+            </div>
+        </div>
+
+        <!-- MENU MANAGEMENT TAB -->
+        <div id="tab-menu" class="hidden-view space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h3 class="text-lg font-bold mb-4">Add New Dish</h3>
+                <div class="flex gap-3">
+                    <select id="mCategory" class="border p-2 rounded-lg text-sm"><option value="Breakfast">Breakfast</option><option value="Main Course">Main Course</option><option value="Beverages">Beverages</option></select>
+                    <input type="text" id="mItemName" placeholder="Dish Name" class="flex-1 border p-2 rounded-lg text-sm">
+                    <input type="number" id="mPrice" placeholder="Price (₹)" class="w-32 border p-2 rounded-lg text-sm">
+                    <button onclick="addMenuItem()" class="bg-green-600 text-white px-6 py-2 rounded-lg font-bold text-sm">Add to Menu</button>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h3 class="text-lg font-bold mb-4 border-b pb-2">Current Catalogue</h3>
+                <table class="w-full text-left text-sm">
+                    <thead><tr class="text-slate-400 uppercase text-[10px] border-b"><th class="py-2">Category</th><th>Item</th><th>Price</th><th class="text-right">Action</th></tr></thead>
+                    <tbody id="menuTable" class="divide-y divide-slate-50"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SETTINGS TAB -->
+        <div id="tab-settings" class="hidden-view space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 max-w-md">
+                <h3 class="text-lg font-bold mb-4">Restaurant Details</h3>
+                <div class="space-y-3">
+                    <div><label class="text-xs font-bold text-slate-500">Cafe Support Contact</label><input type="text" value="+91-9876543210" class="w-full border p-2 rounded mt-1"></div>
+                    <div><label class="text-xs font-bold text-slate-500">Opening Time</label><input type="time" value="07:00" class="w-full border p-2 rounded mt-1"></div>
+                    <div><label class="text-xs font-bold text-slate-500">Closing Time</label><input type="time" value="23:00" class="w-full border p-2 rounded mt-1"></div>
+                    <button class="bg-slate-800 text-white w-full py-2 rounded font-bold">Update Info</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const slug = urlParams.get('hotel');
+        let client = null;
+        let diningData = null;
+
+        async function init() {
+            const res = await fetch(`masterdata.json?_ts=${Date.now()}`);
+            const data = await res.json();
+            client = data[slug];
+        }
+
+        function switchTab(tabId) {
+            ['orders', 'menu', 'settings'].forEach(t => document.getElementById(`tab-${t}`).classList.add('hidden-view'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden-view');
+        }
+
+        function login() {
+            const pin = document.getElementById('pinInput').value;
+            fetch(`${client.scriptUrl}?action=getDiningData&pin=${pin}`)
+                .then(r=>r.json()).then(res => {
+                    if(res.success) {
+                        diningData = res;
+                        document.getElementById('authBox').classList.add('hidden-view');
+                        document.getElementById('sidebar').classList.remove('hidden-view');
+                        document.getElementById('mainContent').classList.remove('hidden-view');
+                        renderUI();
+                    } else alert(res.error || "Incorrect PIN");
+                });
+        }
+
+        function fetchData() { login(); }
+
+        function renderUI() {
+            // Render Orders (Only those approved by Reception)
+            const kOrders = document.getElementById('kitchenOrders');
+            kOrders.innerHTML = "";
+            const approvedOrders = diningData.recentOrders.filter(o => o.Status === "Approved");
+            if(approvedOrders.length === 0) kOrders.innerHTML = "<p class='text-slate-400 text-sm'>No active orders.</p>";
+            
+            approvedOrders.forEach(o => {
+                kOrders.innerHTML += `<div class="p-4 border rounded-xl bg-orange-50/50 shadow-sm">
+                    <div class="flex justify-between items-start mb-2 border-b pb-2">
+                        <span class="font-black text-lg">Room ${o.RoomNo}</span>
+                        <span class="text-xs bg-orange-200 text-orange-800 px-2 py-1 rounded font-bold uppercase">Preparing</span>
+                    </div>
+                    <p class="font-mono text-sm text-slate-700 mb-3">${o.Items}</p>
+                    <button onclick="markDone('${o.OrderId}')" class="w-full bg-green-500 text-white py-2 rounded font-bold text-xs uppercase tracking-wider">Mark Completed</button>
+                </div>`;
+            });
+
+            // Render Menu
+            const mTable = document.getElementById('menuTable');
+            mTable.innerHTML = "";
+            diningData.menu.forEach(m => {
+                mTable.innerHTML += `<tr>
+                    <td class="py-3 text-slate-500 text-xs uppercase">${m.Category}</td>
+                    <td class="py-3 font-bold">${m.ItemName}</td>
+                    <td class="py-3 font-mono">₹${m.Price}</td>
+                    <td class="py-3 text-right"><button onclick="removeMenu('${m.ItemId}')" class="text-red-500 text-xs font-bold hover:underline">Delete</button></td>
+                </tr>`;
+            });
+        }
+
+        function markDone(orderId) {
+            fetch(client.scriptUrl, { method:"POST", body: JSON.stringify({ action: "completeOrder", orderId: orderId }) })
+            .then(()=> fetchData());
+        }
+
+        function addMenuItem() {
+            fetch(client.scriptUrl, { method:"POST", body: JSON.stringify({ action: "addMenu", 
+                category: document.getElementById('mCategory').value, name: document.getElementById('mItemName').value, price: document.getElementById('mPrice').value 
+            })}).then(()=> { document.getElementById('mItemName').value=""; fetchData(); });
+        }
+
+        function removeMenu(id) {
+            if(confirm("Remove item from menu?")) {
+                fetch(client.scriptUrl, { method:"POST", body: JSON.stringify({ action: "removeMenu", itemId: id }) }).then(()=> fetchData());
+            }
+        }
+        init();
+    </script>
+</body>
+</html>
