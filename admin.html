@@ -19,6 +19,8 @@
 </head>
 <body class="flex h-screen overflow-hidden">
 
+    <div id="toast" class="hidden-view fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-indigo-600 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-2xl transition-all duration-300"></div>
+
     <!-- RED ALERT -->
     <div id="alertPopup" class="hidden-view fixed top-5 right-5 bg-red-600 text-white px-6 py-4 rounded-lg shadow-2xl z-50 alert-pulse flex items-center gap-3">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
@@ -34,8 +36,8 @@
         <div class="glass-panel p-8 rounded-2xl w-96 text-center m-4">
             <h2 class="text-2xl font-black text-white mb-1">BI Console</h2>
             <p class="text-xs text-indigo-400 mb-6 uppercase tracking-widest">Authorized Personnel Only</p>
-            <input type="password" id="pinInput" placeholder="••••" class="w-full text-center text-3xl font-mono p-3 bg-slate-800 border-none text-white rounded-xl mb-4 focus:ring-2 focus:ring-indigo-500 outline-none">
-            <button onclick="login()" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-500 transition">Authenticate</button>
+            <input type="password" id="pinInput" placeholder="••••" class="w-full text-center text-3xl font-mono p-3 bg-slate-800 border-none text-white rounded-xl mb-4 focus:ring-2 focus:ring-indigo-500 outline-none transition">
+            <button id="btnLogin" onclick="login()" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-500 transition shadow-lg">Authenticate</button>
         </div>
     </div>
 
@@ -47,7 +49,7 @@
         <nav class="flex-1 p-4 space-y-2 text-sm font-semibold text-slate-400">
             <button onclick="switchTab('dashboard')" class="w-full text-left p-3 rounded-lg hover:bg-slate-800 hover:text-white transition">Overview Analytics</button>
             <button onclick="switchTab('staff')" class="w-full text-left p-3 rounded-lg hover:bg-slate-800 hover:text-white transition">Resource Management</button>
-            <button onclick="switchTab('reports')" class="w-full text-left p-3 rounded-lg hover:bg-slate-800 hover:text-white transition">Data Exports</button>
+            <button onclick="switchTab('reports')" class="w-full text-left p-3 rounded-lg hover:bg-slate-800 hover:text-white transition">Data Exports & Backup</button>
         </nav>
     </aside>
 
@@ -58,16 +60,14 @@
         <main class="flex-1 overflow-y-auto p-8 relative z-10">
             <header class="flex justify-between items-center mb-8">
                 <div>
-                    <!-- HOTEL NAME DYNAMICALLY ADDED HERE -->
                     <h1 id="propTitle" class="text-3xl font-black text-white uppercase tracking-tight">Performance Dashboard</h1>
-                    <p class="text-slate-400 text-sm">Real-time metrics and operational insights.</p>
+                    <p class="text-slate-400 text-sm mt-1">Real-time metrics and operational insights.</p>
                 </div>
-                <button onclick="fetchData()" class="bg-indigo-600 hover:bg-indigo-500 px-5 py-2.5 rounded-lg text-sm font-bold text-white shadow-lg transition">Sync Data</button>
+                <button id="btnSync" onclick="fetchData(this)" class="bg-slate-800 border border-slate-700 hover:bg-slate-700 px-5 py-2.5 rounded-lg text-sm font-bold text-white shadow-lg transition">Refresh Live Data</button>
             </header>
 
             <!-- DASHBOARD TAB -->
             <div id="tab-dashboard" class="space-y-6">
-                <!-- TOP METRICS -->
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <div class="glass-panel p-6 rounded-2xl relative overflow-hidden">
                         <div class="absolute top-0 right-0 w-16 h-16 bg-green-500 opacity-20 blur-2xl"></div>
@@ -93,24 +93,18 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Visual Trend Mockup -->
                     <div class="lg:col-span-2 glass-panel p-6 rounded-2xl">
                         <h3 class="text-sm font-bold text-slate-300 uppercase tracking-widest mb-6">Revenue Trend Visualization</h3>
                         <div class="h-48 flex items-end justify-between gap-2 border-b border-slate-700 pb-2">
-                            <div class="bar" style="height: 30%;"></div>
-                            <div class="bar" style="height: 50%;"></div>
-                            <div class="bar" style="height: 40%;"></div>
-                            <div class="bar" style="height: 70%;"></div>
-                            <div class="bar" style="height: 60%; background:#818cf8;"></div>
-                            <div class="bar" style="height: 90%; background:#4f46e5;"></div>
-                            <div class="bar" style="height: 80%; background:#4338ca;"></div>
+                            <div class="bar" style="height: 30%;"></div><div class="bar" style="height: 50%;"></div><div class="bar" style="height: 40%;"></div>
+                            <div class="bar" style="height: 70%;"></div><div class="bar" style="height: 60%; background:#818cf8;"></div>
+                            <div class="bar" style="height: 90%; background:#4f46e5;"></div><div class="bar" style="height: 80%; background:#4338ca;"></div>
                         </div>
                         <div class="flex justify-between text-[10px] text-slate-500 mt-2 uppercase font-mono">
                             <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
                         </div>
                     </div>
 
-                    <!-- Active Alerts -->
                     <div class="glass-panel p-6 rounded-2xl border-t-4 border-red-500">
                         <h3 class="text-sm font-bold text-red-400 uppercase tracking-widest mb-4">Live Threat Monitor</h3>
                         <div id="alertsContainer" class="space-y-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar"></div>
@@ -126,7 +120,7 @@
                         <input type="text" id="stfName" placeholder="Full Name" class="flex-1 bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm text-white outline-none focus:border-indigo-500">
                         <input type="text" id="stfRole" placeholder="Department" class="flex-1 bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm text-white outline-none focus:border-indigo-500">
                         <input type="text" id="stfPhone" placeholder="Contact" class="flex-1 bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm text-white outline-none focus:border-indigo-500">
-                        <button onclick="addStaff()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg transition">Deploy</button>
+                        <button id="btnAddStf" onclick="addStaff(this)" class="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg transition">Deploy</button>
                     </div>
                 </div>
 
@@ -141,18 +135,25 @@
 
             <!-- REPORTS TAB -->
             <div id="tab-reports" class="hidden-view space-y-6">
-                <div class="glass-panel p-12 rounded-2xl text-center max-w-2xl mx-auto mt-10">
-                    <div class="w-20 h-20 bg-indigo-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <svg class="w-10 h-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass-panel p-10 rounded-2xl text-center">
+                        <div class="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4"><svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div>
+                        <h2 class="text-2xl font-black text-white mb-2">Export Local Report</h2>
+                        <p class="text-slate-400 text-sm mb-6">Download a raw CSV payload of all historical settlements to your local machine.</p>
+                        <button onclick="downloadCSV()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-4 rounded-xl shadow-lg transition transform hover:scale-[1.02]">Export Local CSV</button>
                     </div>
-                    <h2 class="text-3xl font-black text-white mb-2">Data Export Engine</h2>
-                    <p class="text-slate-400 text-sm mb-8">Generate a raw CSV payload of all historical settlements, revenue splits, and transactions for deep accounting analysis.</p>
-                    <button onclick="downloadCSV()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 px-10 rounded-xl shadow-lg transition transform hover:scale-105">Export Raw Dataset (CSV)</button>
+
+                    <div class="glass-panel p-10 rounded-2xl text-center border-t-4 border-indigo-500">
+                        <div class="w-16 h-16 bg-indigo-500/20 rounded-full flex items-center justify-center mx-auto mb-4"><svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg></div>
+                        <h2 class="text-2xl font-black text-white mb-2">Cloud Server Backup</h2>
+                        <p class="text-slate-400 text-sm mb-6">Synchronize all live property data directly to your designated remote Google Sheet Backup server.</p>
+                        <button id="btnPushBackup" onclick="triggerBackup(this)" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-xl shadow-lg transition transform hover:scale-[1.02]">Push to Cloud Backup</button>
+                    </div>
                 </div>
             </div>
         </main>
 
-        <!-- ORIGINAL OFBUZZ FOOTER (Dark Theme adapted layout but exact content) -->
+        <!-- OFBUZZ FOOTER -->
         <footer class="bg-slate-900 border-t border-slate-800 py-6 text-xs w-full relative z-10">
             <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-3">
@@ -162,7 +163,8 @@
                         <p class="text-[10px] text-slate-500 uppercase tracking-widest">Ofbuzz PMS &bull; An Indian Technology</p>
                     </div>
                 </div>
-                <a href="https://wa.me/917827201014" target="_blank" class="border border-slate-700 text-white px-4 py-2 rounded-xl text-[11px] font-semibold hover:bg-slate-800 active:scale-95 transition-all cursor-pointer">
+                <!-- SUPPORT EMAIL UPDATED -->
+                <a href="mailto:ofbuzztechnologycare@gmail.com" target="_blank" class="border border-slate-700 text-white px-5 py-2.5 rounded-xl text-[11px] font-bold hover:bg-slate-800 active:scale-95 transition-all cursor-pointer shadow-sm">
                     Support Desk
                 </a>
             </div>
@@ -173,6 +175,13 @@
         const urlParams = new URLSearchParams(window.location.search);
         const slug = urlParams.get('hotel');
         let client = null, adminData = null;
+
+        function notify(msg) {
+            const el = document.getElementById('toast');
+            el.innerText = msg;
+            el.classList.remove('hidden-view');
+            setTimeout(() => el.classList.add('hidden-view'), 3500);
+        }
 
         async function init() {
             const res = await fetch(`masterdata.json?_ts=${Date.now()}`);
@@ -185,24 +194,55 @@
             document.getElementById(`tab-${tabId}`).classList.remove('hidden-view');
         }
 
+        function apiCall(payload, btnElem, loadingText, callback) {
+            const originalText = btnElem ? btnElem.innerText : "";
+            if(btnElem) { btnElem.innerText = loadingText; btnElem.disabled = true; btnElem.classList.add('opacity-50', 'cursor-not-allowed'); }
+            
+            fetch(client.scriptUrl, { method: "POST", body: JSON.stringify(payload) })
+            .then(r=>r.json()).then(res => {
+                if(btnElem) { btnElem.innerText = originalText; btnElem.disabled = false; btnElem.classList.remove('opacity-50', 'cursor-not-allowed'); }
+                if(callback) callback(res);
+            }).catch(err => {
+                if(btnElem) { btnElem.innerText = originalText; btnElem.disabled = false; btnElem.classList.remove('opacity-50', 'cursor-not-allowed'); }
+                notify("Network communication failed.");
+            });
+        }
+
         function login() {
             const pin = document.getElementById('pinInput').value;
+            const btn = document.getElementById('btnLogin');
+            const orig = btn.innerText; btn.innerText = "Verifying Credentials..."; btn.disabled = true; btn.classList.add('opacity-50');
+
             fetch(`${client.scriptUrl}?action=getAdminData&pin=${pin}`)
                 .then(r=>r.json()).then(res => {
+                    btn.innerText = orig; btn.disabled = false; btn.classList.remove('opacity-50');
                     if(res.success) {
                         adminData = res;
-                        
-                        // HOTEL NAME ADDED TO HEADER HERE
-                        document.getElementById('propTitle').innerText = `${res.propertyName} - BI Dashboard`;
-
+                        document.getElementById('propTitle').innerText = `${client.name} - BI Dashboard`;
                         document.getElementById('authBox').classList.add('hidden-view');
                         document.getElementById('sidebar').classList.remove('hidden-view');
                         document.getElementById('mainWrapper').classList.remove('hidden-view');
                         renderUI();
-                    } else alert(res.error);
+                    } else notify(res.error);
+                }).catch(()=> { btn.innerText = orig; btn.disabled = false; btn.classList.remove('opacity-50'); notify("Connection timeout"); });
+        }
+
+        function fetchData(btn) {
+            const pin = document.getElementById('pinInput').value;
+            if(btn) { btn.innerText = "Syncing..."; btn.disabled = true; btn.classList.add('opacity-50'); }
+            fetch(`${client.scriptUrl}?action=getAdminData&pin=${pin}`)
+                .then(r=>r.json()).then(res => {
+                    if(btn) { btn.innerText = "Refresh Live Data"; btn.disabled = false; btn.classList.remove('opacity-50'); }
+                    if(res.success) { adminData = res; renderUI(); }
                 });
         }
-        function fetchData() { login(); }
+
+        function triggerBackup(btn) {
+            if(!client.backupSheetId) return notify("Backup Sheet ID not configured in Master Console.");
+            apiCall({ action: "syncBackup", backupId: client.backupSheetId }, btn, "Pushing to Cloud...", res => {
+                notify(res.success ? res.message : res.error);
+            });
+        }
 
         function renderUI() {
             document.getElementById('mRev').innerText = `₹${adminData.summary.totalRev.toLocaleString()}`;
@@ -218,7 +258,7 @@
                     alertCont.innerHTML += `<div class="p-4 bg-slate-800/50 border border-red-500/30 rounded-xl">
                         <div class="flex justify-between items-start">
                             <span class="text-white font-bold text-sm">Room ${a.RoomNo}</span>
-                            <span class="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded uppercase">Unverified</span>
+                            <span class="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded uppercase tracking-wider">Unverified</span>
                         </div>
                         <p class="text-xs text-slate-400 mt-1">${a.Issue}</p>
                         <p class="text-[10px] font-mono text-slate-500 mt-2">${a.Timestamp}</p>
@@ -232,25 +272,24 @@
             const tbody = document.getElementById('staffListTable');
             tbody.innerHTML = "";
             adminData.staffList.forEach(s => {
-                tbody.innerHTML += `<tr class="hover:bg-slate-800/30 transition">
+                tbody.innerHTML += `<tr class="hover:bg-slate-800/30 transition border-b border-slate-800/50">
                     <td class="py-4 font-mono text-indigo-400">${s.StaffId}</td>
                     <td class="py-4 font-bold text-white">${s.FullName}</td>
-                    <td class="py-4"><span class="bg-slate-800 px-2 py-1 rounded text-xs">${s.Role}</span></td>
+                    <td class="py-4"><span class="bg-slate-800 px-3 py-1.5 rounded-lg text-xs border border-slate-700">${s.Role}</span></td>
                     <td class="py-4 font-mono text-xs">${s.Phone}</td>
-                    <td class="py-4 text-right"><button onclick="removeStaff('${s.StaffId}')" class="text-red-400 hover:text-red-300 text-xs font-bold uppercase tracking-wider">Terminate</button></td>
+                    <td class="py-4 text-right"><button onclick="removeStaff('${s.StaffId}', this)" class="text-red-400 hover:text-red-300 text-xs font-bold uppercase tracking-wider bg-red-500/10 px-3 py-1.5 rounded hover:bg-red-500/20 transition">Terminate</button></td>
                 </tr>`;
             });
         }
 
-        function addStaff() {
-            fetch(client.scriptUrl, { method:"POST", body: JSON.stringify({ action: "addStaff", 
-                name: document.getElementById('stfName').value, role: document.getElementById('stfRole').value, phone: document.getElementById('stfPhone').value 
-            })}).then(()=> { document.getElementById('stfName').value=""; fetchData(); });
+        function addStaff(btn) {
+            const payload = { action: "addStaff", name: document.getElementById('stfName').value, role: document.getElementById('stfRole').value, phone: document.getElementById('stfPhone').value };
+            apiCall(payload, btn, "Deploying...", res => { document.getElementById('stfName').value=""; fetchData(null); });
         }
 
-        function removeStaff(id) {
+        function removeStaff(id, btn) {
             if(confirm("Confirm resource termination?")) {
-                fetch(client.scriptUrl, { method:"POST", body: JSON.stringify({ action: "removeStaff", staffId: id }) }).then(()=> fetchData());
+                apiCall({ action: "removeStaff", staffId: id }, btn, "Wait...", res => { fetchData(null); });
             }
         }
 
@@ -267,7 +306,7 @@
             document.body.removeChild(link);
         }
 
-        init();
+        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
