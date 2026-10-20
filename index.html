@@ -1,379 +1,368 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reception Desk - Ofbuzz PMS</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background-color: #FAF7F2; color: #111111; }
-        .text-maroon { color: #800020; }
-        .bg-maroon { background-color: #800020; }
-        .bg-maroon:hover { background-color: #650019; }
-        .border-maroon { border-color: #800020; }
-        .hidden-view { display: none !important; }
-    </style>
-</head>
-<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-[#800020] selection:text-white">
+// ==========================================
+// OFBUZZ PMS - MULTI-MODULE BACKEND ENGINE
+// ==========================================
 
-    <div id="toast" class="hidden-view fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-neutral-900 text-white px-5 py-2.5 rounded-xl text-xs font-mono border border-neutral-700 shadow-xl"></div>
+function ensureDatabaseSchema() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
 
-    <div id="licenseExpiredOverlay" class="hidden-view fixed inset-0 bg-[#FAF7F2] z-50 flex items-center justify-center p-6 text-center">
-        <div class="border border-maroon p-8 rounded-2xl max-w-md w-full bg-white space-y-4">
-            <h2 class="text-xl font-bold uppercase text-maroon">Subscription Inactive</h2>
-            <p class="text-xs text-neutral-600">The operational license for this property has expired. Contact administration.</p>
-            <a href="https://wa.me/917827201014" target="_blank" class="block bg-maroon text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider">Contact Technology Support</a>
-        </div>
-    </div>
+  const schema = {
+    "Settings": ["PropertyKey", "PropertyValue"],
+    "Rooms": ["RoomNo", "RoomType", "Price", "Status"],
+    "Bookings": ["BookingId", "RoomNo", "GuestName", "Phone", "CheckIn", "CheckOut", "Advance", "IdPhotoUrl", "Status"],
+    "MenuItems": ["ItemId", "Category", "ItemName", "Price", "Available"],
+    "FoodOrders": ["OrderId", "RoomNo", "BookingId", "Items", "Amount", "Timestamp"],
+    "Staff": ["StaffId", "FullName", "Role", "Phone", "ShiftStatus"],
+    "Attendance": ["RecordId", "StaffId", "StaffName", "Action", "Timestamp"],
+    "Invoices": ["InvoiceId", "BookingId", "RoomNo", "GuestName", "RoomTotal", "FoodTotal", "AdvancePaid", "FinalPaid", "PaymentMode", "Timestamp"],
+    "Feedback": ["FeedbackId", "RoomNo", "GuestName", "Cleanliness", "Staff", "Amenities", "Food", "Comments", "Timestamp"]
+  };
 
-    <main class="w-full max-w-6xl mx-auto p-4 sm:p-6 flex-1 space-y-6">
+  for (const sheetName in schema) {
+    let sheet = ss.getSheetByName(sheetName);
+    const headers = schema[sheetName];
 
-        <header class="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-                <h1 id="propTitle" class="text-xl sm:text-2xl font-black uppercase tracking-tight text-maroon">Reception Operational Desk</h1>
-                <p class="text-xs font-semibold tracking-wider text-neutral-500 uppercase mt-0.5">Live Property Console</p>
-            </div>
-            <button onclick="refreshData()" class="border border-neutral-300 text-black font-semibold text-xs px-4 py-2.5 rounded-xl">Sync Status</button>
-        </header>
+    if (!sheet) {
+      sheet = ss.insertSheet(sheetName);
+    }
 
-        <!-- LIVE COUNTERS -->
-        <div class="grid grid-cols-3 gap-3 sm:gap-4">
-            <div class="bg-white border border-neutral-200 p-4 rounded-xl text-center">
-                <span class="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">Vacant</span>
-                <span id="cntVacant" class="text-xl sm:text-2xl font-black text-black font-mono">0</span>
-            </div>
-            <div class="bg-white border border-neutral-200 p-4 rounded-xl text-center">
-                <span class="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">Occupied</span>
-                <span id="cntOccupied" class="text-xl sm:text-2xl font-black text-maroon font-mono">0</span>
-            </div>
-            <div class="bg-white border border-neutral-200 p-4 rounded-xl text-center">
-                <span class="text-[10px] uppercase font-bold text-neutral-400 block tracking-wider">Cleaning</span>
-                <span id="cntCleaning" class="text-xl sm:text-2xl font-black text-neutral-600 font-mono">0</span>
-            </div>
-        </div>
+    if (sheet.getLastRow() === 0) {
+      sheet.appendRow(headers);
+      sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold");
+      sheet.setFrozenRows(1);
 
-        <!-- ROOM MATRIX GRID -->
-        <section class="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs space-y-4">
-            <div class="flex justify-between items-center border-b border-neutral-100 pb-3">
-                <h2 class="text-xs font-bold uppercase tracking-wider text-black">Live Inventory Matrix</h2>
-                <div class="flex gap-4 text-[10px] font-bold uppercase tracking-wider">
-                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span> Vacant</span>
-                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-[#800020]"></span> Occupied</span>
-                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Cleaning</span>
-                </div>
-            </div>
-            <div id="roomGrid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3"></div>
-        </section>
+      if (sheetName === "Settings") {
+        sheet.appendRow(["PropertyName", "Grand Heritage Residency"]);
+        sheet.appendRow(["AdminPin", "1234"]);
+        sheet.appendRow(["ReceptionPin", "0000"]); // Default Shop ID for Reception
+        sheet.appendRow(["Currency", "INR"]);
+      }
 
-        <!-- INLINE CHECK-IN PANEL -->
-        <section id="checkInPanel" class="hidden-view bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs space-y-4">
-            <div class="flex justify-between items-center border-b border-neutral-100 pb-2.5">
-                <h3 id="ciRoomTitle" class="text-sm font-bold uppercase text-maroon">Check-In Registration</h3>
-                <button onclick="closePanel('checkInPanel')" class="text-neutral-400 hover:text-black font-bold text-lg">&times;</button>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                    <label class="text-[10px] font-bold uppercase text-neutral-500 block mb-1">Guest Full Name</label>
-                    <input type="text" id="ciGuestName" class="w-full px-3 py-2 border border-neutral-200 rounded-xl text-xs focus:outline-none focus:border-maroon">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold uppercase text-neutral-500 block mb-1">Contact Phone</label>
-                    <input type="tel" id="ciGuestPhone" class="w-full px-3 py-2 border border-neutral-200 rounded-xl text-xs font-mono focus:outline-none focus:border-maroon">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold uppercase text-neutral-500 block mb-1">Advance Amount Received</label>
-                    <input type="number" id="ciAdvance" value="0" class="w-full px-3 py-2 border border-neutral-200 rounded-xl text-xs font-mono focus:outline-none focus:border-maroon">
-                </div>
-                <div class="sm:col-span-3">
-                    <label class="text-[10px] font-bold uppercase text-neutral-500 block mb-1">Identity Document (Camera / Upload)</label>
-                    <input type="file" id="ciCameraInput" accept="image/*" capture="camera" class="w-full text-xs text-neutral-500 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:bg-neutral-100 cursor-pointer">
-                    <img id="ciPreview" class="hidden-view mt-2 max-h-24 rounded border border-neutral-200 object-contain">
-                </div>
-            </div>
-            <div class="flex justify-end gap-2 pt-2 border-t border-neutral-100">
-                <button onclick="closePanel('checkInPanel')" class="border border-neutral-200 px-4 py-2 rounded-xl text-xs font-semibold">Cancel</button>
-                <button onclick="submitCheckIn()" id="btnCheckIn" class="bg-maroon text-white px-5 py-2 rounded-xl text-xs font-bold uppercase">Confirm Check-In</button>
-            </div>
-        </section>
+      if (sheetName === "MenuItems") {
+        sheet.appendRow(["M101", "Beverages", "Masala Tea", 30, "Yes"]);
+        sheet.appendRow(["M102", "Beverages", "Filter Coffee", 50, "Yes"]);
+        sheet.appendRow(["M103", "Breakfast", "Club Sandwich", 120, "Yes"]);
+        sheet.appendRow(["M104", "Main Course", "Paneer Butter Masala", 260, "Yes"]);
+        sheet.appendRow(["M105", "Breads", "Butter Naan", 40, "Yes"]);
+      }
 
-        <!-- INLINE CHECKOUT & SETTLEMENT PANEL -->
-        <section id="checkOutPanel" class="hidden-view bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs space-y-4">
-            <div class="flex justify-between items-center border-b border-neutral-100 pb-2.5">
-                <h3 id="coRoomTitle" class="text-sm font-bold uppercase text-maroon">Billing & Settlement</h3>
-                <button onclick="closePanel('checkOutPanel')" class="text-neutral-400 hover:text-black font-bold text-lg">&times;</button>
-            </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="space-y-2 bg-neutral-50 p-3.5 rounded-xl border border-neutral-200 text-xs font-mono">
-                    <div class="flex justify-between"><span>Room Tariff:</span><span id="coRoomRent">₹0</span></div>
-                    <div class="flex justify-between"><span>Dining Orders:</span><span id="coFoodTotal">₹0</span></div>
-                    <div class="flex justify-between text-neutral-400"><span>Advance Received:</span><span id="coAdvanceLess">-₹0</span></div>
-                    <div class="flex justify-between border-t border-neutral-200 pt-2 font-bold text-sm">
-                        <span class="text-black uppercase">Net Balance:</span>
-                        <span id="coNetTotal" class="text-maroon">₹0</span>
-                    </div>
-                </div>
-                <div class="flex flex-col items-center justify-center p-3 border border-neutral-200 rounded-xl bg-white space-y-1">
-                    <img id="coQrImage" src="" alt="Payment QR" class="w-28 h-28 object-contain">
-                    <span class="text-[9px] uppercase font-mono text-neutral-400">Scan to Pay via UPI</span>
-                </div>
-            </div>
-            <div class="flex justify-end gap-2 pt-2 border-t border-neutral-100">
-                <button onclick="closePanel('checkOutPanel')" class="border border-neutral-200 px-4 py-2 rounded-xl text-xs font-semibold">Return</button>
-                <button onclick="confirmCheckOut()" id="btnCheckOut" class="bg-maroon text-white px-5 py-2 rounded-xl text-xs font-bold uppercase">Confirm Clearance & Exit</button>
-            </div>
-        </section>
+      if (sheetName === "Rooms") {
+        sheet.appendRow(["101", "Deluxe Room", 2500, "Vacant"]);
+        sheet.appendRow(["102", "Deluxe Room", 2500, "Vacant"]);
+        sheet.appendRow(["103", "Executive Suite", 4000, "Vacant"]);
+        sheet.appendRow(["104", "Standard Room", 1800, "Vacant"]);
+      }
 
-    </main>
+      if (sheetName === "Staff") {
+        sheet.appendRow(["ST-01", "Ramesh Kumar", "Front Desk", "9876500001", "On Duty"]);
+        sheet.appendRow(["ST-02", "Sunil Verma", "Housekeeping", "9876500002", "Off Duty"]);
+        sheet.appendRow(["ST-03", "Anil Sharma", "Kitchen Service", "9876500003", "On Duty"]);
+      }
+    }
+  }
 
-    <footer class="bg-white border-t border-neutral-200 py-6 mt-12 text-xs">
-        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <img src="https://i.pinimg.com/736x/bd/d0/5c/bdd05c94afb66b5a72f5e17a7a879ab3.jpg" alt="Ofbuzz Logo" class="w-7 h-7 rounded-full object-cover border border-neutral-300">
-                <div>
-                    <p class="font-bold uppercase tracking-wider text-black">Ofbuzz Technology</p>
-                    <p class="text-[10px] text-neutral-400 uppercase tracking-widest">Ofbuzz PMS &bull; An Indian Technology</p>
-                </div>
-            </div>
-            <a href="https://wa.me/917827201014" target="_blank" class="border border-neutral-300 text-black px-4 py-2 rounded-xl text-[11px] font-semibold">
-                Support Desk
-            </a>
-        </div>
-    </footer>
+  const defaultSheet1 = ss.getSheetByName("Sheet1");
+  if (defaultSheet1 && ss.getSheets().length > 1) {
+    try { ss.deleteSheet(defaultSheet1); } catch (e) {}
+  }
+}
 
-    <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const currentSlug = urlParams.get('hotel') || "royalstay";
-        let currentClient = null;
-        let appData = { rooms: [], activeBookings: [], foodOrders: [] };
-        let activeRoomTarget = null, activeBookingTarget = null, base64Compressed = "";
+function doGet(e) {
+  try {
+    ensureDatabaseSchema();
+    const action = e.parameter.action;
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
 
-        function notify(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = msg;
-            t.classList.remove('hidden-view');
-            setTimeout(() => t.classList.add('hidden-view'), 3000);
+    // 1. Initial Property Profile & Settings
+    if (action === "getPropertyConfig") {
+      const settings = getSettingsMap(ss);
+      return createJsonResponse({
+        success: true,
+        propertyName: settings["PropertyName"] || "Hotel Portal",
+        currency: settings["Currency"] || "INR"
+      });
+    }
+
+    // 2. Reception Desk Data (WITH PIN VERIFICATION)
+    if (action === "getReceptionData") {
+      const settings = getSettingsMap(ss);
+      const clientPin = (e.parameter.pin || "").toString().trim();
+      const actualPin = (settings["ReceptionPin"] || "0000").toString().trim();
+
+      if (clientPin !== actualPin) {
+        return createJsonResponse({ success: false, error: "Access verification code incorrect" });
+      }
+
+      const rooms = getSheetDataAsJson(ss.getSheetByName("Rooms"));
+      const activeBookings = getSheetDataAsJson(ss.getSheetByName("Bookings")).filter(b => b.Status === "Active");
+      const foodOrders = getSheetDataAsJson(ss.getSheetByName("FoodOrders"));
+
+      return createJsonResponse({
+        success: true,
+        propertyName: settings["PropertyName"] || "Hotel Operations",
+        rooms: rooms,
+        activeBookings: activeBookings,
+        foodOrders: foodOrders
+      });
+    }
+
+    // 3. Dining & Restaurant Data
+    if (action === "getDiningData") {
+      const settings = getSettingsMap(ss);
+      const menu = getSheetDataAsJson(ss.getSheetByName("MenuItems"));
+      const activeBookings = getSheetDataAsJson(ss.getSheetByName("Bookings")).filter(b => b.Status === "Active");
+      const recentOrders = getSheetDataAsJson(ss.getSheetByName("FoodOrders")).reverse().slice(0, 20);
+
+      return createJsonResponse({
+        success: true,
+        propertyName: settings["PropertyName"] || "Hotel Operations",
+        menu: menu,
+        activeRooms: activeBookings.map(b => ({ RoomNo: b.RoomNo, GuestName: b.GuestName, BookingId: b.BookingId })),
+        recentOrders: recentOrders
+      });
+    }
+
+    // 4. Staff Management Data
+    if (action === "getStaffData") {
+      const settings = getSettingsMap(ss);
+      const staffList = getSheetDataAsJson(ss.getSheetByName("Staff"));
+      const attendance = getSheetDataAsJson(ss.getSheetByName("Attendance")).reverse().slice(0, 30);
+
+      return createJsonResponse({
+        success: true,
+        propertyName: settings["PropertyName"] || "Hotel Operations",
+        staffList: staffList,
+        attendance: attendance
+      });
+    }
+
+    // 5. Admin / Analytics Data
+    if (action === "getAdminData") {
+      const settings = getSettingsMap(ss);
+      const clientPin = (e.parameter.pin || "").toString().trim();
+      const actualPin = (settings["AdminPin"] || "1234").toString().trim();
+
+      if (clientPin !== actualPin) {
+        return createJsonResponse({ success: false, error: "Access verification code incorrect" });
+      }
+
+      const rooms = getSheetDataAsJson(ss.getSheetByName("Rooms"));
+      const bookings = getSheetDataAsJson(ss.getSheetByName("Bookings"));
+      const invoices = getSheetDataAsJson(ss.getSheetByName("Invoices"));
+      const feedback = getSheetDataAsJson(ss.getSheetByName("Feedback"));
+
+      const totalRooms = rooms.length;
+      const occupiedRooms = rooms.filter(r => r.Status === "Occupied").length;
+      const cleaningRooms = rooms.filter(r => r.Status === "Cleaning").length;
+      const vacantRooms = totalRooms - (occupiedRooms + cleaningRooms);
+
+      let totalRoomRev = 0, totalFoodRev = 0, grandTotalRev = 0;
+      invoices.forEach(inv => {
+        totalRoomRev += Number(inv.RoomTotal) || 0;
+        totalFoodRev += Number(inv.FoodTotal) || 0;
+        grandTotalRev += Number(inv.FinalPaid) || 0;
+      });
+
+      return createJsonResponse({
+        success: true,
+        propertyName: settings["PropertyName"] || "Hotel Operations",
+        summary: {
+          totalRooms: totalRooms,
+          occupiedRooms: occupiedRooms,
+          vacantRooms: vacantRooms,
+          cleaningRooms: cleaningRooms,
+          occupancyRate: totalRooms > 0 ? Math.round((occupiedRooms / totalRooms) * 100) + "%" : "0%",
+          totalRoomRev: totalRoomRev,
+          totalFoodRev: totalFoodRev,
+          grandTotalRev: grandTotalRev
+        },
+        invoices: invoices.reverse(),
+        recentBookings: bookings.reverse().slice(0, 50),
+        feedbacks: feedback.reverse()
+      });
+    }
+
+    return createJsonResponse({ success: false, error: "Requested routine not recognized" });
+  } catch (err) {
+    return createJsonResponse({ success: false, error: err.toString() });
+  }
+}
+
+function doPost(e) {
+  try {
+    ensureDatabaseSchema();
+    const postData = JSON.parse(e.postData.contents);
+    const action = postData.action;
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const timeNow = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yyyy HH:mm");
+
+    // Check-In
+    if (action === "checkIn") {
+      const roomNo = postData.roomNo.toString().trim();
+      const guestName = postData.guestName.trim();
+      const phone = postData.phone.trim();
+      const advance = Number(postData.advance) || 0;
+      const photoDataUrl = postData.idPhotoBase64 || "";
+
+      const bookingId = "BK-" + new Date().getTime().toString().slice(-6);
+      const bookingsSheet = ss.getSheetByName("Bookings");
+      bookingsSheet.appendRow([bookingId, roomNo, guestName, phone, timeNow, "", advance, photoDataUrl, "Active"]);
+
+      updateRoomStatus(ss, roomNo, "Occupied");
+      return createJsonResponse({ success: true, bookingId: bookingId, message: "Guest check-in registered" });
+    }
+
+    // Food Order Placement
+    if (action === "addFoodOrder") {
+      const roomNo = postData.roomNo.toString().trim();
+      const bookingId = postData.bookingId || "";
+      const items = postData.items.trim();
+      const amount = Number(postData.amount) || 0;
+
+      const orderId = "ORD-" + new Date().getTime().toString().slice(-5);
+      const foodSheet = ss.getSheetByName("FoodOrders");
+      foodSheet.appendRow([orderId, roomNo, bookingId, items, amount, timeNow]);
+
+      return createJsonResponse({ success: true, orderId: orderId, message: "Dining order billed" });
+    }
+
+    // Check-Out & Settlement
+    if (action === "checkOut") {
+      const bookingId = postData.bookingId;
+      const roomNo = postData.roomNo.toString().trim();
+      const paymentMode = postData.paymentMode || "UPI";
+
+      const bookingsSheet = ss.getSheetByName("Bookings");
+      const bookingsData = bookingsSheet.getDataRange().getValues();
+      let rowIndex = -1, guestName = "", advancePaid = 0;
+
+      for (let i = 1; i < bookingsData.length; i++) {
+        if (bookingsData[i][0] == bookingId && bookingsData[i][8] == "Active") {
+          rowIndex = i + 1;
+          guestName = bookingsData[i][2];
+          advancePaid = Number(bookingsData[i][6]) || 0;
+          break;
         }
+      }
 
-        async function initTenant() {
-            try {
-                const cached = localStorage.getItem(`ofbuzz_tenant_${currentSlug}`);
-                if (cached) currentClient = JSON.parse(cached);
+      if (rowIndex === -1) return createJsonResponse({ success: false, error: "Active record not located" });
 
-                const res = await fetch(`masterdata.json?_ts=${Date.now()}`);
-                if (!res.ok) throw new Error();
-                const registry = await res.json();
-                currentClient = registry[currentSlug];
+      const foodSheet = ss.getSheetByName("FoodOrders");
+      const foodData = foodSheet.getDataRange().getValues();
+      let foodTotal = 0;
+      for (let j = 1; j < foodData.length; j++) {
+        if (foodData[j][2] == bookingId) foodTotal += Number(foodData[j][4]) || 0;
+      }
 
-                if (!currentClient) {
-                    document.body.innerHTML = "<div class='p-12 text-center text-xs font-mono uppercase text-[#800020]'>Tenant configuration profile not identified.</div>";
-                    return false;
-                }
-
-                localStorage.setItem(`ofbuzz_tenant_${currentSlug}`, JSON.stringify(currentClient));
-
-                document.getElementById('propTitle').innerText = `${currentClient.name} - Front Desk`;
-
-                if (Date.now() > new Date(currentClient.expiryDate + "T23:59:59").getTime()) {
-                    document.getElementById('licenseExpiredOverlay').classList.remove('hidden-view');
-                    return false;
-                }
-                return true;
-            } catch (e) {
-                if (currentClient) return true;
-                document.body.innerHTML = "<div class='p-12 text-center text-xs font-mono uppercase text-[#800020]'>Communication failure loading property parameters.</div>";
-                return false;
-            }
+      const roomsSheet = ss.getSheetByName("Rooms");
+      const roomsData = roomsSheet.getDataRange().getValues();
+      let roomRent = 0;
+      for (let k = 1; k < roomsData.length; k++) {
+        if (roomsData[k][0].toString() == roomNo) {
+          roomRent = Number(roomsData[k][2]) || 0;
+          break;
         }
+      }
 
-        function refreshData() {
-            fetch(`${currentClient.scriptUrl}?action=getReceptionData&_ts=${Date.now()}`)
-                .then(r => r.json())
-                .then(res => {
-                    if (res.success) {
-                        appData = res;
-                        renderRooms();
-                    }
-                })
-                .catch(() => notify("Network connection timeout."));
+      const netPayable = (roomRent + foodTotal) - advancePaid;
+      const invoiceId = "INV-" + new Date().getTime().toString().slice(-6);
+
+      bookingsSheet.getRange(rowIndex, 6).setValue(timeNow);
+      bookingsSheet.getRange(rowIndex, 9).setValue("CheckedOut");
+
+      const invSheet = ss.getSheetByName("Invoices");
+      invSheet.appendRow([invoiceId, bookingId, roomNo, guestName, roomRent, foodTotal, advancePaid, netPayable, paymentMode, timeNow]);
+
+      updateRoomStatus(ss, roomNo, "Cleaning");
+      return createJsonResponse({ success: true, invoiceId: invoiceId, netPayable: netPayable, message: "Settlement recorded" });
+    }
+
+    // Mark Room Cleaned
+    if (action === "markRoomCleaned") {
+      const roomNo = postData.roomNo.toString().trim();
+      updateRoomStatus(ss, roomNo, "Vacant");
+      return createJsonResponse({ success: true, message: "Room marked vacant" });
+    }
+
+    // Record Staff Attendance
+    if (action === "recordAttendance") {
+      const staffId = postData.staffId;
+      const staffName = postData.staffName;
+      const dutyAction = postData.dutyAction; // 'Check In' or 'Check Out'
+
+      const recordId = "ATT-" + new Date().getTime().toString().slice(-5);
+      ss.getSheetByName("Attendance").appendRow([recordId, staffId, staffName, dutyAction, timeNow]);
+
+      // Update staff shift status
+      const staffSheet = ss.getSheetByName("Staff");
+      const staffData = staffSheet.getDataRange().getValues();
+      for (let i = 1; i < staffData.length; i++) {
+        if (staffData[i][0] == staffId) {
+          staffSheet.getRange(i + 1, 5).setValue(dutyAction === "Check In" ? "On Duty" : "Off Duty");
+          break;
         }
+      }
+      return createJsonResponse({ success: true, message: "Attendance status updated" });
+    }
 
-        function renderRooms() {
-            const grid = document.getElementById('roomGrid');
-            grid.innerHTML = "";
-            let v = 0, o = 0, c = 0;
+    // Submit Feedback
+    if (action === "submitFeedback") {
+      const feedbackId = "FB-" + new Date().getTime().toString().slice(-5);
+      ss.getSheetByName("Feedback").appendRow([
+        feedbackId,
+        postData.roomNo || "N/A",
+        postData.guestName || "Guest",
+        postData.cleanliness || 5,
+        postData.staff || 5,
+        postData.amenities || 5,
+        postData.food || 5,
+        postData.comments || "",
+        timeNow
+      ]);
+      return createJsonResponse({ success: true, message: "Evaluation saved" });
+    }
 
-            appData.rooms.forEach(r => {
-                const rNo = r.RoomNo.toString();
-                let cls = "", act = "";
+    return createJsonResponse({ success: false, error: "Action routine undefined" });
+  } catch (err) {
+    return createJsonResponse({ success: false, error: err.toString() });
+  }
+}
 
-                if (r.Status === "Vacant") {
-                    v++;
-                    cls = "border-emerald-200 bg-emerald-50/40 text-emerald-950";
-                    act = `onclick="openCheckIn('${rNo}')"`;
-                } else if (r.Status === "Occupied") {
-                    o++;
-                    cls = "border-neutral-300 bg-white text-black";
-                    act = `onclick="openCheckOut('${rNo}')"`;
-                } else {
-                    c++;
-                    cls = "border-amber-200 bg-amber-50/50 text-amber-950";
-                    act = `onclick="markClean('${rNo}')"`;
-                }
+// Helpers
+function getSettingsMap(ss) {
+  const sheet = ss.getSheetByName("Settings");
+  const data = sheet.getDataRange().getValues();
+  const map = {};
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0]) map[data[i][0].toString().trim()] = data[i][1];
+  }
+  return map;
+}
 
-                grid.innerHTML += `
-                    <div ${act} class="border p-4 rounded-xl cursor-pointer flex flex-col justify-between h-24 ${cls}">
-                        <div class="flex justify-between items-start">
-                            <span class="text-base font-black font-mono">${rNo}</span>
-                            <span class="text-[9px] uppercase font-bold opacity-75">${r.Status}</span>
-                        </div>
-                        <div class="text-[10px] text-neutral-400 font-mono">₹${r.Price || 0}</div>
-                    </div>
-                `;
-            });
+function updateRoomStatus(ss, roomNo, status) {
+  const sheet = ss.getSheetByName("Rooms");
+  const data = sheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0].toString() == roomNo.toString()) {
+      sheet.getRange(i + 1, 4).setValue(status);
+      break;
+    }
+  }
+}
 
-            document.getElementById('cntVacant').innerText = v;
-            document.getElementById('cntOccupied').innerText = o;
-            document.getElementById('cntCleaning').innerText = c;
-        }
+function getSheetDataAsJson(sheet) {
+  if (!sheet) return [];
+  const rows = sheet.getDataRange().getValues();
+  if (rows.length <= 1) return [];
+  const headers = rows[0];
+  const out = [];
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i], obj = {};
+    for (let j = 0; j < headers.length; j++) obj[headers[j]] = row[j];
+    out.push(obj);
+  }
+  return out;
+}
 
-        document.getElementById('ciCameraInput').addEventListener('change', function(e) {
-            const f = e.target.files[0];
-            if (!f) return;
-            const r = new FileReader();
-            r.onload = function(evt) {
-                const img = new Image();
-                img.onload = function() {
-                    const c = document.createElement('canvas');
-                    let w = img.width, h = img.height;
-                    if (w > 800) { h = Math.round((h * 800) / w); w = 800; }
-                    c.width = w; c.height = h;
-                    c.getContext('2d').drawImage(img, 0, 0, w, h);
-                    base64Compressed = c.toDataURL('image/jpeg', 0.65);
-                    const p = document.getElementById('ciPreview');
-                    p.src = base64Compressed;
-                    p.classList.remove('hidden-view');
-                };
-                img.src = evt.target.result;
-            };
-            r.readAsDataURL(f);
-        });
-
-        function openCheckIn(rNo) {
-            activeRoomTarget = rNo;
-            document.getElementById('ciRoomTitle').innerText = `Register Guest: Room ${rNo}`;
-            document.getElementById('ciGuestName').value = "";
-            document.getElementById('ciGuestPhone').value = "";
-            document.getElementById('ciAdvance').value = "0";
-            document.getElementById('ciPreview').classList.add('hidden-view');
-            base64Compressed = "";
-            document.getElementById('checkOutPanel').classList.add('hidden-view');
-            document.getElementById('checkInPanel').classList.remove('hidden-view');
-        }
-
-        function submitCheckIn() {
-            const name = document.getElementById('ciGuestName').value.trim();
-            const phone = document.getElementById('ciGuestPhone').value.trim();
-            const adv = document.getElementById('ciAdvance').value.trim();
-
-            if (!name || !phone) return notify("Guest details required.");
-
-            const btn = document.getElementById('btnCheckIn');
-            btn.disabled = true;
-            btn.innerText = "Processing...";
-
-            fetch(currentClient.scriptUrl, {
-                method: "POST",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify({ action: "checkIn", roomNo: activeRoomTarget, guestName: name, phone: phone, advance: adv, idPhotoBase64: base64Compressed })
-            })
-            .then(r => r.json())
-            .then(res => {
-                btn.disabled = false;
-                btn.innerText = "Confirm Check-In";
-                if (res.success) {
-                    closePanel('checkInPanel');
-                    refreshData();
-                    notify("Check-in complete.");
-                }
-            })
-            .catch(() => {
-                btn.disabled = false;
-                btn.innerText = "Confirm Check-In";
-                notify("Transmission failure.");
-            });
-        }
-
-        function openCheckOut(rNo) {
-            const b = appData.activeBookings.find(x => x.RoomNo.toString() === rNo.toString());
-            if (!b) return;
-            activeBookingTarget = b;
-
-            const room = appData.rooms.find(x => x.RoomNo.toString() === rNo.toString());
-            const roomRent = Number(room?.Price) || 0;
-            const foodOrders = appData.foodOrders.filter(f => f.BookingId === b.BookingId);
-            const foodTotal = foodOrders.reduce((sum, f) => sum + (Number(f.Amount) || 0), 0);
-            const advance = Number(b.Advance) || 0;
-            const net = (roomRent + foodTotal) - advance;
-
-            document.getElementById('coRoomTitle').innerText = `Settlement: Room ${rNo} (${b.GuestName})`;
-            document.getElementById('coRoomRent').innerText = `₹${roomRent}`;
-            document.getElementById('coFoodTotal').innerText = `₹${foodTotal}`;
-            document.getElementById('coAdvanceLess').innerText = `-₹${advance}`;
-            document.getElementById('coNetTotal').innerText = `₹${net}`;
-
-            const upiNote = encodeURIComponent(`Bill Room ${rNo}`);
-            const upiStr = `upi://pay?pa=${currentClient.upiVpa}&pn=${encodeURIComponent(currentClient.name)}&am=${net}&cu=INR&tn=${upiNote}`;
-            document.getElementById('coQrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(upiStr)}`;
-
-            document.getElementById('checkInPanel').classList.add('hidden-view');
-            document.getElementById('checkOutPanel').classList.remove('hidden-view');
-        }
-
-        function confirmCheckOut() {
-            const btn = document.getElementById('btnCheckOut');
-            btn.disabled = true;
-            btn.innerText = "Clearing...";
-
-            fetch(currentClient.scriptUrl, {
-                method: "POST",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify({ action: "checkOut", bookingId: activeBookingTarget.BookingId, roomNo: activeBookingTarget.RoomNo, paymentMode: "UPI" })
-            })
-            .then(r => r.json())
-            .then(res => {
-                btn.disabled = false;
-                btn.innerText = "Confirm Clearance & Exit";
-                if (res.success) {
-                    closePanel('checkOutPanel');
-                    refreshData();
-                    notify("Check-out finalized. Room marked for cleaning.");
-                }
-            })
-            .catch(() => {
-                btn.disabled = false;
-                btn.innerText = "Confirm Clearance & Exit";
-                notify("Transmission failure.");
-            });
-        }
-
-        function markClean(rNo) {
-            fetch(currentClient.scriptUrl, {
-                method: "POST",
-                headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify({ action: "markRoomCleaned", roomNo: rNo })
-            })
-            .then(r => r.json())
-            .then(res => { if (res.success) { refreshData(); notify(`Room ${rNo} is now vacant.`); } });
-        }
-
-        function closePanel(id) {
-            document.getElementById(id).classList.add('hidden-view');
-        }
-
-        window.addEventListener('DOMContentLoaded', async () => {
-            const ready = await initTenant();
-            if (ready) refreshData();
-        });
-    </script>
-</body>
-</html>
+function createJsonResponse(data) {
+  return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
+}
