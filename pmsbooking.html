@@ -7,87 +7,132 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>body { background-color: #fafafa; color: #111; } .hidden-view{display:none !important;}</style>
 </head>
-<body class="font-sans antialiased text-gray-800">
+<body class="font-sans antialiased text-gray-800 min-h-screen flex flex-col">
 
     <!-- HEADER -->
-    <header class="bg-red-600 text-white p-4 shadow-md sticky top-0 z-50">
-        <div class="max-w-5xl mx-auto flex justify-between items-center">
-            <h1 id="bPropName" class="text-xl font-black tracking-tight uppercase">Premium Stays</h1>
-            <span class="text-xs font-bold bg-white text-red-600 px-3 py-1 rounded-full shadow">Powered by Ofbuzz</span>
+    <header class="bg-red-600 text-white p-5 shadow-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <!-- HOTEL NAME DYNAMICALLY ADDED HERE -->
+            <h1 id="bPropName" class="text-2xl font-black tracking-tight uppercase">Premium Stays</h1>
+            <span class="text-[10px] font-bold bg-white text-red-600 px-3 py-1.5 rounded-full shadow tracking-widest uppercase">Powered by Ofbuzz</span>
         </div>
     </header>
 
-    <main class="max-w-5xl mx-auto p-4 sm:p-6 mt-4">
+    <main class="flex-1 max-w-6xl mx-auto w-full p-4 sm:p-6 mt-4">
         
         <!-- STEP 1: SEARCH & DATES -->
-        <div id="stepSearch" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-6">
-            <h2 class="text-lg font-black mb-4">Find Your Perfect Room</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div><label class="block text-xs font-bold text-gray-500 mb-1">Check-in</label><input type="date" id="bIn" class="w-full border p-3 rounded-xl outline-none focus:border-red-500"></div>
-                <div><label class="block text-xs font-bold text-gray-500 mb-1">Check-out</label><input type="date" id="bOut" class="w-full border p-3 rounded-xl outline-none focus:border-red-500"></div>
-                <div class="flex items-end"><button onclick="showRooms()" class="w-full bg-red-600 text-white font-bold p-3 rounded-xl hover:bg-red-700 shadow-md">Search Availability</button></div>
+        <div id="stepSearch" class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 mb-6">
+            <h2 class="text-xl font-black mb-6 text-gray-800">Find Your Perfect Room</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div><label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Check-in Date</label><input type="date" id="bIn" class="w-full border border-gray-300 p-4 rounded-xl outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition"></div>
+                <div><label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Check-out Date</label><input type="date" id="bOut" class="w-full border border-gray-300 p-4 rounded-xl outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition"></div>
+                <div class="flex items-end"><button onclick="showRooms()" class="w-full bg-red-600 text-white font-black uppercase tracking-wider p-4 rounded-xl hover:bg-red-700 shadow-md transition transform hover:scale-[1.02]">Search Availability</button></div>
             </div>
         </div>
 
         <!-- STEP 2: ROOM SELECTION -->
-        <div id="stepRooms" class="hidden-view space-y-4 mb-6">
-            <h3 class="font-black text-xl mb-2">Available Categories</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Static UI for Demo -->
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=800&q=80" class="w-full h-48 object-cover">
-                    <div class="p-5">
-                        <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-black text-lg">Deluxe Suite</h4>
-                            <span class="font-mono text-red-600 font-bold text-lg">₹2,500 <span class="text-xs text-gray-400">/night</span></span>
+        <div id="stepRooms" class="hidden-view space-y-6 mb-8">
+            <h3 class="font-black text-2xl mb-2 text-gray-800">Available Categories</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Static UI for Demo Categories -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition">
+                    <img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=800&q=80" class="w-full h-56 object-cover">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="font-black text-xl text-gray-800">Deluxe Suite</h4>
+                            <span class="font-mono text-red-600 font-black text-xl">₹2,500 <span class="text-[10px] text-gray-400 block text-right tracking-widest uppercase">/night</span></span>
                         </div>
-                        <ul class="text-xs text-gray-500 mb-4 flex gap-3"><li class="bg-gray-100 px-2 py-1 rounded">AC</li><li class="bg-gray-100 px-2 py-1 rounded">Free WiFi</li><li class="bg-gray-100 px-2 py-1 rounded">TV</li></ul>
-                        <button onclick="startBooking('Deluxe Suite', 2500)" class="w-full border-2 border-red-600 text-red-600 font-bold py-2 rounded-xl hover:bg-red-50">Select Room</button>
+                        <ul class="text-xs font-bold text-gray-500 mb-6 flex flex-wrap gap-2">
+                            <li class="bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">AC</li>
+                            <li class="bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">Free WiFi</li>
+                            <li class="bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">Smart TV</li>
+                        </ul>
+                        <button onclick="startBooking('Deluxe Suite', 2500)" class="w-full border-2 border-red-600 text-red-600 font-bold py-3 rounded-xl hover:bg-red-50 transition">Select Room</button>
                     </div>
                 </div>
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                    <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80" class="w-full h-48 object-cover">
-                    <div class="p-5">
-                        <div class="flex justify-between items-start mb-2">
-                            <h4 class="font-black text-lg">Standard Room</h4>
-                            <span class="font-mono text-red-600 font-bold text-lg">₹1,500 <span class="text-xs text-gray-400">/night</span></span>
+                
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition">
+                    <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80" class="w-full h-56 object-cover">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="font-black text-xl text-gray-800">Standard Room</h4>
+                            <span class="font-mono text-red-600 font-black text-xl">₹1,500 <span class="text-[10px] text-gray-400 block text-right tracking-widest uppercase">/night</span></span>
                         </div>
-                        <ul class="text-xs text-gray-500 mb-4 flex gap-3"><li class="bg-gray-100 px-2 py-1 rounded">AC</li><li class="bg-gray-100 px-2 py-1 rounded">Basic Setup</li></ul>
-                        <button onclick="startBooking('Standard Room', 1500)" class="w-full border-2 border-red-600 text-red-600 font-bold py-2 rounded-xl hover:bg-red-50">Select Room</button>
+                        <ul class="text-xs font-bold text-gray-500 mb-6 flex flex-wrap gap-2">
+                            <li class="bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">AC</li>
+                            <li class="bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">Basic Setup</li>
+                        </ul>
+                        <button onclick="startBooking('Standard Room', 1500)" class="w-full border-2 border-red-600 text-red-600 font-bold py-3 rounded-xl hover:bg-red-50 transition">Select Room</button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg transition">
+                    <img src="https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=80" class="w-full h-56 object-cover">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-3">
+                            <h4 class="font-black text-xl text-gray-800">Premium Stay</h4>
+                            <span class="font-mono text-red-600 font-black text-xl">₹3,500 <span class="text-[10px] text-gray-400 block text-right tracking-widest uppercase">/night</span></span>
+                        </div>
+                        <ul class="text-xs font-bold text-gray-500 mb-6 flex flex-wrap gap-2">
+                            <li class="bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">King Size</li>
+                            <li class="bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">Balcony</li>
+                            <li class="bg-gray-100 px-3 py-1.5 rounded-lg border border-gray-200">Mini Bar</li>
+                        </ul>
+                        <button onclick="startBooking('Premium Stay', 3500)" class="w-full border-2 border-red-600 text-red-600 font-bold py-3 rounded-xl hover:bg-red-50 transition">Select Room</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- STEP 3: PAYMENT & DETAILS -->
-        <div id="stepPay" class="hidden-view bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h3 class="font-black text-xl border-b pb-3 mb-4">Complete Your Booking</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="space-y-4">
-                    <input type="text" id="gName" placeholder="Guest Full Name" class="w-full border p-3 rounded-xl outline-none focus:border-red-500">
-                    <input type="tel" id="gPhone" placeholder="Mobile Number" class="w-full border p-3 rounded-xl outline-none focus:border-red-500">
-                    <div class="bg-gray-50 p-4 rounded-xl font-mono text-sm space-y-2 border">
-                        <div class="flex justify-between"><span>Room:</span><span id="summRoom" class="font-bold"></span></div>
-                        <div class="flex justify-between"><span>Dates:</span><span id="summDates" class="font-bold"></span></div>
-                        <hr class="border-gray-200">
-                        <div class="flex justify-between text-lg text-red-600 font-black"><span>Total Payable:</span><span id="summTotal"></span></div>
+        <div id="stepPay" class="hidden-view bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+            <h3 class="font-black text-2xl border-b border-gray-100 pb-4 mb-6 text-gray-800">Complete Your Booking</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div class="space-y-5">
+                    <div><label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Guest Name</label><input type="text" id="gName" placeholder="Enter Full Name" class="w-full border border-gray-300 p-4 rounded-xl outline-none focus:border-red-500 transition"></div>
+                    <div><label class="block text-xs font-bold text-gray-500 mb-1 uppercase">Mobile Number</label><input type="tel" id="gPhone" placeholder="Enter Phone Number" class="w-full border border-gray-300 p-4 rounded-xl outline-none focus:border-red-500 transition"></div>
+                    
+                    <div class="bg-red-50 p-5 rounded-xl font-mono text-sm space-y-3 border border-red-100">
+                        <div class="flex justify-between items-center"><span class="text-red-800 font-bold uppercase text-xs">Room Selected:</span><span id="summRoom" class="font-black text-base text-gray-900"></span></div>
+                        <div class="flex justify-between items-center"><span class="text-red-800 font-bold uppercase text-xs">Duration:</span><span id="summDates" class="font-black text-gray-900"></span></div>
+                        <hr class="border-red-200">
+                        <div class="flex justify-between items-center text-xl text-red-600 font-black"><span class="uppercase text-sm">Total Payable:</span><span id="summTotal"></span></div>
                     </div>
                 </div>
-                <div class="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl p-4">
-                    <h4 class="text-xs font-bold uppercase text-gray-400 mb-2">Scan & Pay to Confirm</h4>
-                    <img id="qrCode" src="" class="w-40 h-40 mb-3 border p-1 rounded-lg">
-                    <button onclick="confirmBooking()" id="btnConfirm" class="w-full bg-green-600 text-white font-bold py-3 rounded-xl shadow-md hover:bg-green-700 transition">Payment Done, Confirm Booking</button>
+
+                <div class="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-2xl p-6 bg-gray-50">
+                    <h4 class="text-sm font-black uppercase text-gray-500 mb-4 tracking-widest">Scan & Pay to Confirm</h4>
+                    <img id="qrCode" src="" class="w-48 h-48 mb-6 border-4 border-white shadow-sm rounded-xl">
+                    <button onclick="confirmBooking()" id="btnConfirm" class="w-full bg-green-600 text-white font-black tracking-wider uppercase py-4 rounded-xl shadow-lg hover:bg-green-700 transition transform hover:scale-[1.02]">Payment Done, Confirm Booking</button>
+                    <button onclick="goBack()" class="w-full text-center mt-4 text-xs font-bold text-gray-400 hover:text-gray-600 uppercase underline">Go Back</button>
                 </div>
             </div>
         </div>
 
-        <div id="stepSuccess" class="hidden-view text-center p-12 bg-white rounded-2xl shadow-sm border border-gray-100">
-            <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-4xl">✓</div>
-            <h2 class="text-2xl font-black mb-2">Booking Requested!</h2>
-            <p class="text-gray-500">Your reservation has been sent to the front desk. They will verify your payment and call you to confirm.</p>
+        <!-- SUCCESS MESSAGE -->
+        <div id="stepSuccess" class="hidden-view text-center p-16 bg-white rounded-2xl shadow-sm border border-gray-100">
+            <div class="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 text-5xl shadow-inner">✓</div>
+            <h2 class="text-3xl font-black mb-3 text-gray-800">Booking Requested!</h2>
+            <p class="text-gray-500 max-w-md mx-auto">Your reservation details and payment status have been securely sent to the front desk. Our team will verify and contact you shortly to confirm your stay.</p>
         </div>
 
     </main>
+
+    <!-- ORIGINAL OFBUZZ FOOTER -->
+    <footer class="bg-white border-t border-gray-200 py-6 text-xs w-full mt-auto">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <img src="https://i.pinimg.com/736x/bd/d0/5c/bdd05c94afb66b5a72f5e17a7a879ab3.jpg" alt="Ofbuzz Logo" class="w-7 h-7 rounded-full object-cover border border-gray-300">
+                <div>
+                    <p class="font-bold uppercase tracking-wider text-black">Ofbuzz Technology</p>
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest">Ofbuzz PMS &bull; An Indian Technology</p>
+                </div>
+            </div>
+            <a href="https://wa.me/917827201014" target="_blank" class="border border-gray-300 text-black px-4 py-2 rounded-xl text-[11px] font-semibold hover:bg-gray-100 active:scale-95 transition-all cursor-pointer">
+                Support Desk
+            </a>
+        </div>
+    </footer>
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
@@ -98,47 +143,75 @@
             const res = await fetch(`masterdata.json?_ts=${Date.now()}`);
             const data = await res.json();
             client = data[slug];
-            if(client) document.getElementById('bPropName').innerText = client.name;
+            
+            // DYNAMIC HOTEL NAME IN HEADER
+            if(client) {
+                document.getElementById('bPropName').innerText = client.name;
+            } else {
+                document.getElementById('bPropName').innerText = "Hotel Not Found";
+            }
         }
 
         function showRooms() {
-            if(!document.getElementById('bIn').value || !document.getElementById('bOut').value) return alert("Select dates");
+            if(!document.getElementById('bIn').value || !document.getElementById('bOut').value) return alert("Please select your check-in and check-out dates first.");
             document.getElementById('stepRooms').classList.remove('hidden-view');
+            // Scroll to rooms smoothly
+            document.getElementById('stepRooms').scrollIntoView({ behavior: 'smooth' });
         }
 
         function startBooking(type, price) {
             selectedType = type; selectedTariff = price;
             document.getElementById('summRoom').innerText = type;
             document.getElementById('summDates').innerText = `${document.getElementById('bIn').value} to ${document.getElementById('bOut').value}`;
-            document.getElementById('summTotal').innerText = `₹${price}`;
+            document.getElementById('summTotal').innerText = `₹${price.toLocaleString()}`;
             
             const upiStr = `upi://pay?pa=${client.upiVpa}&pn=${encodeURIComponent(client.name)}&am=${price}&cu=INR`;
-            document.getElementById('qrCode').src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(upiStr)}`;
+            document.getElementById('qrCode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiStr)}`;
             
             document.getElementById('stepRooms').classList.add('hidden-view');
             document.getElementById('stepSearch').classList.add('hidden-view');
             document.getElementById('stepPay').classList.remove('hidden-view');
         }
 
+        function goBack() {
+            document.getElementById('stepPay').classList.add('hidden-view');
+            document.getElementById('stepSearch').classList.remove('hidden-view');
+            document.getElementById('stepRooms').classList.remove('hidden-view');
+        }
+
         function confirmBooking() {
+            const name = document.getElementById('gName').value.trim();
+            const phone = document.getElementById('gPhone').value.trim();
+            
+            if(!name || !phone) {
+                return alert("Please enter your name and mobile number to confirm the booking.");
+            }
+
             const btn = document.getElementById('btnConfirm');
-            btn.innerText = "Processing..."; btn.disabled = true;
+            btn.innerText = "Processing Request..."; 
+            btn.disabled = true;
 
             fetch(client.scriptUrl, {
                 method: "POST",
                 body: JSON.stringify({ 
                     action: "onlineBooking", 
-                    guestName: document.getElementById('gName').value, 
-                    phone: document.getElementById('gPhone').value,
+                    guestName: name, 
+                    phone: phone,
                     dates: document.getElementById('summDates').innerText,
                     roomType: selectedType
                 })
             }).then(r=>r.json()).then(res => {
                 document.getElementById('stepPay').classList.add('hidden-view');
                 document.getElementById('stepSuccess').classList.remove('hidden-view');
-            }).catch(()=> { btn.innerText = "Error. Try again"; btn.disabled = false; });
+            }).catch(()=> { 
+                btn.innerText = "Error. Please Try Again"; 
+                btn.disabled = false; 
+            });
         }
-        init();
+        
+        window.addEventListener('DOMContentLoaded', () => {
+            init();
+        });
     </script>
 </body>
 </html>
