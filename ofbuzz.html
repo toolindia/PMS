@@ -142,22 +142,7 @@
     </footer>
 
     <script>
-        let currentRegistry = {
-            "demo": {
-                "name": "Grand Heritage Residency",
-                "scriptUrl": "https://script.google.com/macros/s/AKfycbwYOUR_DEMO_SCRIPT_ID/exec",
-                "upiVpa": "merchant@bank",
-                "expiryDate": "2027-10-12",
-                "features": { "dining": true, "staff": true, "feedback": true }
-            },
-            "royalstay": {
-                "name": "Royal Stay",
-                "scriptUrl": "https://script.google.com/macros/s/AKfycbyyI9WyLb1ECpXMfI90ZWGGNlMucKUcLFvMNgJ_F1tr5CRGbpnxmkAgvBkpS5jnj_kX/exec",
-                "upiVpa": "ofbuzz@ptyes",
-                "expiryDate": "2027-10-12",
-                "features": { "dining": true, "staff": true, "feedback": true }
-            }
-        };
+        let currentRegistry = {};
 
         function showNotification(msg) {
             const el = document.getElementById('toast');
@@ -173,20 +158,28 @@
                     currentRegistry = await res.json();
                 }
             } catch (e) {}
-            refreshOutputs("royalstay");
+            refreshOutputs(document.getElementById('inHotelSlug').value.trim() || "");
         }
 
         function refreshOutputs(selectedSlug) {
             document.getElementById('codeMasterData').value = JSON.stringify(currentRegistry, null, 2);
 
-            const slug = selectedSlug || "royalstay";
+            const slug = selectedSlug;
             const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
             
-            document.getElementById('linkReception').innerText = `${baseUrl}/index.html?hotel=${slug}`;
-            document.getElementById('linkDining').innerText = `${baseUrl}/food.html?hotel=${slug}`;
-            document.getElementById('linkStaff').innerText = `${baseUrl}/staff.html?hotel=${slug}`;
-            document.getElementById('linkAdmin').innerText = `${baseUrl}/admin.html?hotel=${slug}`;
-            document.getElementById('linkCustomer').innerText = `${baseUrl}/customer.html?hotel=${slug}`;
+            if (slug) {
+                document.getElementById('linkReception').innerText = `${baseUrl}/index.html?hotel=${slug}`;
+                document.getElementById('linkDining').innerText = `${baseUrl}/food.html?hotel=${slug}`;
+                document.getElementById('linkStaff').innerText = `${baseUrl}/staff.html?hotel=${slug}`;
+                document.getElementById('linkAdmin').innerText = `${baseUrl}/admin.html?hotel=${slug}`;
+                document.getElementById('linkCustomer').innerText = `${baseUrl}/customer.html?hotel=${slug}`;
+            } else {
+                document.getElementById('linkReception').innerText = '-';
+                document.getElementById('linkDining').innerText = '-';
+                document.getElementById('linkStaff').innerText = '-';
+                document.getElementById('linkAdmin').innerText = '-';
+                document.getElementById('linkCustomer').innerText = '-';
+            }
         }
 
         function handleSaveClient() {
