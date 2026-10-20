@@ -25,14 +25,25 @@
         </div>
     </div>
 
-    <main class="w-full max-w-5xl mx-auto p-4 sm:p-6 flex-1 space-y-6">
+    <!-- LOGIN BOX FOR POS -->
+    <div id="authBox" class="fixed inset-0 bg-[#FAF7F2] flex items-center justify-center z-40">
+        <div class="bg-white border border-neutral-200 p-8 rounded-2xl shadow-xl max-w-sm w-full m-4 text-center">
+            <h2 class="text-2xl font-black mb-2 text-maroon uppercase tracking-tight">Dining POS</h2>
+            <p class="text-xs text-neutral-500 mb-6 uppercase tracking-wider">Enter Access Code</p>
+            <input type="password" id="pinInput" class="w-full text-center text-3xl font-mono tracking-widest p-3 border border-neutral-200 rounded-xl mb-4 focus:outline-none focus:border-maroon transition-colors" placeholder="••••">
+            <button onclick="login()" class="w-full bg-maroon text-white font-bold py-3 rounded-xl hover:opacity-90 active:scale-95 transition-all shadow-md uppercase tracking-wider text-xs">Unlock System</button>
+        </div>
+    </div>
+
+    <main id="mainContent" class="hidden-view w-full max-w-5xl mx-auto p-4 sm:p-6 flex-1 space-y-6">
 
         <header class="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
+                <!-- HOTEL NAME DYNAMICALLY ADDED HERE -->
                 <h1 id="propTitle" class="text-xl sm:text-2xl font-black uppercase tracking-tight text-maroon">Kitchen & Dining Desk</h1>
                 <p class="text-xs font-semibold tracking-wider text-neutral-500 uppercase mt-0.5">Room Service Order Dispatch</p>
             </div>
-            <button onclick="loadDiningData()" class="border border-neutral-300 text-black px-4 py-2 rounded-xl text-xs font-semibold hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">Sync Menu</button>
+            <button onclick="fetchData()" class="border border-neutral-300 text-black px-4 py-2 rounded-xl text-xs font-semibold hover:bg-neutral-100 active:scale-95 transition-all cursor-pointer">Sync Menu</button>
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -55,7 +66,7 @@
                     
                     <div>
                         <label class="text-[10px] font-bold uppercase tracking-wider text-neutral-500 block mb-1">Target Occupied Room</label>
-                        <select id="roomSelector" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs font-mono bg-white focus:outline-none focus:border-maroon cursor-pointer">
+                        <select id="roomSelector" class="w-full px-3 py-2.5 border border-neutral-200 rounded-xl text-xs font-mono bg-white focus:outline-none focus:border-maroon cursor-pointer transition-colors">
                             <option value="">Select Room</option>
                         </select>
                     </div>
@@ -81,7 +92,7 @@
 
         <!-- RECENT KITCHEN ORDERS -->
         <section class="bg-white border border-neutral-200 rounded-2xl p-5 shadow-xs space-y-4">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-black border-b border-neutral-100 pb-3">Recent Kitchen Dispatches</h2>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-black border-b border-neutral-100 pb-3">Recent Dispatches</h2>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs font-mono">
                     <thead>
@@ -100,7 +111,8 @@
 
     </main>
 
-    <footer class="bg-white border-t border-neutral-200 py-6 mt-12 text-xs">
+    <!-- ORIGINAL OFBUZZ FOOTER -->
+    <footer class="bg-white border-t border-neutral-200 py-6 mt-12 text-xs w-full">
         <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <img src="https://i.pinimg.com/736x/bd/d0/5c/bdd05c94afb66b5a72f5e17a7a879ab3.jpg" alt="Ofbuzz Logo" class="w-7 h-7 rounded-full object-cover border border-neutral-300">
@@ -117,7 +129,7 @@
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const currentSlug = urlParams.get('hotel') || "royalstay";
+        const currentSlug = urlParams.get('hotel');
         let currentClient = null;
         let menuItems = [], activeRooms = [], cart = {};
 
@@ -130,11 +142,7 @@
 
         async function initTenant() {
             try {
-                const cached = localStorage.getItem(`ofbuzz_tenant_${currentSlug}`);
-                if (cached) currentClient = JSON.parse(cached);
-
                 const res = await fetch(`masterdata.json?_ts=${Date.now()}`);
-                if (!res.ok) throw new Error();
                 const registry = await res.json();
                 currentClient = registry[currentSlug];
 
@@ -142,30 +150,37 @@
                     document.getElementById('moduleBlockedView').classList.remove('hidden-view');
                     return false;
                 }
-
-                localStorage.setItem(`ofbuzz_tenant_${currentSlug}`, JSON.stringify(currentClient));
-                document.getElementById('propTitle').innerText = `${currentClient.name} - Dining`;
                 return true;
             } catch (e) {
-                if (currentClient) return true;
                 return false;
             }
         }
 
-        function loadDiningData() {
-            fetch(`${currentClient.scriptUrl}?action=getDiningData&_ts=${Date.now()}`)
+        function login() {
+            const pin = document.getElementById('pinInput').value;
+            fetch(`${currentClient.scriptUrl}?action=getDiningData&pin=${pin}&_ts=${Date.now()}`)
                 .then(r => r.json())
                 .then(res => {
                     if (res.success) {
+                        document.getElementById('authBox').classList.add('hidden-view');
+                        document.getElementById('mainContent').classList.remove('hidden-view');
+                        
+                        // HOTEL NAME SET HERE
+                        document.getElementById('propTitle').innerText = `${res.propertyName} - Dining POS`;
+
                         menuItems = res.menu || [];
                         activeRooms = res.activeRooms || [];
                         renderMenu();
                         renderRoomOptions();
                         renderRecentOrders(res.recentOrders || []);
+                    } else {
+                        notify(res.error || "Incorrect PIN");
                     }
                 })
                 .catch(() => notify("Network connection timeout."));
         }
+
+        function fetchData() { login(); }
 
         function renderMenu() {
             const el = document.getElementById('menuContainer');
@@ -245,7 +260,7 @@
             fetch(currentClient.scriptUrl, {
                 method: "POST",
                 headers: { "Content-Type": "text/plain;charset=utf-8" },
-                body: JSON.stringify({ action: "addFoodOrder", roomNo: roomNo, bookingId: bookingId, items: summary.join(", "), amount: totalAmount })
+                body: JSON.stringify({ action: "placeOrder", roomNo: roomNo, bookingId: bookingId, items: summary.join(", "), amount: totalAmount })
             })
             .then(r => r.json())
             .then(res => {
@@ -254,8 +269,8 @@
                 if (res.success) {
                     cart = {};
                     renderCart();
-                    notify("Kitchen Order Ticket recorded.");
-                    loadDiningData();
+                    notify("Order Ticket sent to Reception for Approval.");
+                    fetchData();
                 } else notify("Order could not be registered.");
             })
             .catch(() => {
@@ -269,9 +284,10 @@
             const tbody = document.getElementById('recentOrdersBody');
             tbody.innerHTML = "";
             orders.forEach(o => {
+                let statusColor = o.Status === "Pending" ? "text-orange-500" : (o.Status === "Approved" ? "text-blue-500" : "text-green-600");
                 tbody.innerHTML += `
                     <tr class="hover:bg-neutral-50 transition-colors">
-                        <td class="py-2 px-3 font-bold text-black">${o.OrderId}</td>
+                        <td class="py-2 px-3 font-bold text-black">${o.OrderId} <br><span class="text-[9px] uppercase ${statusColor}">${o.Status}</span></td>
                         <td class="py-2 px-3">${o.RoomNo}</td>
                         <td class="py-2 px-3 text-neutral-600">${o.Items}</td>
                         <td class="py-2 px-3 font-bold text-maroon">₹${o.Amount}</td>
@@ -282,8 +298,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', async () => {
-            const ok = await initTenant();
-            if (ok) loadDiningData();
+            await initTenant();
         });
     </script>
 </body>
