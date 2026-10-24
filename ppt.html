@@ -44,18 +44,9 @@
             Next-Generation <br />
             <span class="text-accent">Property Management System</span>
         </h1>
-        <p class="text-lg text-slate-500 font-medium max-w-2xl mx-auto mb-10">
+        <p class="text-lg text-slate-500 font-medium max-w-2xl mx-auto">
             A fully integrated, cloud-native hotel and cafe management solution. Experience seamless operations from front desk to kitchen, powered by intelligent automation and offline-sync technology.
         </p>
-        
-        <!-- DIRECT LOGIN SEARCH BAR -->
-        <div class="max-w-md mx-auto bg-white p-2 rounded-xl shadow-lg border border-slate-100 flex items-center">
-            <input type="text" id="propertySlug" placeholder="Enter your property code..." class="flex-1 bg-transparent px-4 py-3 outline-none text-primary font-bold placeholder-slate-400">
-            <button onclick="goToProperty()" class="bg-primary hover:bg-accent text-white px-6 py-3 rounded-lg font-bold transition-colors shadow-md">
-                Launch Portal
-            </button>
-        </div>
-        <p id="errorMsg" class="text-accent text-sm font-bold mt-3 hidden"></p>
     </section>
 
     <!-- MODULES PRESENTATION GRID -->
@@ -142,30 +133,5 @@
         </a>
     </div>
 
-    <script>
-        // Simple logic to redirect user to their specific property dashboard
-        function goToProperty() {
-            const slug = document.getElementById('propertySlug').value.trim().toLowerCase().replace(/[^a-z0-9-_]/g, '');
-            const errorMsg = document.getElementById('errorMsg');
-            
-            if(!slug) {
-                errorMsg.innerText = "Please enter a valid property code.";
-                errorMsg.classList.remove('hidden');
-                return;
-            }
-            
-            errorMsg.classList.add('hidden');
-            // Check if we are in the root directory and redirect to index.html with the parameter
-            const baseUrl = window.location.href.split('/').slice(0, -1).join('/');
-            window.location.href = `${baseUrl}/index.html?hotel=${slug}`;
-        }
-
-        // Add Enter key support
-        document.getElementById('propertySlug').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                goToProperty();
-            }
-        });
-    </script>
 </body>
 </html>
