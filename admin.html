@@ -5,172 +5,191 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enterprise Analytics - Ofbuzz</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        body { background-color: #F8FAFC; color: #0F172A; font-family: 'Inter', sans-serif; }
         .hidden-view { display: none !important; }
-        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
-        .alert-pulse { animation: pulse-red 2s infinite; border-left: 5px solid #ef4444; }
-        .bar { width: 12%; background: #6366f1; border-radius: 4px 4px 0 0; transition: height 0.5s; }
+        .sidebar-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 0.5rem; font-weight: 500; font-size: 0.875rem; color: #64748B; transition: all 0.2s; cursor: pointer; }
+        .sidebar-item:hover { background-color: #F1F5F9; color: #0F172A; }
+        .sidebar-item.active { background-color: #EFF6FF; color: #2563EB; font-weight: 600; }
+        .sidebar-item.active svg { color: #2563EB; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4f46e5; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+        
+        /* Bar Chart & Alert Styles from Original Code */
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        .alert-pulse { animation: pulse-red 2s infinite; border-left: 5px solid #ef4444; }
+        .bar { width: 12%; background: #2563eb; border-radius: 4px 4px 0 0; transition: height 0.5s; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
 
-    <div id="toast" class="hidden-view fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-indigo-600 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-2xl transition-all duration-300"></div>
+    <div id="toast" class="hidden-view fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-2xl transition-all duration-300"></div>
 
     <!-- RED ALERT -->
-    <div id="alertPopup" class="hidden-view fixed top-5 right-5 bg-red-600 text-white px-6 py-4 rounded-lg shadow-2xl z-50 alert-pulse flex items-center gap-3">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-        <div>
-            <h4 class="font-black tracking-widest text-sm">SECURITY ALERT</h4>
-            <p class="text-xs text-red-100">Action Required: Missing Guest Details</p>
+    <div id="alertPopup" class="hidden-view fixed top-5 right-5 bg-white border border-red-200 text-slate-900 px-6 py-4 rounded-xl shadow-2xl z-50 alert-pulse flex items-center gap-4">
+        <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
         </div>
-        <button onclick="document.getElementById('alertPopup').classList.add('hidden-view')" class="ml-4 font-bold hover:text-red-200">X</button>
+        <div>
+            <h4 class="font-bold tracking-widest text-sm text-red-600 uppercase">Security Alert</h4>
+            <p class="text-xs font-semibold text-slate-600 mt-0.5">Action Required: Missing Guest Details</p>
+        </div>
+        <button onclick="document.getElementById('alertPopup').classList.add('hidden-view')" class="ml-4 font-bold text-slate-400 hover:text-slate-800 transition">X</button>
     </div>
 
     <!-- LOGIN -->
     <div id="authBox" class="fixed inset-0 bg-slate-900 flex items-center justify-center z-50">
-        <div class="glass-panel p-8 rounded-2xl w-96 text-center m-4">
-            <h2 class="text-2xl font-black text-white mb-1">BI Console</h2>
-            <p class="text-xs text-indigo-400 mb-6 uppercase tracking-widest">Authorized Personnel Only</p>
-            <input type="password" id="pinInput" placeholder="••••" class="w-full text-center text-3xl font-mono p-3 bg-slate-800 border-none text-white rounded-xl mb-4 focus:ring-2 focus:ring-indigo-500 outline-none transition">
-            <button id="btnLogin" onclick="login()" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-500 transition shadow-lg">Authenticate</button>
+        <div class="bg-white p-8 rounded-2xl w-full max-w-sm text-center m-4 shadow-2xl">
+            <div class="flex justify-center mb-4">
+                <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-md">O</div>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-900 mb-1">BI Console</h2>
+            <p class="text-xs text-slate-500 mb-8 uppercase tracking-widest font-semibold">Authorized Personnel Only</p>
+            <input type="password" id="pinInput" placeholder="••••" class="w-full text-center text-3xl tracking-widest p-4 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl mb-6 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition">
+            <button id="btnLogin" onclick="login()" class="w-full bg-blue-900 text-white font-bold py-3.5 rounded-xl hover:bg-blue-800 transition shadow-md">Authenticate</button>
         </div>
     </div>
 
     <!-- SIDEBAR -->
-    <aside id="sidebar" class="hidden-view w-64 glass-panel border-r border-slate-800 flex flex-col z-10">
-        <div class="p-6 font-black text-2xl tracking-tighter border-b border-slate-800 text-white">
-            OFBUZZ<span class="text-indigo-500 text-lg">BI</span>
+    <aside id="sidebar" class="hidden-view w-64 bg-white border-r border-slate-200 flex flex-col z-20 shrink-0">
+        <div class="p-6 flex items-center gap-3">
+            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm">O</div>
+            <span class="font-bold text-slate-900 tracking-tight text-lg">OFBUZZ <span class="text-blue-600">BI</span></span>
         </div>
-        <nav class="flex-1 p-4 space-y-2 text-sm font-semibold text-slate-400">
-            <button onclick="switchTab('dashboard')" class="w-full text-left p-3 rounded-lg hover:bg-slate-800 hover:text-white transition">Overview Analytics</button>
-            <button onclick="switchTab('staff')" class="w-full text-left p-3 rounded-lg hover:bg-slate-800 hover:text-white transition">Resource Management</button>
-            <button onclick="switchTab('reports')" class="w-full text-left p-3 rounded-lg hover:bg-slate-800 hover:text-white transition">Data Exports & Backup</button>
+        <nav class="flex-1 px-4 space-y-1">
+            <div onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-item active">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
+                Overview Analytics
+            </div>
+            <div onclick="switchTab('staff')" id="nav-staff" class="sidebar-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                Resource Management
+            </div>
+            <div onclick="switchTab('reports')" id="nav-reports" class="sidebar-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                Data Exports & Backup
+            </div>
         </nav>
     </aside>
 
     <!-- MAIN CONTENT -->
-    <div id="mainWrapper" class="hidden-view flex-1 flex flex-col relative bg-slate-900">
-        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 pointer-events-none z-0"></div>
+    <div id="mainWrapper" class="hidden-view flex-1 flex flex-col relative bg-slate-50">
         
-        <main class="flex-1 overflow-y-auto p-8 relative z-10">
-            <header class="flex justify-between items-center mb-8">
-                <div>
-                    <h1 id="propTitle" class="text-3xl font-black text-white uppercase tracking-tight">Performance Dashboard</h1>
-                    <p class="text-slate-400 text-sm mt-1">Real-time metrics and operational insights.</p>
-                </div>
-                <button id="btnSync" onclick="fetchData(this)" class="bg-slate-800 border border-slate-700 hover:bg-slate-700 px-5 py-2.5 rounded-lg text-sm font-bold text-white shadow-lg transition">Refresh Live Data</button>
-            </header>
+        <header class="bg-white border-b border-slate-200 px-8 py-5 flex justify-between items-center z-10 shrink-0">
+            <div>
+                <h1 id="propTitle" class="text-2xl font-bold text-slate-900 tracking-tight">Performance Dashboard</h1>
+                <p class="text-sm text-slate-500 font-medium mt-1">Real-time metrics and operational insights.</p>
+            </div>
+            <button id="btnSync" onclick="fetchData(this)" class="bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 px-5 py-2.5 rounded-lg text-sm font-bold shadow-sm transition">Refresh Live Data</button>
+        </header>
 
+        <main class="flex-1 overflow-y-auto p-4 sm:p-8 relative z-10 custom-scrollbar">
+            
             <!-- DASHBOARD TAB -->
-            <div id="tab-dashboard" class="space-y-6">
+            <div id="tab-dashboard" class="max-w-7xl mx-auto space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div class="glass-panel p-6 rounded-2xl relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-16 h-16 bg-green-500 opacity-20 blur-2xl"></div>
-                        <p class="text-xs uppercase font-bold text-slate-400 tracking-wider">Gross Revenue</p>
-                        <p id="mRev" class="text-4xl font-black text-white mt-2">₹0</p>
-                        <p class="text-xs text-green-400 font-bold mt-3 flex items-center gap-1"><span class="text-lg leading-none">↑</span> All-time settled</p>
+                    <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm border-t-4 border-t-emerald-500">
+                        <p class="text-xs uppercase font-bold text-slate-500 tracking-wider">Gross Revenue</p>
+                        <p id="mRev" class="text-3xl font-black text-slate-900 mt-2">₹0</p>
+                        <p class="text-xs text-emerald-600 font-bold mt-3 flex items-center gap-1"><span class="text-lg leading-none">↑</span> All-time settled</p>
                     </div>
-                    <div class="glass-panel p-6 rounded-2xl relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-16 h-16 bg-indigo-500 opacity-20 blur-2xl"></div>
-                        <p class="text-xs uppercase font-bold text-slate-400 tracking-wider">Room Revenue</p>
-                        <p id="mRoom" class="text-4xl font-black text-indigo-400 mt-2">₹0</p>
+                    <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
+                        <p class="text-xs uppercase font-bold text-slate-500 tracking-wider">Room Revenue</p>
+                        <p id="mRoom" class="text-3xl font-black text-blue-600 mt-2">₹0</p>
                     </div>
-                    <div class="glass-panel p-6 rounded-2xl relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-16 h-16 bg-orange-500 opacity-20 blur-2xl"></div>
-                        <p class="text-xs uppercase font-bold text-slate-400 tracking-wider">F&B Revenue</p>
-                        <p id="mFood" class="text-4xl font-black text-orange-400 mt-2">₹0</p>
+                    <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
+                        <p class="text-xs uppercase font-bold text-slate-500 tracking-wider">F&B Revenue</p>
+                        <p id="mFood" class="text-3xl font-black text-orange-600 mt-2">₹0</p>
                     </div>
-                    <div class="glass-panel p-6 rounded-2xl relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-16 h-16 bg-blue-500 opacity-20 blur-2xl"></div>
-                        <p class="text-xs uppercase font-bold text-slate-400 tracking-wider">Total Checkouts</p>
-                        <p id="mInvoices" class="text-4xl font-black text-blue-400 mt-2">0</p>
+                    <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
+                        <p class="text-xs uppercase font-bold text-slate-500 tracking-wider">Total Checkouts</p>
+                        <p id="mInvoices" class="text-3xl font-black text-slate-900 mt-2">0</p>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-2 glass-panel p-6 rounded-2xl">
-                        <h3 class="text-sm font-bold text-slate-300 uppercase tracking-widest mb-6">Revenue Trend Visualization</h3>
-                        <div class="h-48 flex items-end justify-between gap-2 border-b border-slate-700 pb-2">
-                            <div class="bar" style="height: 30%;"></div><div class="bar" style="height: 50%;"></div><div class="bar" style="height: 40%;"></div>
-                            <div class="bar" style="height: 70%;"></div><div class="bar" style="height: 60%; background:#818cf8;"></div>
-                            <div class="bar" style="height: 90%; background:#4f46e5;"></div><div class="bar" style="height: 80%; background:#4338ca;"></div>
+                    <div class="lg:col-span-2 bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
+                        <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-6">Revenue Trend Visualization</h3>
+                        <div class="h-48 flex items-end justify-between gap-2 border-b border-slate-100 pb-2">
+                            <div class="bar" style="height: 30%; background:#93c5fd;"></div><div class="bar" style="height: 50%; background:#60a5fa;"></div><div class="bar" style="height: 40%; background:#93c5fd;"></div>
+                            <div class="bar" style="height: 70%; background:#3b82f6;"></div><div class="bar" style="height: 60%; background:#60a5fa;"></div>
+                            <div class="bar" style="height: 90%; background:#1d4ed8;"></div><div class="bar" style="height: 80%; background:#2563eb;"></div>
                         </div>
-                        <div class="flex justify-between text-[10px] text-slate-500 mt-2 uppercase font-mono">
+                        <div class="flex justify-between text-[10px] text-slate-400 mt-2 uppercase font-bold">
                             <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
                         </div>
                     </div>
 
-                    <div class="glass-panel p-6 rounded-2xl border-t-4 border-red-500">
-                        <h3 class="text-sm font-bold text-red-400 uppercase tracking-widest mb-4">Live Threat Monitor</h3>
-                        <div id="alertsContainer" class="space-y-3 max-h-48 overflow-y-auto pr-2 custom-scrollbar"></div>
+                    <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm border-t-4 border-t-red-500 flex flex-col h-full">
+                        <h3 class="text-sm font-bold text-red-600 uppercase tracking-widest mb-4">Live Threat Monitor</h3>
+                        <div id="alertsContainer" class="space-y-3 flex-1 overflow-y-auto pr-2 custom-scrollbar"></div>
                     </div>
                 </div>
             </div>
 
             <!-- STAFF TAB -->
-            <div id="tab-staff" class="hidden-view space-y-6">
-                <div class="glass-panel p-6 rounded-2xl">
-                    <h3 class="text-lg font-bold text-white mb-4">Onboard Resource</h3>
+            <div id="tab-staff" class="hidden-view max-w-7xl mx-auto space-y-6">
+                <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
+                    <h3 class="text-lg font-bold text-slate-900 mb-4">Onboard Resource</h3>
                     <div class="flex flex-col md:flex-row gap-4">
-                        <input type="text" id="stfName" placeholder="Full Name" class="flex-1 bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm text-white outline-none focus:border-indigo-500">
-                        <input type="text" id="stfRole" placeholder="Department" class="flex-1 bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm text-white outline-none focus:border-indigo-500">
-                        <input type="text" id="stfPhone" placeholder="Contact" class="flex-1 bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm text-white outline-none focus:border-indigo-500">
-                        <button id="btnAddStf" onclick="addStaff(this)" class="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg transition">Deploy</button>
+                        <input type="text" id="stfName" placeholder="Full Name" class="flex-1 bg-slate-50 border border-slate-200 p-3.5 rounded-xl text-sm outline-none focus:border-blue-600 font-medium transition-colors">
+                        <input type="text" id="stfRole" placeholder="Department" class="flex-1 bg-slate-50 border border-slate-200 p-3.5 rounded-xl text-sm outline-none focus:border-blue-600 font-medium transition-colors">
+                        <input type="text" id="stfPhone" placeholder="Contact" class="flex-1 bg-slate-50 border border-slate-200 p-3.5 rounded-xl text-sm outline-none focus:border-blue-600 font-medium transition-colors">
+                        <button id="btnAddStf" onclick="addStaff(this)" class="bg-blue-900 hover:bg-blue-800 text-white px-8 py-3.5 rounded-xl font-bold text-sm shadow-sm transition">Deploy</button>
                     </div>
                 </div>
 
-                <div class="glass-panel p-6 rounded-2xl overflow-x-auto">
-                    <h3 class="text-lg font-bold text-white mb-4 border-b border-slate-800 pb-2">Active Workforce Directory</h3>
+                <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm overflow-x-auto">
+                    <h3 class="text-lg font-bold text-slate-900 mb-4 border-b border-slate-100 pb-3">Active Workforce Directory</h3>
                     <table class="w-full text-left text-sm min-w-max">
-                        <thead><tr class="text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-800"><th class="py-3">ID</th><th>Resource Name</th><th>Dept</th><th>Contact</th><th class="text-right">Action</th></tr></thead>
-                        <tbody id="staffListTable" class="divide-y divide-slate-800 text-slate-300"></tbody>
+                        <thead><tr class="text-slate-400 uppercase tracking-wider text-[10px] border-b border-slate-100"><th class="py-3">ID</th><th>Resource Name</th><th>Dept</th><th>Contact</th><th class="text-right">Action</th></tr></thead>
+                        <tbody id="staffListTable" class="divide-y divide-slate-100 text-slate-700"></tbody>
                     </table>
                 </div>
             </div>
 
             <!-- REPORTS TAB -->
-            <div id="tab-reports" class="hidden-view space-y-6">
+            <div id="tab-reports" class="hidden-view max-w-7xl mx-auto space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="glass-panel p-10 rounded-2xl text-center">
-                        <div class="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4"><svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div>
-                        <h2 class="text-2xl font-black text-white mb-2">Export Local Report</h2>
-                        <p class="text-slate-400 text-sm mb-6">Download a raw CSV payload of all historical settlements to your local machine.</p>
-                        <button onclick="downloadCSV()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-4 rounded-xl shadow-lg transition transform hover:scale-[1.02]">Export Local CSV</button>
+                    <div class="bg-white border border-slate-200 p-10 rounded-2xl shadow-sm text-center border-t-4 border-t-emerald-500">
+                        <div class="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-emerald-100"><svg class="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div>
+                        <h2 class="text-xl font-bold text-slate-900 mb-2">Export Local Report</h2>
+                        <p class="text-slate-500 text-sm mb-6">Download a raw CSV payload of all historical settlements to your local machine.</p>
+                        <button onclick="downloadCSV()" class="w-full bg-white border border-slate-300 text-slate-700 font-bold py-4 rounded-xl shadow-sm hover:bg-slate-50 transition">Export Local CSV</button>
                     </div>
 
-                    <div class="glass-panel p-10 rounded-2xl text-center border-t-4 border-indigo-500">
-                        <div class="w-16 h-16 bg-indigo-500/20 rounded-full flex items-center justify-center mx-auto mb-4"><svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg></div>
-                        <h2 class="text-2xl font-black text-white mb-2">Cloud Server Backup</h2>
-                        <p class="text-slate-400 text-sm mb-6">Synchronize all live property data directly to your designated remote Google Sheet Backup server.</p>
-                        <button id="btnPushBackup" onclick="triggerBackup(this)" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-xl shadow-lg transition transform hover:scale-[1.02]">Push to Cloud Backup</button>
+                    <div class="bg-white border border-slate-200 p-10 rounded-2xl shadow-sm text-center border-t-4 border-t-blue-600">
+                        <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-blue-100"><svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg></div>
+                        <h2 class="text-xl font-bold text-slate-900 mb-2">Cloud Server Backup</h2>
+                        <p class="text-slate-500 text-sm mb-6">Synchronize all live property data directly to your designated remote Google Sheet Backup server.</p>
+                        <button id="btnPushBackup" onclick="triggerBackup(this)" class="w-full bg-blue-900 text-white font-bold py-4 rounded-xl shadow-sm hover:bg-blue-800 transition">Push to Cloud Backup</button>
                     </div>
                 </div>
             </div>
         </main>
 
-        <!-- OFBUZZ FOOTER -->
-        <footer class="bg-slate-900 border-t border-slate-800 py-6 text-xs w-full relative z-10">
-            <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <!-- FOOTER -->
+        <footer class="bg-white border-t border-slate-200 py-4 px-8 text-xs shrink-0">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-3">
-                    <img src="https://i.pinimg.com/736x/bd/d0/5c/bdd05c94afb66b5a72f5e17a7a879ab3.jpg" alt="Ofbuzz Logo" class="w-7 h-7 rounded-full object-cover border border-slate-700">
+                    <div class="w-7 h-7 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center overflow-hidden">
+                        <img src="https://i.pinimg.com/736x/bd/d0/5c/bdd05c94afb66b5a72f5e17a7a879ab3.jpg" alt="Ofbuzz Logo" class="w-full h-full object-cover">
+                    </div>
                     <div>
-                        <p class="font-bold uppercase tracking-wider text-white">Ofbuzz Technology</p>
+                        <p class="font-bold uppercase tracking-wider text-slate-900">Ofbuzz Technology</p>
                         <p class="text-[10px] text-slate-500 uppercase tracking-widest">Ofbuzz PMS &bull; An Indian Technology</p>
                     </div>
                 </div>
-                <!-- SUPPORT EMAIL UPDATED -->
-                <a href="mailto:ofbuzztechnologycare@gmail.com" target="_blank" class="border border-slate-700 text-white px-5 py-2.5 rounded-xl text-[11px] font-bold hover:bg-slate-800 active:scale-95 transition-all cursor-pointer shadow-sm">
+                <a href="mailto:ofbuzztechnologycare@gmail.com" target="_blank" class="border border-slate-200 text-slate-700 px-4 py-2 rounded-lg text-[11px] font-bold hover:bg-slate-50 transition-colors shadow-sm">
                     Support Desk
                 </a>
             </div>
         </footer>
     </div>
 
+    <!-- JAVASCRIPT (Original Logic Maintained, UI Templates Updated for Light Mode) -->
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const slug = urlParams.get('hotel');
@@ -190,8 +209,12 @@
         }
 
         function switchTab(tabId) {
-            ['dashboard', 'staff', 'reports'].forEach(t => document.getElementById(`tab-${t}`).classList.add('hidden-view'));
+            ['dashboard', 'staff', 'reports'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden-view');
+                document.getElementById(`nav-${t}`).classList.remove('active');
+            });
             document.getElementById(`tab-${tabId}`).classList.remove('hidden-view');
+            document.getElementById(`nav-${tabId}`).classList.add('active');
         }
 
         function apiCall(payload, btnElem, loadingText, callback) {
@@ -255,29 +278,29 @@
                 document.getElementById('alertPopup').classList.remove('hidden-view');
                 alertCont.innerHTML = "";
                 adminData.alerts.forEach(a => {
-                    alertCont.innerHTML += `<div class="p-4 bg-slate-800/50 border border-red-500/30 rounded-xl">
+                    alertCont.innerHTML += `<div class="p-4 bg-white border border-red-200 rounded-xl shadow-sm">
                         <div class="flex justify-between items-start">
-                            <span class="text-white font-bold text-sm">Room ${a.RoomNo}</span>
-                            <span class="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded uppercase tracking-wider">Unverified</span>
+                            <span class="text-slate-900 font-bold text-sm">Room ${a.RoomNo}</span>
+                            <span class="text-[10px] bg-red-50 text-red-600 border border-red-100 px-2 py-0.5 rounded font-bold uppercase tracking-wider">Unverified</span>
                         </div>
-                        <p class="text-xs text-slate-400 mt-1">${a.Issue}</p>
-                        <p class="text-[10px] font-mono text-slate-500 mt-2">${a.Timestamp}</p>
+                        <p class="text-xs font-medium text-slate-500 mt-1">${a.Issue}</p>
+                        <p class="text-[10px] font-mono font-semibold text-slate-400 mt-2">${a.Timestamp}</p>
                     </div>`;
                 });
             } else {
                 document.getElementById('alertPopup').classList.add('hidden-view');
-                alertCont.innerHTML = "<p class='text-slate-500 text-sm'>System secure. No operational threats.</p>";
+                alertCont.innerHTML = "<p class='text-slate-400 text-sm font-semibold'>System secure. No operational threats.</p>";
             }
 
             const tbody = document.getElementById('staffListTable');
             tbody.innerHTML = "";
             adminData.staffList.forEach(s => {
-                tbody.innerHTML += `<tr class="hover:bg-slate-800/30 transition border-b border-slate-800/50">
-                    <td class="py-4 font-mono text-indigo-400">${s.StaffId}</td>
-                    <td class="py-4 font-bold text-white">${s.FullName}</td>
-                    <td class="py-4"><span class="bg-slate-800 px-3 py-1.5 rounded-lg text-xs border border-slate-700">${s.Role}</span></td>
-                    <td class="py-4 font-mono text-xs">${s.Phone}</td>
-                    <td class="py-4 text-right"><button onclick="removeStaff('${s.StaffId}', this)" class="text-red-400 hover:text-red-300 text-xs font-bold uppercase tracking-wider bg-red-500/10 px-3 py-1.5 rounded hover:bg-red-500/20 transition">Terminate</button></td>
+                tbody.innerHTML += `<tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                    <td class="py-4 font-mono font-semibold text-blue-600">${s.StaffId}</td>
+                    <td class="py-4 font-bold text-slate-900">${s.FullName}</td>
+                    <td class="py-4"><span class="bg-slate-100 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 border border-slate-200">${s.Role}</span></td>
+                    <td class="py-4 font-mono font-medium text-xs">${s.Phone}</td>
+                    <td class="py-4 text-right"><button onclick="removeStaff('${s.StaffId}', this)" class="text-red-600 hover:text-red-700 text-xs font-bold uppercase tracking-wider bg-red-50 px-3 py-1.5 rounded hover:bg-red-100 transition">Terminate</button></td>
                 </tr>`;
             });
         }
