@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enterprise Analytics - Ofbuzz</title>
+    <title>Enterprise Analytics - PMS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -17,7 +17,7 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
         
-        /* Bar Chart & Alert Styles from Original Code */
+        /* Bar Chart & Alert Styles */
         @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
         .alert-pulse { animation: pulse-red 2s infinite; border-left: 5px solid #ef4444; }
         .bar { width: 12%; background: #2563eb; border-radius: 4px 4px 0 0; transition: height 0.5s; }
@@ -34,7 +34,7 @@
         </div>
         <div>
             <h4 class="font-bold tracking-widest text-sm text-red-600 uppercase">Security Alert</h4>
-            <p class="text-xs font-semibold text-slate-600 mt-0.5">Action Required: Missing Guest Details</p>
+            <p id="alertPopupText" class="text-xs font-semibold text-slate-600 mt-0.5">Action Required</p>
         </div>
         <button onclick="document.getElementById('alertPopup').classList.add('hidden-view')" class="ml-4 font-bold text-slate-400 hover:text-slate-800 transition">X</button>
     </div>
@@ -43,9 +43,9 @@
     <div id="authBox" class="fixed inset-0 bg-slate-900 flex items-center justify-center z-50">
         <div class="bg-white p-8 rounded-2xl w-full max-w-sm text-center m-4 shadow-2xl">
             <div class="flex justify-center mb-4">
-                <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-md">O</div>
+                <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-md">A</div>
             </div>
-            <h2 class="text-2xl font-bold text-slate-900 mb-1">BI Console</h2>
+            <h2 id="loginPropName" class="text-2xl font-bold text-slate-900 mb-1">BI Console</h2>
             <p class="text-xs text-slate-500 mb-8 uppercase tracking-widest font-semibold">Authorized Personnel Only</p>
             <input type="password" id="pinInput" placeholder="••••" class="w-full text-center text-3xl tracking-widest p-4 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl mb-6 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition">
             <button id="btnLogin" onclick="login()" class="w-full bg-blue-900 text-white font-bold py-3.5 rounded-xl hover:bg-blue-800 transition shadow-md">Authenticate</button>
@@ -55,8 +55,8 @@
     <!-- SIDEBAR -->
     <aside id="sidebar" class="hidden-view w-64 bg-white border-r border-slate-200 flex flex-col z-20 shrink-0">
         <div class="p-6 flex items-center gap-3">
-            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm">O</div>
-            <span class="font-bold text-slate-900 tracking-tight text-lg">OFBUZZ <span class="text-blue-600">BI</span></span>
+            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm">BI</div>
+            <span id="sidebarPropName" class="font-bold text-slate-900 tracking-tight text-lg overflow-hidden whitespace-nowrap text-ellipsis">Property Name</span>
         </div>
         <nav class="flex-1 px-4 space-y-1">
             <div onclick="switchTab('dashboard')" id="nav-dashboard" class="sidebar-item active">
@@ -123,7 +123,10 @@
                     </div>
 
                     <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm border-t-4 border-t-red-500 flex flex-col h-full">
-                        <h3 class="text-sm font-bold text-red-600 uppercase tracking-widest mb-4">Live Threat Monitor</h3>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-sm font-bold text-red-600 uppercase tracking-widest">Live Threat Monitor</h3>
+                            <span id="alertCount" class="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+                        </div>
                         <div id="alertsContainer" class="space-y-3 flex-1 overflow-y-auto pr-2 custom-scrollbar"></div>
                     </div>
                 </div>
@@ -170,7 +173,7 @@
             </div>
         </main>
 
-        <!-- FOOTER -->
+        <!-- FOOTER (Preserved Powered By Ofbuzz design) -->
         <footer class="bg-white border-t border-slate-200 py-4 px-8 text-xs shrink-0">
             <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-3">
@@ -189,7 +192,6 @@
         </footer>
     </div>
 
-    <!-- JAVASCRIPT (Original Logic Maintained, UI Templates Updated for Light Mode) -->
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const slug = urlParams.get('hotel');
@@ -206,6 +208,9 @@
             const res = await fetch(`masterdata.json?_ts=${Date.now()}`);
             const data = await res.json();
             client = data[slug];
+            if(client) {
+                document.getElementById('loginPropName').innerText = client.name + ' BI';
+            }
         }
 
         function switchTab(tabId) {
@@ -234,29 +239,39 @@
         function login() {
             const pin = document.getElementById('pinInput').value;
             const btn = document.getElementById('btnLogin');
-            const orig = btn.innerText; btn.innerText = "Verifying Credentials..."; btn.disabled = true; btn.classList.add('opacity-50');
+            const orig = btn.innerText; btn.innerText = "Verifying..."; btn.disabled = true; btn.classList.add('opacity-50');
 
             fetch(`${client.scriptUrl}?action=getAdminData&pin=${pin}`)
                 .then(r=>r.json()).then(res => {
                     btn.innerText = orig; btn.disabled = false; btn.classList.remove('opacity-50');
                     if(res.success) {
                         adminData = res;
-                        document.getElementById('propTitle').innerText = `${client.name} - BI Dashboard`;
+                        
+                        document.getElementById('propTitle').innerText = `${client.name} Dashboard`;
+                        document.getElementById('sidebarPropName').innerHTML = `${client.name} <span class="text-blue-600 ml-1">BI</span>`;
+                        
                         document.getElementById('authBox').classList.add('hidden-view');
                         document.getElementById('sidebar').classList.remove('hidden-view');
                         document.getElementById('mainWrapper').classList.remove('hidden-view');
+                        
                         renderUI();
-                    } else notify(res.error);
+                    } else notify(res.error || "Incorrect PIN");
                 }).catch(()=> { btn.innerText = orig; btn.disabled = false; btn.classList.remove('opacity-50'); notify("Connection timeout"); });
         }
 
         function fetchData(btn) {
             const pin = document.getElementById('pinInput').value;
             if(btn) { btn.innerText = "Syncing..."; btn.disabled = true; btn.classList.add('opacity-50'); }
+            
             fetch(`${client.scriptUrl}?action=getAdminData&pin=${pin}`)
                 .then(r=>r.json()).then(res => {
                     if(btn) { btn.innerText = "Refresh Live Data"; btn.disabled = false; btn.classList.remove('opacity-50'); }
-                    if(res.success) { adminData = res; renderUI(); }
+                    if(res.success) { 
+                        adminData = res; 
+                        renderUI(); 
+                    }
+                }).catch(() => {
+                    if(btn) { btn.innerText = "Refresh Live Data"; btn.disabled = false; btn.classList.remove('opacity-50'); }
                 });
         }
 
@@ -274,8 +289,13 @@
             document.getElementById('mInvoices').innerText = adminData.summary.invoiceCount;
 
             const alertCont = document.getElementById('alertsContainer');
+            document.getElementById('alertCount').innerText = adminData.alerts.length;
+            
             if(adminData.alerts.length > 0) {
+                const latestAlert = adminData.alerts[0];
+                document.getElementById('alertPopupText').innerText = `Room ${latestAlert.RoomNo}: ${latestAlert.Issue}`;
                 document.getElementById('alertPopup').classList.remove('hidden-view');
+                
                 alertCont.innerHTML = "";
                 adminData.alerts.forEach(a => {
                     alertCont.innerHTML += `<div class="p-4 bg-white border border-red-200 rounded-xl shadow-sm">
@@ -289,41 +309,62 @@
                 });
             } else {
                 document.getElementById('alertPopup').classList.add('hidden-view');
-                alertCont.innerHTML = "<p class='text-slate-400 text-sm font-semibold'>System secure. No operational threats.</p>";
+                alertCont.innerHTML = "<div class='p-6 text-center border border-dashed border-slate-200 rounded-xl bg-slate-50'><p class='text-slate-400 text-sm font-semibold'>System secure. No operational threats.</p></div>";
             }
 
             const tbody = document.getElementById('staffListTable');
             tbody.innerHTML = "";
-            adminData.staffList.forEach(s => {
-                tbody.innerHTML += `<tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                    <td class="py-4 font-mono font-semibold text-blue-600">${s.StaffId}</td>
-                    <td class="py-4 font-bold text-slate-900">${s.FullName}</td>
-                    <td class="py-4"><span class="bg-slate-100 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 border border-slate-200">${s.Role}</span></td>
-                    <td class="py-4 font-mono font-medium text-xs">${s.Phone}</td>
-                    <td class="py-4 text-right"><button onclick="removeStaff('${s.StaffId}', this)" class="text-red-600 hover:text-red-700 text-xs font-bold uppercase tracking-wider bg-red-50 px-3 py-1.5 rounded hover:bg-red-100 transition">Terminate</button></td>
-                </tr>`;
-            });
+            if(adminData.staffList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400 text-sm font-medium">No staff deployed yet.</td></tr>`;
+            } else {
+                adminData.staffList.forEach(s => {
+                    tbody.innerHTML += `<tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                        <td class="py-4 font-mono font-semibold text-blue-600">${s.StaffId}</td>
+                        <td class="py-4 font-bold text-slate-900">${s.FullName}</td>
+                        <td class="py-4"><span class="bg-slate-100 px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 border border-slate-200">${s.Role}</span></td>
+                        <td class="py-4 font-mono font-medium text-xs">${s.Phone}</td>
+                        <td class="py-4 text-right"><button onclick="removeStaff('${s.StaffId}', this)" class="text-red-600 hover:text-red-700 text-xs font-bold uppercase tracking-wider bg-red-50 px-3 py-1.5 rounded hover:bg-red-100 transition">Terminate</button></td>
+                    </tr>`;
+                });
+            }
         }
 
         function addStaff(btn) {
-            const payload = { action: "addStaff", name: document.getElementById('stfName').value, role: document.getElementById('stfRole').value, phone: document.getElementById('stfPhone').value };
-            apiCall(payload, btn, "Deploying...", res => { document.getElementById('stfName').value=""; fetchData(null); });
+            const name = document.getElementById('stfName').value.trim();
+            const role = document.getElementById('stfRole').value.trim();
+            const phone = document.getElementById('stfPhone').value.trim();
+            
+            if(!name || !role) return notify("Please fill Resource Name and Department.");
+            
+            const payload = { action: "addStaff", name: name, role: role, phone: phone };
+            apiCall(payload, btn, "Deploying...", res => { 
+                document.getElementById('stfName').value=""; 
+                document.getElementById('stfRole').value=""; 
+                document.getElementById('stfPhone').value=""; 
+                fetchData(null); 
+                notify("Resource Deployed Successfully.");
+            });
         }
 
         function removeStaff(id, btn) {
             if(confirm("Confirm resource termination?")) {
-                apiCall({ action: "removeStaff", staffId: id }, btn, "Wait...", res => { fetchData(null); });
+                apiCall({ action: "removeStaff", staffId: id }, btn, "Wait...", res => { 
+                    fetchData(null); 
+                    notify("Resource Terminated.");
+                });
             }
         }
 
         function downloadCSV() {
+            if(!adminData.invoices || adminData.invoices.length === 0) return notify("No invoice data available to export.");
+            
             let csvContent = "data:text/csv;charset=utf-8,Invoice ID,Booking ID,Room,Revenue,Food Total,Final Paid,Mode,Date\n";
             adminData.invoices.forEach(row => {
                 csvContent += `${row.InvoiceId},${row.BookingId},${row.RoomNo},${row.RoomTotal},${row.FoodTotal},${row.FinalPaid},${row.PaymentMode},${row.Timestamp}\n`;
             });
             const link = document.createElement("a");
             link.setAttribute("href", encodeURI(csvContent));
-            link.setAttribute("download", `DataExport_${Date.now()}.csv`);
+            link.setAttribute("download", `${client.name.replace(/\s+/g, '_')}_DataExport_${Date.now()}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
