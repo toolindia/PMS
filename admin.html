@@ -17,7 +17,6 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
         
-        /* Bar Chart & Alert Styles */
         @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
         .alert-pulse { animation: pulse-red 2s infinite; border-left: 5px solid #ef4444; }
         .bar { width: 12%; background: #2563eb; border-radius: 4px 4px 0 0; transition: height 0.5s; }
@@ -27,7 +26,6 @@
 
     <div id="toast" class="hidden-view fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-2xl transition-all duration-300"></div>
 
-    <!-- RED ALERT -->
     <div id="alertPopup" class="hidden-view fixed top-5 right-5 bg-white border border-red-200 text-slate-900 px-6 py-4 rounded-xl shadow-2xl z-50 alert-pulse flex items-center gap-4">
         <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center shrink-0">
             <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
@@ -39,7 +37,6 @@
         <button onclick="document.getElementById('alertPopup').classList.add('hidden-view')" class="ml-4 font-bold text-slate-400 hover:text-slate-800 transition">X</button>
     </div>
 
-    <!-- LOGIN -->
     <div id="authBox" class="fixed inset-0 bg-slate-900 flex items-center justify-center z-50">
         <div class="bg-white p-8 rounded-2xl w-full max-w-sm text-center m-4 shadow-2xl">
             <div class="flex justify-center mb-4">
@@ -52,7 +49,6 @@
         </div>
     </div>
 
-    <!-- SIDEBAR -->
     <aside id="sidebar" class="hidden-view w-64 bg-white border-r border-slate-200 flex flex-col z-20 shrink-0">
         <div class="p-6 flex items-center gap-3">
             <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm">BI</div>
@@ -74,7 +70,6 @@
         </nav>
     </aside>
 
-    <!-- MAIN CONTENT -->
     <div id="mainWrapper" class="hidden-view flex-1 flex flex-col relative bg-slate-50">
         
         <header class="bg-white border-b border-slate-200 px-8 py-5 flex justify-between items-center z-10 shrink-0">
@@ -87,7 +82,6 @@
 
         <main class="flex-1 overflow-y-auto p-4 sm:p-8 relative z-10 custom-scrollbar">
             
-            <!-- DASHBOARD TAB -->
             <div id="tab-dashboard" class="max-w-7xl mx-auto space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm border-t-4 border-t-emerald-500">
@@ -132,7 +126,6 @@
                 </div>
             </div>
 
-            <!-- STAFF TAB -->
             <div id="tab-staff" class="hidden-view max-w-7xl mx-auto space-y-6">
                 <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
                     <h3 class="text-lg font-bold text-slate-900 mb-4">Onboard Resource</h3>
@@ -153,7 +146,6 @@
                 </div>
             </div>
 
-            <!-- REPORTS TAB -->
             <div id="tab-reports" class="hidden-view max-w-7xl mx-auto space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-white border border-slate-200 p-10 rounded-2xl shadow-sm text-center border-t-4 border-t-emerald-500">
@@ -173,7 +165,6 @@
             </div>
         </main>
 
-        <!-- FOOTER (Preserved Powered By Ofbuzz design) -->
         <footer class="bg-white border-t border-slate-200 py-4 px-8 text-xs shrink-0">
             <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div class="flex items-center gap-3">
@@ -224,14 +215,14 @@
 
         function apiCall(payload, btnElem, loadingText, callback) {
             const originalText = btnElem ? btnElem.innerText : "";
-            if(btnElem) { btnElem.innerText = loadingText; btnElem.disabled = true; btnElem.classList.add('opacity-50', 'cursor-not-allowed'); }
+            if(btnElem) { btnElem.innerText = loadingText; btnElem.disabled = true; btnElem.classList.add('opacity-50'); }
             
             fetch(client.scriptUrl, { method: "POST", body: JSON.stringify(payload) })
             .then(r=>r.json()).then(res => {
-                if(btnElem) { btnElem.innerText = originalText; btnElem.disabled = false; btnElem.classList.remove('opacity-50', 'cursor-not-allowed'); }
+                if(btnElem) { btnElem.innerText = originalText; btnElem.disabled = false; btnElem.classList.remove('opacity-50'); }
                 if(callback) callback(res);
             }).catch(err => {
-                if(btnElem) { btnElem.innerText = originalText; btnElem.disabled = false; btnElem.classList.remove('opacity-50', 'cursor-not-allowed'); }
+                if(btnElem) { btnElem.innerText = originalText; btnElem.disabled = false; btnElem.classList.remove('opacity-50'); }
                 notify("Network communication failed.");
             });
         }
@@ -358,13 +349,14 @@
         function downloadCSV() {
             if(!adminData.invoices || adminData.invoices.length === 0) return notify("No invoice data available to export.");
             
-            let csvContent = "data:text/csv;charset=utf-8,Invoice ID,Booking ID,Room,Revenue,Food Total,Final Paid,Mode,Date\n";
+            let csvContent = "data:text/csv;charset=utf-8,Invoice ID,Booking ID,Room,Guest Name,Room Revenue,Food Total,Final Paid,Mode,Date\n";
             adminData.invoices.forEach(row => {
-                csvContent += `${row.InvoiceId},${row.BookingId},${row.RoomNo},${row.RoomTotal},${row.FoodTotal},${row.FinalPaid},${row.PaymentMode},${row.Timestamp}\n`;
+                // Mapping matching the new Invoice structure in AppScript
+                csvContent += `${row.InvoiceId},${row.BookingId},${row.RoomNo},${row.GuestName},${row.RoomTotal},${row.FoodTotal},${row.FinalPaid},${row.PaymentMode},${row.Timestamp}\n`;
             });
             const link = document.createElement("a");
             link.setAttribute("href", encodeURI(csvContent));
-            link.setAttribute("download", `${client.name.replace(/\s+/g, '_')}_DataExport_${Date.now()}.csv`);
+            link.setAttribute("download", `${client.name.replace(/\s+/g, '_')}_Analytics_Export_${Date.now()}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
