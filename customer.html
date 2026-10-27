@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guest Portal - Ofbuzz PMS</title>
+    <title>Guest Portal - PMS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #fafafa; color: #111; }
@@ -19,8 +19,8 @@
     <!-- HEADER -->
     <header class="bg-red-600 text-white p-5 shadow-md sticky top-0 z-40">
         <div class="max-w-5xl mx-auto flex justify-between items-center">
-            <h1 id="bPropName" class="text-xl font-black tracking-tight uppercase">Guest Portal <span id="networkStatus" class="text-green-300 text-xs ml-2">• Online</span></h1>
-            <span class="text-[10px] font-bold bg-white text-red-600 px-3 py-1.5 rounded-full shadow tracking-widest uppercase">Powered by Ofbuzz</span>
+            <h1 id="bPropName" class="text-xl font-black tracking-tight uppercase">Guest Portal <span id="networkStatus" class="text-green-300 text-xs ml-2 font-bold tracking-widest uppercase">• Online</span></h1>
+            <span class="text-[10px] font-bold bg-white text-red-600 px-3 py-1.5 rounded-full shadow tracking-widest uppercase">Room Service</span>
         </div>
     </header>
 
@@ -119,14 +119,14 @@
 
     </main>
 
-    <!-- OFBUZZ FOOTER (With Dynamic Hotel Contact) -->
+    <!-- DYNAMIC FOOTER -->
     <footer class="bg-white border-t border-gray-200 py-6 mt-auto text-xs w-full">
         <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
-                <img src="https://i.pinimg.com/736x/bd/d0/5c/bdd05c94afb66b5a72f5e17a7a879ab3.jpg" alt="Ofbuzz Logo" class="w-7 h-7 rounded-full object-cover border border-gray-300">
+                <div class="w-8 h-8 rounded-full bg-red-100 border border-red-200 flex items-center justify-center text-red-600 font-bold shadow-sm">H</div>
                 <div>
-                    <p class="font-bold uppercase tracking-wider text-black">Ofbuzz Technology</p>
-                    <p class="text-[10px] text-gray-500 uppercase tracking-widest">Ofbuzz PMS &bull; An Indian Technology</p>
+                    <p id="footerPropName" class="font-bold uppercase tracking-wider text-black">Hotel Property</p>
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest">Powered by Ofbuzz PMS</p>
                 </div>
             </div>
             <!-- DYNAMIC HOTEL CONTACT NUMBER WILL BE INJECTED HERE -->
@@ -193,7 +193,10 @@
             client = data[slug];
             
             if(client) {
+                // Dynamically injecting Hotel Name everywhere
                 document.getElementById('bPropName').innerHTML = `${client.name} <span id="networkStatus" class="text-green-300 text-[10px] ml-2 font-bold tracking-widest uppercase">• Online</span>`;
+                document.getElementById('footerPropName').innerText = client.name;
+                
                 fetchData();
             } else {
                 document.getElementById('loader').innerHTML = "<p class='font-bold text-red-500'>Hotel Not Found in Registry</p>";
@@ -208,6 +211,7 @@
                         document.getElementById('supportBtn').href = `tel:${res.hotelContact}`;
                         document.getElementById('loader').classList.add('hidden-view');
                         document.getElementById('mainContent').classList.remove('hidden-view');
+                        
                         renderMenu();
                         syncOffline(); // Initial sync check
                     }
@@ -226,6 +230,12 @@
         function renderMenu() {
             const el = document.getElementById('menuContainer');
             el.innerHTML = "";
+            
+            if(menuItems.length === 0) {
+                el.innerHTML = `<div class="p-6 text-center border border-dashed border-gray-200 rounded-xl bg-gray-50"><p class="text-sm font-bold text-gray-400">Menu is currently unavailable.</p></div>`;
+                return;
+            }
+
             menuItems.forEach(item => {
                 el.innerHTML += `
                     <div class="bg-white border border-gray-200 p-4 rounded-xl flex justify-between items-center hover:shadow-md transition">
@@ -235,7 +245,7 @@
                             <p class="text-xs text-gray-500 mt-1">${item.Description || ''}</p>
                             <span class="block text-red-600 font-bold mt-2">₹${item.Price}</span>
                         </div>
-                        <button onclick="addToCart('${item.ItemId}', '${item.ItemName}', ${item.Price})" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wider active:scale-95 transition-all shadow-sm">
+                        <button onclick="addToCart('${item.ItemId}', '${item.ItemName.replace(/'/g, "\\'")}', ${item.Price})" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wider active:scale-95 transition-all shadow-sm">
                             Add +
                         </button>
                     </div>
