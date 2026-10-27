@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reception - Ofbuzz PMS</title>
+    <title>Reception - PMS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -29,9 +29,9 @@
     <div id="authBox" class="fixed inset-0 bg-slate-900 flex items-center justify-center z-50">
         <div class="bg-white p-8 rounded-2xl shadow-2xl text-center w-full max-w-sm m-4">
             <div class="flex justify-center mb-5">
-                <div class="w-14 h-14 bg-blue-700 rounded-xl flex items-center justify-center text-white font-bold text-2xl shadow-lg">O</div>
+                <div class="w-14 h-14 bg-blue-700 rounded-xl flex items-center justify-center text-white font-bold text-2xl shadow-lg">R</div>
             </div>
-            <h2 class="text-2xl font-bold mb-1 text-slate-900 tracking-tight">Ofbuzz PMS</h2>
+            <h2 id="loginPropName" class="text-2xl font-bold mb-1 text-slate-900 tracking-tight">Front Desk</h2>
             <p class="text-xs text-slate-500 mb-8 uppercase tracking-widest font-semibold">Enter Shop ID</p>
             <input type="password" id="pinInput" class="w-full text-center text-3xl tracking-widest p-4 bg-slate-50 border border-slate-200 rounded-xl mb-6 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all font-mono" placeholder="••••">
             <button id="btnLogin" onclick="login()" class="w-full bg-blue-900 text-white font-semibold py-3.5 rounded-xl hover:bg-blue-800 transition-all shadow-md">Unlock Terminal</button>
@@ -41,8 +41,8 @@
     <!-- SIDEBAR -->
     <aside id="sidebar" class="hidden-view w-64 bg-white border-r border-slate-200 flex flex-col z-20 shrink-0">
         <div class="p-6 flex items-center gap-3 mb-2">
-            <div class="w-9 h-9 bg-blue-700 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-sm">O</div>
-            <span class="font-bold text-slate-900 tracking-tight text-lg">OFBUZZ PMS</span>
+            <div class="w-9 h-9 bg-blue-700 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-sm">FD</div>
+            <span id="sidebarPropName" class="font-bold text-slate-900 tracking-tight text-lg overflow-hidden whitespace-nowrap text-ellipsis">Reception</span>
         </div>
         <nav class="flex-1 px-3 space-y-1 overflow-y-auto custom-scrollbar">
             <div id="nav-dashboard" onclick="switchTab('dashboard')" class="sidebar-item active">
@@ -70,6 +70,11 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Settings
             </div>
         </nav>
+        
+        <!-- Small Footer in Sidebar for PMS Credit -->
+        <div class="p-4 border-t border-slate-200 text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center bg-slate-50">
+            Powered by Ofbuzz
+        </div>
     </aside>
 
     <!-- MAIN DASHBOARD CONTENT -->
@@ -275,6 +280,9 @@
             const res = await fetch(`masterdata.json?_ts=${Date.now()}`);
             const data = await res.json();
             client = data[slug];
+            if(client) {
+                document.getElementById('loginPropName').innerText = client.name + ' PMS';
+            }
             syncOffline();
         }
 
@@ -285,7 +293,7 @@
             setTimeout(() => el.classList.add('hidden-view'), 3500);
         }
 
-        // --- NEW: Multi-Tab Switching Logic ---
+        // --- Multi-Tab Switching Logic ---
         function switchTab(tabId) {
             const tabs = ['dashboard', 'reservations', 'rooms', 'guests', 'billing', 'dining', 'reports', 'settings'];
             tabs.forEach(t => {
@@ -347,11 +355,19 @@
                     btn.innerText = orig; btn.disabled = false; btn.classList.remove('opacity-50');
                     if(res.success) {
                         appData = res;
+                        
+                        // Inject Dynamic Names
+                        document.getElementById('propTitle').innerText = `${client.name} - Front Desk`;
+                        document.getElementById('sidebarPropName').innerText = client.name;
+                        
                         document.getElementById('authBox').classList.add('hidden-view');
                         document.getElementById('sidebar').classList.remove('hidden-view');
                         document.getElementById('mainWrapper').classList.remove('hidden-view');
                         populateAllViews();
                     } else alert(res.error || "Incorrect PIN");
+                }).catch(() => {
+                    btn.innerText = orig; btn.disabled = false; btn.classList.remove('opacity-50');
+                    notify("Connection failed.");
                 });
         }
 
@@ -361,8 +377,18 @@
             fetch(`${client.scriptUrl}?action=getReceptionData&pin=${pin}`)
                 .then(r=>r.json()).then(res => {
                     if(btn) { btn.innerText = "Refresh UI"; btn.disabled = false; btn.classList.remove('opacity-50'); }
-                    if(res.success) { appData = res; populateAllViews(); }
+                    if(res.success) { appData = res; populateAllViews(); notify("Dashboard Refreshed."); }
+                }).catch(() => {
+                    if(btn) { btn.innerText = "Refresh UI"; btn.disabled = false; btn.classList.remove('opacity-50'); }
                 });
+        }
+
+        // Trigger Cloud Backup (Checks for Backup Sheet ID in client config)
+        function triggerBackup(btn) {
+            if(!client.backupSheetId) return notify("Backup Sheet ID not configured in Master Console.");
+            apiCall({ action: "syncBackup", backupId: client.backupSheetId }, btn, "Pushing to Cloud...", res => {
+                notify(res.success ? res.message : res.error);
+            });
         }
 
         // --- Data Binding to All Tabs ---
