@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant Control - Ofbuzz PMS</title>
+    <title>Restaurant Control - PMS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -28,7 +28,7 @@
             <div class="flex justify-center mb-4">
                 <div class="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-md">C</div>
             </div>
-            <h2 class="text-2xl font-bold text-slate-900 mb-1">Cafe Portal</h2>
+            <h2 id="loginPropName" class="text-2xl font-bold text-slate-900 mb-1">Cafe Portal</h2>
             <p class="text-xs text-slate-500 mb-8 uppercase tracking-widest font-semibold">Kitchen & Menu Management</p>
             <input type="password" id="pinInput" placeholder="••••" class="w-full text-center text-3xl tracking-widest p-4 bg-slate-50 border border-slate-200 text-slate-900 rounded-xl mb-6 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 transition">
             <button onclick="login()" id="btnLogin" class="w-full bg-blue-900 text-white font-bold py-3.5 rounded-xl hover:bg-blue-800 transition shadow-md">Enter Kitchen</button>
@@ -38,8 +38,8 @@
     <!-- SIDEBAR -->
     <aside id="sidebar" class="hidden-view w-64 bg-white border-r border-slate-200 flex flex-col z-20 shrink-0">
         <div class="p-6 flex items-center gap-3">
-            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm">O</div>
-            <span class="font-bold text-slate-900 tracking-tight text-lg">OFBUZZ <span class="text-orange-500">CAFE</span></span>
+            <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm">C</div>
+            <span id="sidebarPropName" class="font-bold text-slate-900 tracking-tight text-lg overflow-hidden whitespace-nowrap text-ellipsis">Cafe</span>
         </div>
         <nav class="flex-1 px-4 space-y-1">
             <div onclick="switchTab('orders')" id="nav-orders" class="sidebar-item active">
@@ -163,6 +163,9 @@
             const res = await fetch(`masterdata.json?_ts=${Date.now()}`);
             const data = await res.json();
             client = data[slug];
+            if(client) {
+                document.getElementById('loginPropName').innerText = client.name + ' Cafe';
+            }
         }
 
         function switchTab(tabId) {
@@ -191,8 +194,9 @@
                     if(res.success) {
                         diningData = res;
                         
-                        // BUG FIX: Using client.name instead of res.propertyName
-                        document.getElementById('propTitle').innerText = `${client.name} - Cafe Hub`;
+                        // Dynamically setting names
+                        document.getElementById('propTitle').innerText = `${client.name} - Kitchen`;
+                        document.getElementById('sidebarPropName').innerHTML = `${client.name} <span class="text-orange-500 ml-1">CAFE</span>`;
 
                         document.getElementById('authBox').classList.add('hidden-view');
                         document.getElementById('sidebar').classList.remove('hidden-view');
@@ -212,8 +216,22 @@
             const orig = btn.innerText;
             btn.innerText = "Syncing...";
             btn.disabled = true;
-            login(); 
-            setTimeout(() => { btn.innerText = orig; btn.disabled = false; }, 1000);
+            
+            const pin = document.getElementById('pinInput').value;
+            fetch(`${client.scriptUrl}?action=getDiningData&pin=${pin}`)
+                .then(r=>r.json()).then(res => {
+                    btn.innerText = orig;
+                    btn.disabled = false;
+                    if(res.success) {
+                        diningData = res;
+                        renderUI();
+                        notify("Kitchen synced successfully.");
+                    }
+                }).catch(() => {
+                    btn.innerText = orig;
+                    btn.disabled = false;
+                    notify("Sync failed.");
+                });
         }
 
         function renderUI() {
@@ -240,14 +258,19 @@
             // Render Menu
             const mTable = document.getElementById('menuTable');
             mTable.innerHTML = "";
-            diningData.menu.forEach(m => {
-                mTable.innerHTML += `<tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                    <td class="py-4 text-slate-500 text-xs uppercase font-bold tracking-wider">${m.Category}</td>
-                    <td class="py-4 font-bold text-slate-900">${m.ItemName}</td>
-                    <td class="py-4 font-mono font-bold text-slate-900">₹${m.Price}</td>
-                    <td class="py-4 text-right"><button onclick="removeMenu('${m.ItemId}', this)" class="text-red-600 hover:text-red-700 text-xs font-bold uppercase tracking-wider bg-red-50 px-3 py-1.5 rounded hover:bg-red-100 transition">Delete</button></td>
-                </tr>`;
-            });
+            
+            if(diningData.menu.length === 0) {
+                mTable.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-400 text-sm font-medium">Catalogue is empty. Add a dish.</td></tr>`;
+            } else {
+                diningData.menu.forEach(m => {
+                    mTable.innerHTML += `<tr class="hover:bg-slate-50 transition border-b border-slate-100">
+                        <td class="py-4 text-slate-500 text-xs uppercase font-bold tracking-wider">${m.Category}</td>
+                        <td class="py-4 font-bold text-slate-900">${m.ItemName}</td>
+                        <td class="py-4 font-mono font-bold text-slate-900">₹${m.Price}</td>
+                        <td class="py-4 text-right"><button onclick="removeMenu('${m.ItemId}', this)" class="text-red-600 hover:text-red-700 text-xs font-bold uppercase tracking-wider bg-red-50 px-3 py-1.5 rounded hover:bg-red-100 transition">Delete</button></td>
+                    </tr>`;
+                });
+            }
         }
 
         function markDone(orderId, btn) {
@@ -255,31 +278,75 @@
             btn.innerText = "Updating...";
             btn.disabled = true;
             fetch(client.scriptUrl, { method:"POST", body: JSON.stringify({ action: "completeOrder", orderId: orderId }) })
-            .then(()=> { fetchData(); });
+            .then(r=>r.json()).then(res => { 
+                if(res.success) {
+                    fetchData(); 
+                } else {
+                    btn.innerText = orig;
+                    btn.disabled = false;
+                    notify("Failed to update status.");
+                }
+            }).catch(() => {
+                btn.innerText = orig;
+                btn.disabled = false;
+                notify("Network error.");
+            });
         }
 
         function addMenuItem() {
             const btn = document.getElementById('btnAddMenu');
+            
+            const category = document.getElementById('mCategory').value.trim();
+            const name = document.getElementById('mItemName').value.trim();
+            const price = document.getElementById('mPrice').value.trim();
+            
+            if(!name || !price) return notify("Please enter Dish Name and Price.");
+            
             const orig = btn.innerText;
             btn.innerText = "Adding...";
             btn.disabled = true;
             
             fetch(client.scriptUrl, { method:"POST", body: JSON.stringify({ action: "addMenu", 
-                category: document.getElementById('mCategory').value, name: document.getElementById('mItemName').value, price: document.getElementById('mPrice').value 
-            })}).then(()=> { 
-                document.getElementById('mItemName').value=""; 
-                document.getElementById('mPrice').value="";
+                category: category, name: name, price: price 
+            })}).then(r=>r.json()).then(res => { 
+                if(res.success) {
+                    document.getElementById('mItemName').value=""; 
+                    document.getElementById('mPrice').value="";
+                    btn.innerText = orig;
+                    btn.disabled = false;
+                    fetchData(); 
+                    notify("Dish added successfully.");
+                } else {
+                    btn.innerText = orig;
+                    btn.disabled = false;
+                    notify("Failed to add dish.");
+                }
+            }).catch(() => {
                 btn.innerText = orig;
                 btn.disabled = false;
-                fetchData(); 
+                notify("Network error.");
             });
         }
 
         function removeMenu(id, btn) {
             if(confirm("Permanently remove this item from the catalogue?")) {
+                const orig = btn.innerText;
                 btn.innerText = "...";
                 btn.disabled = true;
-                fetch(client.scriptUrl, { method:"POST", body: JSON.stringify({ action: "removeMenu", itemId: id }) }).then(()=> fetchData());
+                fetch(client.scriptUrl, { method:"POST", body: JSON.stringify({ action: "removeMenu", itemId: id }) })
+                .then(r=>r.json()).then(res => {
+                    if(res.success) {
+                        fetchData();
+                    } else {
+                        btn.innerText = orig;
+                        btn.disabled = false;
+                        notify("Failed to delete dish.");
+                    }
+                }).catch(() => {
+                    btn.innerText = orig;
+                    btn.disabled = false;
+                    notify("Network error.");
+                });
             }
         }
         
