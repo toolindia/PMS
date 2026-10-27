@@ -2,985 +2,663 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
-    <title>Ofbuzz Technology | Global Digital Growth & Enterprise Technology Firm</title>
-    
-    <!-- Geo & Localized SEO Meta Tags -->
-    <meta name="description" content="Ofbuzz Technology is a global enterprise growth & web development firm serving Jewellery, Luxury Fashion, Real Estate & Hotels (PMS) in Delhi NCR, Noida, Gurugram, Gujarat, Rajasthan, Bengaluru, New York, New Jersey, Sydney, and London.">
-    <meta name="keywords" content="Digital Marketing Agency Delhi, Web Development New York, SEO Services London, Jewellery Marketing Sydney, Real Estate Marketing New Jersey, Performance Marketing Agency, Ofbuzz Technology">
-    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-    <meta name="geo.region" content="IN-DL;IN-UP;IN-HR;IN-GJ;IN-RJ;IN-KA;US-NY;US-NJ;AU-NSW;GB-LND">
-    <meta name="geo.placename" content="Delhi, Noida, Gurugram, Gujarat, Rajasthan, Bengaluru, New York, New Jersey, Sydney, London">
-    <meta name="geo.position" content="28.6258;77.2882">
-    <meta name="ICBM" content="28.6258, 77.2882">
-    <link rel="canonical" href="https://www.ofbuzztechnology.in/">
-
-    <!-- Open Graph / Social Media -->
-    <meta property="og:type" content="website">
-    <meta property="og:locale" content="en_US">
-    <meta property="og:site_name" content="Ofbuzz Technology">
-    <meta property="og:url" content="https://www.ofbuzztechnology.in/">
-    <meta property="og:title" content="Ofbuzz Technology | Global Enterprise Growth Partner">
-    <meta property="og:description" content="Scale your enterprise globally across Delhi, New York, London & Sydney with high-performance web systems, targeted ads, and search dominance.">
-    <meta property="og:image" content="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1200">
-    <meta property="og:image:alt" content="Ofbuzz Technology Dashboard">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Ofbuzz Technology | Global Enterprise Growth Partner">
-    <meta name="twitter:description" content="Enterprise digital growth firm architecting high-converting web applications and revenue campaigns worldwide.">
-    <meta name="twitter:image" content="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1200">
-
-    <!-- Tailwind & Google Fonts -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reception - PMS</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Base Variables & Setup */
-        :root {
-            --bg-dark: #0f172a;
-            --bg-card: #1e293b;
-            --accent-orange: #f97316;
-            --accent-orange-hover: #ea580c;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border-color: rgba(255, 255, 255, 0.1);
-        }
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            overflow-x: hidden;
-            padding-bottom: 90px; /* Space for floating CTA */
-        }
-
-        h1, h2, h3, h4, .serif {
-            font-family: 'Lora', serif;
-        }
-
-        /* Progress Bar */
-        .scroll-progress-container {
-            position: fixed; top: 0; left: 0; width: 100%; height: 4px; z-index: 99999; background: rgba(255,255,255,0.05);
-        }
-        .scroll-progress-bar {
-            height: 100%; width: 0%; background: linear-gradient(90deg, #f97316, #fb923c);
-            box-shadow: 0 0 10px rgba(249, 115, 22, 0.8); transition: width 0.1s linear;
-        }
-
-        /* Advanced PPT Animations Setup */
-        .animate-section .anim-element {
-            opacity: 0; transform: translateY(40px); transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .animate-section .anim-fade {
-            opacity: 0; transition: opacity 1.5s ease-in-out;
-        }
-        .animate-section .anim-scale {
-            opacity: 0; transform: scale(0.9); transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        /* In-View Triggers */
-        .animate-section.in-view .anim-element { opacity: 1; transform: translateY(0); }
-        .animate-section.in-view .anim-fade { opacity: 1; }
-        .animate-section.in-view .anim-scale { opacity: 1; transform: scale(1); }
-
-        /* Staggered Delays */
-        .delay-1 { transition-delay: 0.1s; }
-        .delay-2 { transition-delay: 0.2s; }
-        .delay-3 { transition-delay: 0.3s; }
-        .delay-4 { transition-delay: 0.4s; }
-        .delay-5 { transition-delay: 0.5s; }
-        .delay-6 { transition-delay: 0.6s; }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg-dark); }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--accent-orange); }
-
-        /* Modals */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background-color: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px);
-            display: flex; align-items: flex-start; justify-content: center;
-            z-index: 2147483647; opacity: 0; visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease; padding: 16px;
-        }
-        .modal-overlay.active { opacity: 1; visibility: visible; }
-        .modal-content {
-            position: relative; background: #fff; width: 100%; max-width: 650px;
-            height: 84vh; max-height: 760px; margin-top: 10px; border-radius: 20px;
-            box-shadow: 0 0 40px rgba(249, 115, 22, 0.2); overflow: hidden;
-            transform: translateY(-25px) scale(0.97); transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .modal-overlay.active .modal-content { transform: translateY(0) scale(1); }
-        .modal-close-btn {
-            position: absolute; top: 12px; right: 12px; width: 40px; height: 40px;
-            background-color: var(--bg-dark); color: #FFF; border: none; border-radius: 50%;
-            font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            z-index: 20; transition: all 0.2s;
-        }
-        .modal-close-btn:hover { background-color: var(--accent-orange); transform: scale(1.05); }
-        .modal-iframe { width: 100%; height: 100%; border: none; }
-
-        /* Marquee */
-        .trusted-wrap {
-            background: var(--bg-card); padding: 35px 0; overflow: hidden;
-            border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);
-        }
-        .trusted-marquee {
-            white-space: nowrap; overflow: hidden; position: relative; width: 100%;
-            mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
-            -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%);
-        }
-        .trusted-track {
-            display: inline-flex; gap: 14px; animation: scrollMarquee 70s linear infinite; will-change: transform;
-        }
-        .trusted-track:hover { animation-play-state: paused; }
-        .trusted-item-box {
-            display: inline-flex; align-items: center; justify-content: center;
-            background: var(--bg-dark); border: 1px solid var(--border-color);
-            padding: 12px 22px; border-radius: 12px; color: var(--text-muted);
-            font-size: 13px; font-weight: 700; transition: all 0.25s ease; cursor: default;
-        }
-        .trusted-item-box:hover {
-            border-color: var(--accent-orange); color: var(--accent-orange); transform: translateY(-2px);
-        }
-        @keyframes scrollMarquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-
-        /* Glass Cards for Services & Sections */
-        .glass-card {
-            background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(16px);
-            border: 1px solid var(--border-color); border-radius: 20px;
-            transition: all 0.3s ease; overflow: hidden;
-        }
-        .glass-card:hover {
-            border-color: var(--accent-orange); box-shadow: 0 15px 30px -10px rgba(249, 115, 22, 0.2);
-            transform: translateY(-5px);
-        }
-        .tilt-card { transform-style: preserve-3d; }
+        body { background-color: #F8FAFC; color: #0F172A; font-family: 'Inter', sans-serif; }
+        .hidden-view { display: none !important; }
+        .sidebar-item { display: flex; align-items: center; gap: 0.875rem; padding: 0.75rem 1.25rem; border-radius: 0.5rem; font-weight: 600; font-size: 0.875rem; color: #64748B; transition: all 0.2s ease-in-out; cursor: pointer; margin-bottom: 0.25rem; }
+        .sidebar-item:hover { background-color: #F1F5F9; color: #0F172A; }
+        .sidebar-item.active { background-color: #EFF6FF; color: #1D4ED8; }
+        .sidebar-item.active svg { color: #1D4ED8; }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; height: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+        .modal-overlay { background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); }
+        .data-table th { padding: 1rem; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 0.05em; color: #64748B; border-bottom: 1px solid #E2E8F0; }
+        .data-table td { padding: 1rem; font-size: 0.875rem; font-weight: 500; border-bottom: 1px solid #F1F5F9; color: #334155; }
     </style>
-
-    <!-- Comprehensive Structured SEO Schema (JSON-LD) -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "WebSite",
-          "@id": "https://www.ofbuzztechnology.in/#website",
-          "url": "https://www.ofbuzztechnology.in/",
-          "name": "Ofbuzz Technology",
-          "description": "Global Digital Growth & Enterprise Technology Firm",
-          "inLanguage": "en-US",
-          "publisher": {
-            "@id": "https://www.ofbuzztechnology.in/#organization"
-          }
-        },
-        {
-          "@type": "Organization",
-          "@id": "https://www.ofbuzztechnology.in/#organization",
-          "name": "Ofbuzz Technology",
-          "alternateName": ["Ofbuzz", "Ofbuzz Tech", "Ofbuzz Studio"],
-          "url": "https://www.ofbuzztechnology.in/",
-          "logo": {
-            "@type": "ImageObject",
-            "url": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=200",
-            "caption": "Ofbuzz Technology Logo"
-          },
-          "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1200",
-          "description": "Ofbuzz Technology is an enterprise digital growth firm providing custom software web systems, digital marketing, and studio production across Delhi NCR, Noida, Gurugram, Gujarat, Rajasthan, Bengaluru, New York, New Jersey, Sydney, and London.",
-          "telephone": "+91-7827201014",
-          "email": "hello@ofbuzztechnology.in",
-          "sameAs": [
-            "https://www.linkedin.com/company/ofbuzztechnology",
-            "https://www.youtube.com/@ofbuzztechnology",
-            "https://www.instagram.com/ofbuzztechnology"
-          ],
-          "contactPoint": [
-            {
-              "@type": "ContactPoint",
-              "telephone": "+91-7827201014",
-              "contactType": "customer service",
-              "areaServed": ["IN", "US", "AU", "GB"],
-              "availableLanguage": ["English", "Hindi"]
-            }
-          ]
-        },
-        {
-          "@type": "ProfessionalService",
-          "@id": "https://www.ofbuzztechnology.in/#localbusiness",
-          "name": "Ofbuzz Technology",
-          "url": "https://www.ofbuzztechnology.in/",
-          "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=400",
-          "telephone": "+91-7827201014",
-          "email": "hello@ofbuzztechnology.in",
-          "priceRange": "$$",
-          "paymentAccepted": "Cash, Credit Card, Bank Transfer, UPI",
-          "currenciesAccepted": "INR, USD, GBP, AUD",
-          "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "Pandav Nagar",
-            "addressLocality": "New Delhi",
-            "addressRegion": "Delhi",
-            "postalCode": "110092",
-            "addressCountry": "IN"
-          },
-          "geo": {
-            "@type": "GeoCoordinates",
-            "latitude": 28.6258,
-            "longitude": 77.2882
-          },
-          "areaServed": [
-            { "@type": "Place", "name": "Delhi NCR" },
-            { "@type": "Place", "name": "Noida" },
-            { "@type": "Place", "name": "Gurugram" },
-            { "@type": "Place", "name": "Gujarat" },
-            { "@type": "Place", "name": "Rajasthan" },
-            { "@type": "Place", "name": "Bengaluru" },
-            { "@type": "Place", "name": "New York" },
-            { "@type": "Place", "name": "New Jersey" },
-            { "@type": "Place", "name": "Sydney" },
-            { "@type": "Place", "name": "London" }
-          ],
-          "hasOfferCatalog": {
-            "@type": "OfferCatalog",
-            "name": "Enterprise Growth Solutions",
-            "itemListElement": [
-              {
-                "@type": "Offer",
-                "itemOffered": {
-                  "@type": "Service",
-                  "name": "Jewellery Marketing",
-                  "description": "Specialized digital marketing strategies and social media growth for fine jewellery brands and bullion retailers.",
-                  "url": "https://www.ofbuzztechnology.in/choose/marketing-for-jewellery"
-                }
-              },
-              {
-                "@type": "Offer",
-                "itemOffered": {
-                  "@type": "Service",
-                  "name": "Real Estate Marketing",
-                  "description": "High-converting lead generation and digital campaigns tailored for real estate developers and property consultants.",
-                  "url": "https://www.ofbuzztechnology.in/choose/marketing-for-real-estate"
-                }
-              },
-              {
-                "@type": "Offer",
-                "itemOffered": {
-                  "@type": "Service",
-                  "name": "Ofbuzz Studio Photo & Video Production",
-                  "description": "High-end studio photography, product shoots, and viral ad videos managed directly by Ofbuzz Studio.",
-                  "url": "https://www.ofbuzztechnology.in/choose/ofbuzz-studio-photography-videography"
-                }
-              },
-              {
-                "@type": "Offer",
-                "itemOffered": {
-                  "@type": "Service",
-                  "name": "Web Systems & Custom Tools",
-                  "description": "Bespoke web development, calculators, and automated web tools built to scale enterprise operations.",
-                  "url": "https://www.ofbuzztechnology.in/choose/web-tools"
-                }
-              },
-              {
-                "@type": "Offer",
-                "itemOffered": {
-                  "@type": "Service",
-                  "name": "E-Commerce Services",
-                  "description": "Complete e-commerce store setup, optimization, and scaling partner solutions for retail brands globally.",
-                  "url": "https://www.ofbuzztechnology.in/choose/e-commerce-partner"
-                }
-              },
-              {
-                "@type": "Offer",
-                "itemOffered": {
-                  "@type": "Service",
-                  "name": "PMS & Hotel Management Software",
-                  "description": "Advanced Property Management Systems (PMS) and Hotel Management Software to streamline enterprise operations.",
-                  "url": "https://www.ofbuzztechnology.in/choose/pms-hotel-management-software"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "@type": "FAQPage",
-          "@id": "https://www.ofbuzztechnology.in/#faq",
-          "mainEntity": [
-            {
-              "@type": "Question",
-              "name": "Which cities and states does Ofbuzz Technology serve?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "We run dedicated growth campaigns and localized SEO for brands across Delhi NCR, Noida, Gurugram, Gujarat, Rajasthan, Bengaluru, New York, New Jersey, Sydney, and London."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "Why choose a specialized digital growth partner?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "High-ticket industries such as Fine Jewellery and Real Estate demand hyper-targeted sales funnels and high trust signals. Our specialized knowledge drives faster ROI and lowers cost-per-lead globally."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "How fast can paid advertising deliver results?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Meta and Google ad campaigns generate verified leads within 7 to 14 days of launch. SEO ranking expansions typically consolidate within 3 to 6 months."
-              }
-            }
-          ]
-        }
-      ]
-    }
-    </script>
 </head>
-<body>
+<body class="flex h-screen overflow-hidden">
+    
+    <div id="toast" class="hidden-view fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-6 py-3 rounded-lg text-sm font-semibold shadow-xl transition-all duration-300"></div>
 
-    <!-- Kinetic Scroll Progress Bar -->
-    <div class="scroll-progress-container">
-        <div class="scroll-progress-bar" id="progressBar"></div>
-    </div>
-
-    <!-- Popup Modal Form (Top-Aligned) -->
-    <div class="modal-overlay" id="formModal">
-        <div class="modal-content">
-            <button class="modal-close-btn" id="closeModalBtn" aria-label="Close Form">&times;</button>
-            <iframe class="modal-iframe" src="https://satyamxpandey.github.io/ofbuzzquery/" title="Business Inquiry Form" loading="lazy"></iframe>
+    <!-- LOGIN BOX -->
+    <div id="authBox" class="fixed inset-0 bg-slate-900 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl text-center w-full max-w-sm m-4">
+            <div class="flex justify-center mb-5">
+                <div class="w-14 h-14 bg-blue-700 rounded-xl flex items-center justify-center text-white font-bold text-2xl shadow-lg">R</div>
+            </div>
+            <h2 id="loginPropName" class="text-2xl font-bold mb-1 text-slate-900 tracking-tight">Front Desk</h2>
+            <p class="text-xs text-slate-500 mb-8 uppercase tracking-widest font-semibold">Enter Shop ID</p>
+            <input type="password" id="pinInput" class="w-full text-center text-3xl tracking-widest p-4 bg-slate-50 border border-slate-200 rounded-xl mb-6 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all font-mono" placeholder="••••">
+            <button id="btnLogin" onclick="login()" class="w-full bg-blue-900 text-white font-semibold py-3.5 rounded-xl hover:bg-blue-800 transition-all shadow-md">Unlock Terminal</button>
         </div>
     </div>
 
-    <!-- STICKY CTA CONTAINER (Clickable Buttons) -->
-    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] bg-slate-800/90 backdrop-blur-md px-6 py-3 rounded-full border border-slate-700 shadow-2xl flex gap-3 sm:gap-6 items-center w-max max-w-[90vw]">
-        <a href="mailto:hello@ofbuzztechnology.in" class="text-xs sm:text-sm font-semibold text-slate-300 hover:text-orange-500 transition-colors flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-            <span class="hidden sm:inline">Email Us</span>
-        </a>
-        <span class="w-1 h-1 bg-slate-600 rounded-full"></span>
-        <a href="tel:+917827201014" class="text-xs sm:text-sm font-semibold text-slate-300 hover:text-orange-500 transition-colors flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-            Call Now
-        </a>
-        <span class="w-1 h-1 bg-slate-600 rounded-full"></span>
-        <a href="https://wa.me/917827201014" target="_blank" class="text-xs sm:text-sm font-bold text-white bg-orange-500 px-5 py-2 rounded-full hover:bg-orange-600 transition-all shadow-[0_0_15px_rgba(249,115,22,0.4)] hover:shadow-[0_0_25px_rgba(249,115,22,0.6)] flex items-center gap-2 transform hover:-translate-y-0.5">
-            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 21.172c-1.895 0-3.753-.509-5.385-1.472l-.387-.229-4.004 1.05 1.068-3.904-.251-.4A11.055 11.055 0 011.05 10.87c0-6.108 4.97-11.077 11.082-11.077 2.96 0 5.74 1.152 7.834 3.245 2.094 2.094 3.248 4.873 3.246 7.834 0 6.108-4.971 11.077-11.08 11.077m0-13.064c-.398 0-.8.026-1.192.079-1.921.258-3.567 1.458-4.509 3.093a5.274 5.274 0 00-.712 2.646c0 .768.163 1.517.472 2.203l.231.513-1.042 3.805 3.89-1.021.5.297c1.378.819 2.973 1.25 4.607 1.25 4.542 0 8.238-3.696 8.24-8.24 0-2.201-.856-4.269-2.411-5.824-1.556-1.554-3.623-2.411-5.825-2.411-1.325 0-2.61.354-3.729 1.014a6.477 6.477 0 00-2.664 2.76zM17.09 13.91c-.276-.138-1.636-.807-1.89-.9-.253-.092-.438-.138-.622.138-.184.276-.713.9-.875 1.084-.16.184-.322.207-.599.069-.276-.138-1.168-.43-2.224-1.37-.822-.733-1.377-1.638-1.54-1.914-.16-.276-.017-.425.121-.563.125-.124.276-.322.414-.483.138-.16.184-.276.276-.46.092-.184.046-.345-.023-.483-.069-.138-.622-1.5-.853-2.054-.225-.541-.455-.467-.622-.476-.16-.008-.345-.01-.53-.01s-.483.069-.737.345c-.253.276-.967.944-.967 2.302 0 1.359.99 2.672 1.128 2.856.138.184 1.944 2.967 4.71 4.129 2.508 1.054 2.872.842 3.378.796.506-.046 1.636-.668 1.867-1.312.23-.644.23-1.197.16-1.312-.069-.115-.253-.184-.53-.322z"/></svg>
-            WhatsApp
-        </a>
-    </div>
-
-    <!-- Hero Section (Presentation Style) -->
-    <section class="animate-section relative pt-24 pb-20 px-4 flex flex-col items-center justify-center min-h-[90vh]">
-        <div class="absolute top-0 right-0 w-[40rem] h-[40rem] bg-orange-500/10 rounded-full blur-[100px] -z-10 translate-x-1/3 -translate-y-1/3"></div>
-        <div class="absolute bottom-0 left-0 w-[30rem] h-[30rem] bg-blue-500/10 rounded-full blur-[100px] -z-10 -translate-x-1/3 translate-y-1/3"></div>
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="hidden-view w-64 bg-white border-r border-slate-200 flex flex-col z-20 shrink-0">
+        <div class="p-6 flex items-center gap-3 mb-2">
+            <div class="w-9 h-9 bg-blue-700 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-sm">FD</div>
+            <span id="sidebarPropName" class="font-bold text-slate-900 tracking-tight text-lg overflow-hidden whitespace-nowrap text-ellipsis">Reception</span>
+        </div>
+        <nav class="flex-1 px-3 space-y-1 overflow-y-auto custom-scrollbar">
+            <div id="nav-dashboard" onclick="switchTab('dashboard')" class="sidebar-item active">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> Dashboard
+            </div>
+            <div id="nav-reservations" onclick="switchTab('reservations')" class="sidebar-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg> Reservations
+            </div>
+            <div id="nav-rooms" onclick="switchTab('rooms')" class="sidebar-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg> Rooms
+            </div>
+            <div id="nav-guests" onclick="switchTab('guests')" class="sidebar-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg> Guests
+            </div>
+            <div id="nav-billing" onclick="switchTab('billing')" class="sidebar-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg> Billing
+            </div>
+            <div id="nav-dining" onclick="switchTab('dining')" class="sidebar-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg> Dining
+            </div>
+            <div id="nav-reports" onclick="switchTab('reports')" class="sidebar-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> Reports
+            </div>
+            <div id="nav-settings" onclick="switchTab('settings')" class="sidebar-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Settings
+            </div>
+        </nav>
         
-        <div class="max-w-5xl mx-auto text-center z-10 w-full">
-            <span class="anim-element delay-1 inline-block px-4 py-1.5 rounded-full border border-orange-500/30 bg-orange-500/10 text-orange-500 text-xs font-bold uppercase tracking-widest mb-6">
-                Enterprise Digital Growth Firm
-            </span>
-            <h1 class="anim-element delay-2 text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight text-white">
-                Architecting High-Growth <br><span class="italic text-orange-500 serif">Market Leaders</span>
-            </h1>
-            <p class="anim-element delay-3 text-lg md:text-xl text-slate-400 font-light max-w-3xl mx-auto leading-relaxed mb-10">
-                We empower Fine Jewellery, Luxury Fashion, Real Estate, and Financial enterprises globally with high-converting web applications and revenue-driven ad strategies.
-            </p>
-            
-            <div class="anim-element delay-4 flex flex-wrap justify-center gap-4 mb-16">
-                <button onclick="openFormModal()" class="bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-lg transition-all shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:shadow-[0_0_25px_rgba(249,115,22,0.5)]">Book Strategy Call</button>
-                <button onclick="openFormModal()" class="bg-transparent border border-slate-600 text-white hover:border-orange-500 hover:text-orange-500 font-bold px-6 py-3 rounded-lg transition-all">Submit Business Inquiry</button>
-                <a href="https://www.ofbuzztechnology.in/choose/the-8" target="_blank" class="bg-transparent border border-slate-600 text-white hover:border-orange-500 hover:text-orange-500 font-bold px-6 py-3 rounded-lg transition-all">Explore The 8</a>
-                <a href="https://chat.whatsapp.com/KShccjQGtulFjnocl0LK4A" target="_blank" class="bg-green-600/20 border border-green-500 text-green-500 hover:bg-green-600 hover:text-white font-bold px-6 py-3 rounded-lg transition-all">Join WhatsApp Group</a>
-                <a href="https://www.ofbuzztechnology.in/operations" target="_blank" class="bg-blue-600/20 border border-blue-500 text-blue-500 hover:bg-blue-600 hover:text-white font-bold px-6 py-3 rounded-lg transition-all"><i class="fas fa-user-shield mr-2"></i>Staff Portal</a>
-            </div>
+        <!-- Small Footer in Sidebar for PMS Credit -->
+        <div class="p-4 border-t border-slate-200 text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center bg-slate-50">
+            Powered by Ofbuzz
+        </div>
+    </aside>
 
-            <div class="anim-scale delay-5 max-w-4xl mx-auto tilt-card">
-                <div class="rounded-2xl overflow-hidden border border-slate-700 shadow-2xl">
-                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1400" alt="Ofbuzz Dashboard" class="w-full h-auto max-h-[500px] object-cover">
+    <!-- MAIN DASHBOARD CONTENT -->
+    <div id="mainWrapper" class="hidden-view flex-1 flex flex-col h-screen overflow-hidden bg-slate-50 relative">
+        <header class="bg-white border-b border-slate-200 px-8 py-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 z-10 shrink-0">
+            <div>
+                <h1 id="propTitle" class="text-2xl font-bold text-slate-900 tracking-tight">Front Desk Control</h1>
+                <p class="text-xs font-semibold tracking-wider text-slate-500 uppercase mt-1">Live Property Console <span id="networkStatus" class="text-emerald-600 ml-2 font-bold">• Online</span></p>
+            </div>
+            <div class="flex gap-3">
+                <button id="btnBackup" onclick="triggerBackup(this)" class="flex items-center gap-2 bg-white border border-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 transition shadow-sm">
+                    Sync Backup
+                </button>
+                <button id="btnSync" onclick="fetchData(this)" class="flex items-center gap-2 bg-blue-900 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-800 transition shadow-sm">
+                    Refresh UI
+                </button>
+            </div>
+        </header>
+
+        <main class="flex-1 overflow-y-auto p-4 sm:p-8 custom-scrollbar">
+            
+            <!-- TAB: DASHBOARD -->
+            <div id="tab-dashboard" class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- ROOM MATRIX -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-sm font-bold uppercase text-slate-500 tracking-wider">Live Inventory Matrix</h2>
+                        <div class="flex gap-4 text-xs font-semibold text-slate-500">
+                            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Vacant</span>
+                            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-orange-500"></span> Occupied</span>
+                            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-slate-400"></span> Maintenance</span>
+                        </div>
+                    </div>
+                    <div id="roomGrid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4"></div>
+                </div>
+
+                <!-- FOOD APPROVALS -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 border-t-4 border-t-orange-500 flex flex-col h-full">
+                    <h2 class="text-sm font-bold uppercase mb-4 text-orange-600 tracking-wider">Food Approvals</h2>
+                    <div id="approvalQueue" class="space-y-3 flex-1 overflow-y-auto custom-scrollbar pr-1"></div>
                 </div>
             </div>
-        </div>
-    </section>
 
-    <!-- Location Strip -->
-    <div class="bg-slate-900 border-y border-slate-800 py-6 text-center animate-section">
-        <div class="max-w-6xl mx-auto px-4">
-            <strong class="text-white text-sm uppercase tracking-wider block mb-4 anim-element delay-1">Serving Premium Brands Globally & Nationally:</strong>
-            <div class="flex flex-wrap justify-center gap-3 anim-element delay-2">
-                <span class="px-4 py-1.5 rounded-full border border-slate-700 text-xs font-bold text-slate-300 hover:border-orange-500 hover:text-orange-500 transition-colors">Delhi NCR</span>
-                <span class="px-4 py-1.5 rounded-full border border-slate-700 text-xs font-bold text-slate-300 hover:border-orange-500 hover:text-orange-500 transition-colors">Noida</span>
-                <span class="px-4 py-1.5 rounded-full border border-slate-700 text-xs font-bold text-slate-300 hover:border-orange-500 hover:text-orange-500 transition-colors">Gurugram</span>
-                <span class="px-4 py-1.5 rounded-full border border-slate-700 text-xs font-bold text-slate-300 hover:border-orange-500 hover:text-orange-500 transition-colors">Gujarat</span>
-                <span class="px-4 py-1.5 rounded-full border border-slate-700 text-xs font-bold text-slate-300 hover:border-orange-500 hover:text-orange-500 transition-colors">Rajasthan</span>
-                <span class="px-4 py-1.5 rounded-full border border-slate-700 text-xs font-bold text-slate-300 hover:border-orange-500 hover:text-orange-500 transition-colors">Bengaluru</span>
-                <span class="px-4 py-1.5 rounded-full border border-slate-700 text-xs font-bold text-slate-300 hover:border-orange-500 hover:text-orange-500 transition-colors">New York</span>
-                <span class="px-4 py-1.5 rounded-full border border-slate-700 text-xs font-bold text-slate-300 hover:border-orange-500 hover:text-orange-500 transition-colors">New Jersey</span>
-                <span class="px-4 py-1.5 rounded-full border border-slate-700 text-xs font-bold text-slate-300 hover:border-orange-500 hover:text-orange-500 transition-colors">Sydney</span>
-                <span class="px-4 py-1.5 rounded-full border border-slate-700 text-xs font-bold text-slate-300 hover:border-orange-500 hover:text-orange-500 transition-colors">London</span>
+            <!-- TAB: RESERVATIONS & GUESTS -->
+            <div id="tab-reservations" class="hidden-view max-w-7xl mx-auto space-y-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-lg font-bold text-slate-900 mb-4 border-b border-slate-100 pb-4">Active & Upcoming Reservations</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left data-table">
+                            <thead><tr><th>Booking ID</th><th>Guest Name</th><th>Phone</th><th>Room</th><th>Check-In Date</th><th>Status</th></tr></thead>
+                            <tbody id="tblReservations"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-guests" class="hidden-view max-w-7xl mx-auto space-y-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-lg font-bold text-slate-900 mb-4 border-b border-slate-100 pb-4">In-House Guest Directory</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left data-table">
+                            <thead><tr><th>Room No</th><th>Guest Name</th><th>Contact</th><th>Advance Paid</th><th>ID Proof</th></tr></thead>
+                            <tbody id="tblGuests"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: ROOMS -->
+            <div id="tab-rooms" class="hidden-view max-w-7xl mx-auto space-y-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-lg font-bold text-slate-900 mb-4 border-b border-slate-100 pb-4">Property Room Configurations</h2>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left data-table">
+                            <thead><tr><th>Room No</th><th>Category</th><th>Tariff (₹)</th><th>Current Status</th><th>Action</th></tr></thead>
+                            <tbody id="tblRoomsConfig"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: BILLING -->
+            <div id="tab-billing" class="hidden-view max-w-7xl mx-auto space-y-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-lg font-bold text-slate-900 mb-4 border-b border-slate-100 pb-4">Pending Checkouts & Billing</h2>
+                    <div id="billingQueue" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </div>
+            </div>
+
+            <!-- TAB: DINING, REPORTS, SETTINGS (Placeholders for UI completeness) -->
+            <div id="tab-dining" class="hidden-view max-w-7xl mx-auto">
+                <div class="bg-white p-12 rounded-2xl shadow-sm border border-slate-200 text-center">
+                    <h2 class="text-xl font-bold text-slate-900 mb-2">Dining POS Integrated</h2>
+                    <p class="text-slate-500">Access the full Cafe Portal for advanced menu and kitchen management.</p>
+                </div>
+            </div>
+            <div id="tab-reports" class="hidden-view max-w-7xl mx-auto">
+                <div class="bg-white p-12 rounded-2xl shadow-sm border border-slate-200 text-center">
+                    <h2 class="text-xl font-bold text-slate-900 mb-2">Reports & Analytics</h2>
+                    <p class="text-slate-500">Comprehensive reporting is available in the Admin BI Console.</p>
+                </div>
+            </div>
+            <div id="tab-settings" class="hidden-view max-w-7xl mx-auto">
+                <div class="bg-white p-12 rounded-2xl shadow-sm border border-slate-200 text-center">
+                    <h2 class="text-xl font-bold text-slate-900 mb-2">System Settings</h2>
+                    <p class="text-slate-500">Configuration is managed via the Master Console.</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MODALS -->
+    <!-- Action Modal -->
+    <div id="actionModal" class="hidden-view fixed inset-0 modal-overlay flex items-center justify-center p-4 z-40">
+        <div class="bg-white p-6 rounded-2xl w-full max-w-sm space-y-5 shadow-2xl border border-slate-100">
+            <div class="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h3 class="font-bold text-xl text-slate-900">Room <span id="actRoomText" class="text-blue-700"></span></h3>
+                <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            <button onclick="openCheckIn()" class="w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold shadow-sm hover:bg-emerald-700 transition">Proceed to Check-In</button>
+            <button id="btnMaint" onclick="changeStatus('Maintenance', this)" class="w-full bg-white border border-slate-200 text-slate-700 py-3.5 rounded-xl font-bold hover:bg-slate-50 transition">Mark Maintenance</button>
+        </div>
+    </div>
+
+    <!-- Restore Modal -->
+    <div id="restoreModal" class="hidden-view fixed inset-0 modal-overlay flex items-center justify-center p-4 z-40">
+        <div class="bg-white p-6 rounded-2xl w-full max-w-sm space-y-5 shadow-2xl border border-slate-100">
+            <div class="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h3 class="font-bold text-xl text-slate-900">Room <span id="restRoomText" class="text-blue-700"></span></h3>
+                <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            <p class="text-sm font-semibold text-slate-600 text-center">Is this room ready for guests?</p>
+            <button id="btnVacant" onclick="changeStatus('Vacant', this)" class="w-full bg-blue-700 text-white py-3.5 rounded-xl font-bold shadow-sm hover:bg-blue-800 transition">Mark Available (Vacant)</button>
+        </div>
+    </div>
+
+    <!-- Check-In Modal (UPDATED WITH ID VERIFICATION) -->
+    <div id="ciModal" class="hidden-view fixed inset-0 modal-overlay flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-7 rounded-2xl w-full max-w-md space-y-4 shadow-2xl border border-slate-100 h-[90vh] overflow-y-auto custom-scrollbar">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-100 sticky top-0 bg-white z-10">
+                <h3 class="font-bold text-xl text-slate-900">Check-In: Room <span id="ciRoomText" class="text-blue-700"></span></h3>
+                <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            
+            <div class="space-y-3">
+                <input type="text" id="ciName" placeholder="Guest Full Name" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-600 font-semibold text-sm">
+                <input type="tel" id="ciPhone" placeholder="Mobile Number" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-600 font-semibold text-sm">
+                <input type="number" id="ciAdvance" placeholder="Advance Payment (₹)" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-600 font-mono text-sm">
+            </div>
+
+            <!-- NEW ID VERIFICATION BLOCK -->
+            <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100 space-y-3">
+                <p class="font-bold text-blue-800 uppercase tracking-wider text-[10px]">Guest ID Verification (Mandatory)</p>
+                <select id="ciIdType" onchange="updateIdPlaceholder()" class="w-full bg-white border border-blue-200 p-2.5 rounded-lg outline-none focus:border-blue-600 text-sm font-semibold text-slate-700 cursor-pointer">
+                    <option value="Aadhar Card">Aadhar Card</option>
+                    <option value="PAN Card">PAN Card</option>
+                    <option value="Voter ID">Voter ID</option>
+                    <option value="Driving License">Driving License</option>
+                    <option value="Passport">Passport</option>
+                </select>
+                <input type="text" id="ciIdNumber" placeholder="12-digit Aadhar No" class="w-full bg-white border border-blue-200 p-2.5 rounded-lg outline-none focus:border-blue-600 text-sm font-mono uppercase">
+                
+                <div class="flex items-center gap-2 py-1">
+                    <div class="h-px bg-blue-200 flex-1"></div>
+                    <span class="text-[10px] text-blue-400 font-bold uppercase">OR</span>
+                    <div class="h-px bg-blue-200 flex-1"></div>
+                </div>
+
+                <div class="relative">
+                    <input type="file" id="ciIdFile" accept="image/*,application/pdf" class="w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
+                    <p class="text-[9px] text-slate-400 mt-1 font-semibold">* Upload ID Scan directly (Will securely convert to Base64)</p>
+                </div>
+            </div>
+            
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <p class="font-bold mb-3 text-slate-500 uppercase tracking-wider text-[10px]">Provided Essentials:</p>
+                <div class="grid grid-cols-2 gap-3 text-sm font-semibold text-slate-700">
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="chkSoap" class="essentials w-4 h-4 accent-blue-600"> Soap Kit</label>
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="chkTowel" class="essentials w-4 h-4 accent-blue-600"> Fresh Towels</label>
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="chkWater" class="essentials w-4 h-4 accent-blue-600"> Water Bottles</label>
+                </div>
+            </div>
+            
+            <div class="pt-2 sticky bottom-0 bg-white">
+                <button id="btnCheckIn" onclick="doCheckIn()" class="w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold shadow-sm hover:bg-emerald-700 transition">Confirm Check-In</button>
             </div>
         </div>
     </div>
 
-    <!-- Trusted Marquee -->
-    <div class="trusted-wrap animate-section">
-        <div class="text-center text-xs font-bold tracking-[0.12em] uppercase text-white mb-6 anim-element delay-1">
-            Trusted by <span class="text-orange-500">100+ Industry Leaders Globally</span>
-        </div>
-        <div class="trusted-marquee anim-fade delay-2">
-            <div class="trusted-track">
-                <!-- SET 1 -->
-                <div class="trusted-item-box">Getwise POS</div>
-                <div class="trusted-item-box">Vachya</div>
-                <div class="trusted-item-box">Vachya Jewels USA</div>
-                <div class="trusted-item-box">Rosce Jewellers</div>
-                <div class="trusted-item-box">Manohar Lal Jewellers</div>
-                <div class="trusted-item-box">Sonir by Adarsh</div>
-                <div class="trusted-item-box">Royal Estate Developers</div>
-                <div class="trusted-item-box">Malhotra Properties</div>
-                <div class="trusted-item-box">Jindal Properties</div>
-                <div class="trusted-item-box">Indoroute Global LLP</div>
-                <div class="trusted-item-box">Krishna Jewellers</div>
-                <div class="trusted-item-box">NS Trending Unisex Salon</div>
-                <div class="trusted-item-box">Loona Hospital</div>
-                <div class="trusted-item-box">Kashi Hospital</div>
-                <div class="trusted-item-box">Jazz Media</div>
-                <div class="trusted-item-box">AM Jewellers</div>
-                <div class="trusted-item-box">Abhushan Mandir</div>
-                <div class="trusted-item-box">Everycom</div>
-                <div class="trusted-item-box">Sonu Graphics</div>
-                <div class="trusted-item-box">Ranj Jewellers</div>
-                <div class="trusted-item-box">Garima Garg Makeup Studio</div>
-                <div class="trusted-item-box">Alluring Memories</div>
-                <div class="trusted-item-box">VVIP Travels</div>
-                <div class="trusted-item-box">Jewllz</div>
-                <div class="trusted-item-box">Fine Jewllz</div>
-                <div class="trusted-item-box">OfbuzzMart</div>
-                <div class="trusted-item-box">BBK India</div>
-                <div class="trusted-item-box">Vellora Global Sourcing</div>
-                <div class="trusted-item-box">Vellora Gs</div>
-                <div class="trusted-item-box">Suman Jewellers - Gurugram</div>
-                <div class="trusted-item-box">Mon Cher (Cafe)</div>
-                <div class="trusted-item-box">Ask Gems Veda</div>
-                <div class="trusted-item-box">Skin Story</div>
-                <div class="trusted-item-box">Kayastha Shadi Vivah</div>
-                <div class="trusted-item-box">Bien ERP</div>
-                <div class="trusted-item-box">Stephano Slack</div>
-                <div class="trusted-item-box">Devon Veterinary Hospital</div>
-                <div class="trusted-item-box">Diamond Mansion</div>
-                <div class="trusted-item-box">Shagun Jewellers</div>
-                <div class="trusted-item-box">NYJ Chicago</div>
-                <div class="trusted-item-box">Bienvenue Systems</div>
-                <div class="trusted-item-box">Veddic Urja</div>
-                <div class="trusted-item-box">Rajni Elements</div>
-                <div class="trusted-item-box">Mahalakshami Jewellers</div>
-
-                <!-- SET 2 -->
-                <div class="trusted-item-box">Getwise POS</div>
-                <div class="trusted-item-box">Vachya</div>
-                <div class="trusted-item-box">Vachya Jewels USA</div>
-                <div class="trusted-item-box">Rosce Jewellers</div>
-                <div class="trusted-item-box">Manohar Lal Jewellers</div>
-                <div class="trusted-item-box">Sonir by Adarsh</div>
-                <div class="trusted-item-box">Royal Estate Developers</div>
-                <div class="trusted-item-box">Malhotra Properties</div>
-                <div class="trusted-item-box">Jindal Properties</div>
-                <div class="trusted-item-box">Indoroute Global LLP</div>
-                <div class="trusted-item-box">Krishna Jewellers</div>
-                <div class="trusted-item-box">NS Trending Unisex Salon</div>
-                <div class="trusted-item-box">Loona Hospital</div>
-                <div class="trusted-item-box">Kashi Hospital</div>
-                <div class="trusted-item-box">Jazz Media</div>
-                <div class="trusted-item-box">AM Jewellers</div>
-                <div class="trusted-item-box">Abhushan Mandir</div>
-                <div class="trusted-item-box">Everycom</div>
-                <div class="trusted-item-box">Sonu Graphics</div>
-                <div class="trusted-item-box">Ranj Jewellers</div>
-                <div class="trusted-item-box">Garima Garg Makeup Studio</div>
-                <div class="trusted-item-box">Alluring Memories</div>
-                <div class="trusted-item-box">VVIP Travels</div>
-                <div class="trusted-item-box">Jewllz</div>
-                <div class="trusted-item-box">Fine Jewllz</div>
-                <div class="trusted-item-box">OfbuzzMart</div>
-                <div class="trusted-item-box">BBK India</div>
-                <div class="trusted-item-box">Vellora Global Sourcing</div>
-                <div class="trusted-item-box">Vellora Gs</div>
-                <div class="trusted-item-box">Suman Jewellers - Gurugram</div>
-                <div class="trusted-item-box">Mon Cher (Cafe)</div>
-                <div class="trusted-item-box">Ask Gems Veda</div>
-                <div class="trusted-item-box">Skin Story</div>
-                <div class="trusted-item-box">Kayastha Shadi Vivah</div>
-                <div class="trusted-item-box">Bien ERP</div>
-                <div class="trusted-item-box">Stephano Slack</div>
-                <div class="trusted-item-box">Devon Veterinary Hospital</div>
-                <div class="trusted-item-box">Diamond Mansion</div>
-                <div class="trusted-item-box">Shagun Jewellers</div>
-                <div class="trusted-item-box">NYJ Chicago</div>
-                <div class="trusted-item-box">Bienvenue Systems</div>
-                <div class="trusted-item-box">Veddic Urja</div>
-                <div class="trusted-item-box">Rajni Elements</div>
-                <div class="trusted-item-box">Mahalakshami Jewellers</div>
+    <!-- Check-Out Modal -->
+    <div id="coModal" class="hidden-view fixed inset-0 modal-overlay flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-7 rounded-2xl w-full max-w-sm space-y-5 shadow-2xl border border-slate-100">
+            <div class="flex justify-between items-center pb-4 border-b border-slate-100">
+                <h3 class="font-bold text-xl text-slate-900">Checkout: Room <span id="coRoomText" class="text-blue-700"></span></h3>
+                <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
             </div>
+            
+            <div class="space-y-2 text-sm font-medium">
+                <div class="flex justify-between items-center p-2.5 rounded-lg bg-slate-50"><span class="text-slate-600">Room Tariff:</span> <span id="coTariff" class="font-bold text-slate-900 font-mono">₹0</span></div>
+                <div class="flex justify-between items-center p-2.5 rounded-lg bg-slate-50"><span class="text-slate-600">Dining Orders:</span> <span id="coFood" class="font-bold text-slate-900 font-mono">₹0</span></div>
+                <div class="flex justify-between items-center p-2.5 rounded-lg bg-emerald-50 text-emerald-700"><span class="font-semibold">Advance Paid:</span> <span id="coAdvance" class="font-bold font-mono">-₹0</span></div>
+            </div>
+            
+            <div class="pt-4 border-t border-slate-100">
+                <div class="flex justify-between items-center font-bold text-lg mb-4">
+                    <span class="text-slate-900">Final Payable:</span> 
+                    <span id="coFinal" class="text-blue-700 font-mono text-2xl tracking-tight">₹0</span>
+                </div>
+                <select id="coMode" class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl font-bold outline-none focus:border-blue-600 text-sm">
+                    <option value="Cash">Cash</option><option value="UPI">UPI</option><option value="Card">Card</option>
+                </select>
+            </div>
+            
+            <button id="btnCheckOut" onclick="doCheckOut()" class="w-full bg-blue-700 text-white py-3.5 rounded-xl font-bold shadow-sm hover:bg-blue-800 transition mt-2">Settle & Exit</button>
         </div>
     </div>
 
-    <!-- About Statement -->
-    <section class="py-20 px-4 bg-slate-900 animate-section">
-        <div class="max-w-4xl mx-auto text-center">
-            <span class="anim-element delay-1 inline-block px-3 py-1 bg-slate-800 border border-slate-700 rounded-full text-xs font-bold text-orange-500 uppercase tracking-widest mb-6">Corporate Statement</span>
-            <blockquote class="anim-element delay-2 text-2xl md:text-3xl font-bold text-white leading-relaxed mb-8 serif italic">
-                "Ofbuzz Technology is a global enterprise growth consultancy. We blend data-backed digital marketing, Search Engine Optimization (SEO), custom web development, and studio shoots to help your business get consistent sales across India, US, UK, and Australia."
-            </blockquote>
-            <div class="anim-element delay-3 flex flex-wrap justify-center gap-3">
-                <span class="px-4 py-2 bg-slate-800 border border-slate-700 rounded-full text-xs font-bold text-slate-300">Jewellery Digital Marketing</span>
-                <span class="px-4 py-2 bg-slate-800 border border-slate-700 rounded-full text-xs font-bold text-slate-300">Luxury Fashion Growth</span>
-                <span class="px-4 py-2 bg-slate-800 border border-slate-700 rounded-full text-xs font-bold text-slate-300">Real Estate Lead Generation</span>
-                <span class="px-4 py-2 bg-slate-800 border border-slate-700 rounded-full text-xs font-bold text-slate-300">PMS & Hotel Software</span>
-            </div>
-        </div>
-    </section>
-
-    <!-- Services Section -->
-    <section class="py-24 px-4 animate-section">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="anim-element delay-1 text-3xl md:text-5xl font-bold text-white mb-4">Our Business Solutions</h2>
-                <p class="anim-element delay-2 text-slate-400 text-lg">Simple, effective, and results-focused growth solutions built to increase your revenues.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Service 1 -->
-                <a href="https://www.ofbuzztechnology.in/choose/marketing-for-jewellery" class="anim-element delay-1 glass-card tilt-card block group" target="_blank" rel="noopener">
-                    <div class="h-48 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80&w=600" alt="Jewellery" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    </div>
-                    <div class="p-6">
-                        <span class="text-xs font-bold text-orange-500 uppercase tracking-widest bg-orange-500/10 px-2 py-1 rounded mb-3 inline-block">01 / Fine Jewellery</span>
-                        <h3 class="text-xl font-bold text-white mb-2">Jewellery Marketing</h3>
-                        <p class="text-sm text-slate-400">Specialized digital marketing strategies and social media growth for fine jewellery brands and bullion retailers.</p>
-                    </div>
-                </a>
-
-                <!-- Service 2 -->
-                <a href="https://www.ofbuzztechnology.in/choose/marketing-for-real-estate" class="anim-element delay-2 glass-card tilt-card block group" target="_blank" rel="noopener">
-                    <div class="h-48 overflow-hidden">
-                        <img src="https://i.pinimg.com/736x/e1/d5/17/e1d517bef42db9be0303ef0de90870e8.jpg" alt="Real Estate" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    </div>
-                    <div class="p-6">
-                        <span class="text-xs font-bold text-orange-500 uppercase tracking-widest bg-orange-500/10 px-2 py-1 rounded mb-3 inline-block">02 / Real Estate</span>
-                        <h3 class="text-xl font-bold text-white mb-2">Real Estate Marketing</h3>
-                        <p class="text-sm text-slate-400">High-converting lead generation and digital campaigns tailored for real estate developers and property consultants.</p>
-                    </div>
-                </a>
-
-                <!-- Service 3 -->
-                <a href="https://www.ofbuzztechnology.in/choose/ofbuzz-studio-photography-videography" class="anim-element delay-3 glass-card tilt-card block group" target="_blank" rel="noopener">
-                    <div class="h-48 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1542038784456-1ea8e935640e?auto=format&fit=crop&q=80&w=600" alt="Studio" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    </div>
-                    <div class="p-6">
-                        <span class="text-xs font-bold text-orange-500 uppercase tracking-widest bg-orange-500/10 px-2 py-1 rounded mb-3 inline-block">03 / Ofbuzz Studio</span>
-                        <h3 class="text-xl font-bold text-white mb-2">Photo & Video Production</h3>
-                        <p class="text-sm text-slate-400">High-end studio photography, product shoots, and viral ad videos managed directly by <strong>Ofbuzz Studio</strong>.</p>
-                    </div>
-                </a>
-
-                <!-- Service 4 -->
-                <a href="https://www.ofbuzztechnology.in/choose/web-tools" class="anim-element delay-4 glass-card tilt-card block group" target="_blank" rel="noopener">
-                    <div class="h-48 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1432888498266-38ffec3eaf0a?auto=format&fit=crop&q=80&w=600" alt="Web & Tools" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    </div>
-                    <div class="p-6">
-                        <span class="text-xs font-bold text-orange-500 uppercase tracking-widest bg-orange-500/10 px-2 py-1 rounded mb-3 inline-block">04 / Web & Tools</span>
-                        <h3 class="text-xl font-bold text-white mb-2">Web Systems & Custom Tools</h3>
-                        <p class="text-sm text-slate-400">Bespoke web development, calculators, and automated web tools built to scale your enterprise operations.</p>
-                    </div>
-                </a>
-
-                <!-- Service 5 -->
-                <a href="https://www.ofbuzztechnology.in/choose/e-commerce-partner" class="anim-element delay-5 glass-card tilt-card block group" target="_blank" rel="noopener">
-                    <div class="h-48 overflow-hidden">
-                        <img src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&q=80&w=600" alt="Ecommerce" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    </div>
-                    <div class="p-6">
-                        <span class="text-xs font-bold text-orange-500 uppercase tracking-widest bg-orange-500/10 px-2 py-1 rounded mb-3 inline-block">05 / E-Commerce</span>
-                        <h3 class="text-xl font-bold text-white mb-2">E-Commerce Services</h3>
-                        <p class="text-sm text-slate-400">Complete e-commerce store setup, optimization, and scaling partner solutions for retail brands globally.</p>
-                    </div>
-                </a>
-
-                <!-- Service 6 -->
-                <a href="https://www.ofbuzztechnology.in/choose/pms-hotel-management-software" class="anim-element delay-6 glass-card tilt-card block group" target="_blank" rel="noopener">
-                    <div class="h-48 overflow-hidden">
-                        <img src="https://i.ibb.co/rRSQZvDB/eef8369398e2d8ac1191ee20223f219f.webp" alt="PMS Hotel Management Software" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                    </div>
-                    <div class="p-6">
-                        <span class="text-xs font-bold text-orange-500 uppercase tracking-widest bg-orange-500/10 px-2 py-1 rounded mb-3 inline-block">06 / Property Management</span>
-                        <h3 class="text-xl font-bold text-white mb-2">PMS & Hotel Software</h3>
-                        <p class="text-sm text-slate-400">Advanced Property Management Systems (PMS) and Hotel Management Software to streamline enterprise operations.</p>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Industries & Stats -->
-    <section class="py-24 px-4 bg-slate-900 border-y border-slate-800 animate-section relative overflow-hidden">
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-orange-500/5 rounded-full blur-[100px] -z-10"></div>
-        <div class="max-w-6xl mx-auto">
-            
-            <div class="text-center mb-16">
-                <h2 class="anim-element delay-1 text-3xl md:text-5xl font-bold text-white mb-4">Industries We Scale</h2>
-                <p class="anim-element delay-2 text-slate-400 text-lg">Dedicated growth frameworks tailored for high-ticket market segments globally.</p>
-            </div>
-
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-20 anim-scale delay-3">
-                <div class="glass-card p-4 text-center font-bold text-sm text-white">Fine Jewellery</div>
-                <div class="glass-card p-4 text-center font-bold text-sm text-white">Luxury Fashion & Retail</div>
-                <div class="glass-card p-4 text-center font-bold text-sm text-white">Real Estate Developers</div>
-                <div class="glass-card p-4 text-center font-bold text-sm text-white">Hotels & Property Management</div>
-                <div class="glass-card p-4 text-center font-bold text-sm text-white md:col-span-1 col-span-2">D2C E-Commerce Brands</div>
-            </div>
-
-            <!-- Stats Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center anim-element delay-4">
-                <div class="glass-card p-6 border-t-2 border-t-orange-500">
-                    <h3 class="counter text-4xl md:text-5xl font-bold text-white mb-2" data-target="94" data-suffix="%">0%</h3>
-                    <p class="text-xs uppercase tracking-widest text-slate-400 font-bold">Client Retention</p>
-                </div>
-                <div class="glass-card p-6 border-t-2 border-t-slate-600">
-                    <h3 class="counter text-4xl md:text-5xl font-bold text-white mb-2" data-target="10" data-suffix="+">0+</h3>
-                    <p class="text-xs uppercase tracking-widest text-slate-400 font-bold">Key Industries</p>
-                </div>
-                <div class="glass-card p-6 border-t-2 border-t-slate-600">
-                    <h3 class="counter text-4xl md:text-5xl font-bold text-white mb-2" data-target="100" data-suffix="%">0%</h3>
-                    <p class="text-xs uppercase tracking-widest text-slate-400 font-bold">Transparent Reporting</p>
-                </div>
-                <div class="glass-card p-6 border-t-2 border-t-slate-600">
-                    <h3 class="text-4xl md:text-5xl font-bold text-white mb-2">Dedicated</h3>
-                    <p class="text-xs uppercase tracking-widest text-slate-400 font-bold">Growth Directors</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Workflow -->
-    <section class="py-24 px-4 animate-section">
-        <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="anim-element delay-1 text-3xl md:text-4xl font-bold text-white mb-4">How We Work With You</h2>
-                <p class="anim-element delay-2 text-slate-400 text-lg">A simple 3-step process to generate high-value leads and maximize your ROI.</p>
-            </div>
-            
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="anim-element delay-1 glass-card p-8 border-l-4 border-l-orange-500">
-                    <h4 class="text-xl font-bold text-white mb-3">1. Business Audit</h4>
-                    <p class="text-sm text-slate-400 leading-relaxed">We review your current website, social media, ad performance, and competitors to find new growth gaps.</p>
-                </div>
-                <div class="anim-element delay-2 glass-card p-8 border-l-4 border-l-slate-600 hover:border-l-orange-500 transition-colors">
-                    <h4 class="text-xl font-bold text-white mb-3">2. System Setup</h4>
-                    <p class="text-sm text-slate-400 leading-relaxed">We build high-converting landing pages, set up accurate conversion tracking, and design high-performing ads.</p>
-                </div>
-                <div class="anim-element delay-3 glass-card p-8 border-l-4 border-l-slate-600 hover:border-l-orange-500 transition-colors">
-                    <h4 class="text-xl font-bold text-white mb-3">3. Scale & Optimize</h4>
-                    <p class="text-sm text-slate-400 leading-relaxed">We launch targeted Google Ads, Meta Ads, and SEO campaigns to generate verified customer inquiries.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- The 8 Program (Strategic Highlight) -->
-    <section class="py-24 px-4 bg-slate-950 text-center animate-section">
-        <div class="max-w-4xl mx-auto">
-            <span class="anim-element delay-1 px-4 py-1.5 rounded-full border border-slate-700 text-xs font-bold text-slate-300 uppercase tracking-widest mb-6 inline-block">Exclusive Partnership Tier</span>
-            <h2 class="anim-element delay-2 text-4xl md:text-5xl font-bold text-white mb-6">The Growth Program: <span class="italic text-orange-500 serif">The 8</span></h2>
-            <p class="anim-element delay-3 text-lg text-slate-400 mb-12 max-w-2xl mx-auto font-light">
-                An exclusive partnership model where we strictly accept 8 corporate accounts globally at a time to deliver focused founder-level involvement.
-            </p>
-            
-            <div class="anim-scale delay-4 flex flex-col sm:flex-row justify-center gap-8 mb-12 bg-slate-900/50 p-8 rounded-2xl border border-slate-800">
-                <div>
-                    <span class="text-4xl md:text-5xl font-bold text-orange-500 block mb-2 serif">08</span>
-                    <span class="text-xs uppercase tracking-widest font-bold text-slate-400">Global Client Capacity</span>
-                </div>
-                <div class="hidden sm:block w-px bg-slate-700"></div>
-                <div>
-                    <span class="text-4xl md:text-5xl font-bold text-orange-500 block mb-2 serif">Direct</span>
-                    <span class="text-xs uppercase tracking-widest font-bold text-slate-400">Founder Level Support</span>
-                </div>
-            </div>
-
-            <div class="anim-element delay-5">
-                <a href="https://www.ofbuzztechnology.in/choose/the-8" target="_blank" class="inline-block bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-4 rounded-lg transition-all shadow-[0_0_15px_rgba(249,115,22,0.4)]">Discover The 8 Program</a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Ecosystem & FAQs -->
-    <section class="py-24 px-4 animate-section">
-        <div class="max-w-4xl mx-auto">
-            
-            <div class="text-center mb-12 anim-element delay-1">
-                <h2 class="text-3xl font-bold text-white mb-4">Ofbuzz Tools & Resources</h2>
-            </div>
-            
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-20 anim-scale delay-2">
-                <a href="https://www.ofbuzztechnology.in/ofbuzz-tools" target="_blank" class="glass-card p-4 text-center font-bold text-sm text-white hover:text-orange-500 transition-colors">Ofbuzz Tools Hub</a>
-                <a href="https://www.ofbuzztechnology.in/choose/daily-poster-365" target="_blank" class="glass-card p-4 text-center font-bold text-sm text-white hover:text-orange-500 transition-colors">365 Marketing</a>
-                <a href="https://www.ofbuzztechnology.in/about/blogs" target="_blank" class="glass-card p-4 text-center font-bold text-sm text-white hover:text-orange-500 transition-colors">Business Blogs</a>
-                <a href="https://www.ofbuzztechnology.in/operations" target="_blank" class="glass-card p-4 text-center font-bold text-sm text-blue-400 border-blue-500/30 hover:border-blue-500 transition-colors"><i class="fas fa-user-shield mr-2"></i>Staff Portal</a>
-            </div>
-
-            <div class="text-center mb-12 anim-element delay-3">
-                <h2 class="text-3xl font-bold text-white mb-4">Frequently Asked Questions</h2>
-                <p class="text-slate-400">Clear, direct answers regarding our agency operations and global coverage.</p>
-            </div>
-
-            <div class="space-y-4 anim-element delay-4">
-                <div class="glass-card p-6">
-                    <h3 class="text-lg font-bold text-white mb-2">Which cities and states does Ofbuzz Technology serve?</h3>
-                    <p class="text-sm text-slate-400">We run dedicated growth campaigns and localized SEO for brands across Delhi NCR, Noida, Gurugram, Gujarat, Rajasthan, Bengaluru, New York, New Jersey, Sydney, and London.</p>
-                </div>
-                <div class="glass-card p-6">
-                    <h3 class="text-lg font-bold text-white mb-2">Why choose a specialized digital growth partner?</h3>
-                    <p class="text-sm text-slate-400">High-ticket industries such as Fine Jewellery and Real Estate demand hyper-targeted sales funnels and high trust signals. Our specialized knowledge drives faster ROI and lowers cost-per-lead globally.</p>
-                </div>
-                <div class="glass-card p-6">
-                    <h3 class="text-lg font-bold text-white mb-2">How fast can paid advertising deliver results?</h3>
-                    <p class="text-sm text-slate-400">Meta and Google ad campaigns generate verified leads within 7 to 14 days of launch. SEO ranking expansions typically consolidate within 3 to 6 months.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-slate-950 border-t border-slate-800 py-16 px-4 animate-section">
-        <div class="max-w-6xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12 anim-element delay-1">
-                <div>
-                    <h3 class="text-2xl font-bold text-white mb-4">OFBUZZ<span class="text-orange-500">.</span></h3>
-                    <p class="text-sm text-slate-400 mb-6 leading-relaxed">India's trusted global business growth agency. Delivering web platforms, ad strategies, and SEO across Delhi, Indian States, New York, New Jersey, Sydney & London.</p>
-                    <div class="flex gap-4">
-                        <a href="https://www.linkedin.com/company/ofbuzztechnology" target="_blank" class="w-10 h-10 rounded bg-slate-800 text-slate-400 flex items-center justify-center hover:bg-orange-500 hover:text-white transition-colors"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="https://www.instagram.com/ofbuzztechnology" target="_blank" class="w-10 h-10 rounded bg-slate-800 text-slate-400 flex items-center justify-center hover:bg-orange-500 hover:text-white transition-colors"><i class="fab fa-instagram"></i></a>
-                        <a href="https://www.youtube.com/@ofbuzztechnology" target="_blank" class="w-10 h-10 rounded bg-slate-800 text-slate-400 flex items-center justify-center hover:bg-orange-500 hover:text-white transition-colors"><i class="fab fa-youtube"></i></a>
-                        <a href="https://chat.whatsapp.com/KShccjQGtulFjnocl0LK4A" target="_blank" class="w-10 h-10 rounded bg-slate-800 text-slate-400 flex items-center justify-center hover:bg-green-500 hover:text-white transition-colors"><i class="fab fa-whatsapp"></i></a>
-                    </div>
-                </div>
-
-                <div>
-                    <h4 class="text-xs font-bold uppercase tracking-widest text-white mb-6">Growth Solutions</h4>
-                    <div class="flex flex-col gap-3 text-sm text-slate-400">
-                        <a href="https://www.ofbuzztechnology.in/choose/marketing-for-jewellery" target="_blank" class="hover:text-orange-500 transition-colors w-max">Jewellery Marketing</a>
-                        <a href="https://www.ofbuzztechnology.in/choose/marketing-for-real-estate" target="_blank" class="hover:text-orange-500 transition-colors w-max">Real Estate Marketing</a>
-                        <a href="https://www.ofbuzztechnology.in/choose/e-commerce-partner" target="_blank" class="hover:text-orange-500 transition-colors w-max">E-Commerce Services</a>
-                        <a href="https://www.ofbuzztechnology.in/choose/ofbuzz-studio-photography-videography" target="_blank" class="hover:text-orange-500 transition-colors w-max">Ofbuzz Studio</a>
-                        <a href="https://www.ofbuzztechnology.in/choose/pms-hotel-management-software" target="_blank" class="hover:text-orange-500 transition-colors w-max">PMS & Hotel Software</a>
-                        <a href="https://www.ofbuzztechnology.in/choose/daily-poster-365" target="_blank" class="hover:text-orange-500 transition-colors w-max">365 Marketing</a>
-                    </div>
-                </div>
-
-                <div>
-                    <h4 class="text-xs font-bold uppercase tracking-widest text-white mb-6">Quick Links</h4>
-                    <div class="flex flex-col gap-3 text-sm text-slate-400">
-                        <a href="https://www.ofbuzztechnology.in/choose/web-tools" target="_blank" class="hover:text-orange-500 transition-colors w-max">Web & Tools</a>
-                        <a href="https://www.ofbuzztechnology.in/operations" target="_blank" class="text-blue-400 font-bold hover:text-blue-300 transition-colors w-max"><i class="fas fa-user-shield mr-2"></i>Staff Portal</a>
-                        <a href="https://www.ofbuzztechnology.in/about/blogs" target="_blank" class="hover:text-orange-500 transition-colors w-max">Blogs</a>
-                        <a href="https://www.ofbuzztechnology.in/career" target="_blank" class="hover:text-orange-500 transition-colors w-max">Careers</a>
-                        <a href="https://www.ofbuzztechnology.in/about/privacy-policy" target="_blank" class="hover:text-orange-500 transition-colors w-max">Privacy Policy & T&C</a>
-                    </div>
-                </div>
-
-                <div>
-                    <h4 class="text-xs font-bold uppercase tracking-widest text-white mb-6">Delhi Head Office</h4>
-                    <div class="text-sm text-slate-400 mb-6">
-                        <p>Pandav Nagar, New Delhi, India</p>
-                        <p class="mt-2">hello@ofbuzztechnology.in</p>
-                    </div>
-                    <a href="tel:+917827201014" class="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-lg transition-all"><i class="fas fa-phone-alt"></i> Call Us Now</a>
-                </div>
-            </div>
-
-            <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500 anim-element delay-2">
-                <p>&copy; 2026 Ofbuzz Technology. All rights reserved. Empowering global companies to dominate online.</p>
-                <div class="flex gap-6">
-                    <a href="https://www.ofbuzztechnology.in/operations" class="hover:text-white transition-colors">Staff Portal</a>
-                    <a href="https://www.ofbuzztechnology.in/about/privacy-policy" class="hover:text-white transition-colors">Privacy Policy & T&C</a>
-                    <a href="https://www.ofbuzztechnology.in/choose/web-tools" class="hover:text-white transition-colors">Web & Tools</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Embedded SEO Conversion & Telemetry Tracking Script -->
+    <!-- JAVASCRIPT LOGIC -->
     <script>
-        (function() {
-            window.dataLayer = window.dataLayer || [];
-            function trackSeoEvent(eventName, eventDetails) {
-                window.dataLayer.push({
-                    event: eventName,
-                    ...eventDetails,
-                    timestamp: new Date().toISOString()
-                });
+        const urlParams = new URLSearchParams(window.location.search);
+        const slug = urlParams.get('hotel');
+        let client = null, activeRoom = null, activeBooking = null;
+        let appData = { rooms: [], activeBookings: [], foodOrders: [], pendingOrders: [] };
+
+        async function init() {
+            const res = await fetch(`masterdata.json?_ts=${Date.now()}`);
+            const data = await res.json();
+            client = data[slug];
+            if(client) {
+                document.getElementById('loginPropName').innerText = client.name + ' PMS';
             }
+            syncOffline();
+        }
 
-            // Track phone clicks
-            document.querySelectorAll('a[href^="tel:"]').forEach(link => {
-                link.addEventListener('click', function() {
-                    trackSeoEvent('direct_phone_call', { targetNumber: link.getAttribute('href') });
-                });
+        function notify(msg) {
+            const el = document.getElementById('toast');
+            el.innerText = msg;
+            el.classList.remove('hidden-view');
+            setTimeout(() => el.classList.add('hidden-view'), 4000);
+        }
+
+        // --- ID Verification Frontend Logic ---
+        function updateIdPlaceholder() {
+            const type = document.getElementById('ciIdType').value;
+            const input = document.getElementById('ciIdNumber');
+            if(type === 'Aadhar Card') input.placeholder = "12-digit Aadhar No (e.g. 123456789012)";
+            else if(type === 'PAN Card') input.placeholder = "10-char PAN (e.g. ABCDE1234F)";
+            else if(type === 'Voter ID') input.placeholder = "10-char Voter ID (e.g. ABC1234567)";
+            else if(type === 'Driving License') input.placeholder = "DL Number (e.g. DL1420110012345)";
+            else if(type === 'Passport') input.placeholder = "Passport No (e.g. A1234567)";
+        }
+
+        function validateId(type, value) {
+            if(!value) return false;
+            value = value.toUpperCase().replace(/\s/g, '');
+            if(type === 'Aadhar Card') return /^\d{12}$/.test(value);
+            if(type === 'PAN Card') return /^[A-Z]{5}\d{4}[A-Z]$/.test(value);
+            if(type === 'Voter ID') return /^[A-Z]{3}\d{7}$/.test(value);
+            if(type === 'Driving License') return /^[A-Z0-9\-\s]{10,20}$/.test(value); // DL formats vary across states
+            if(type === 'Passport') return /^[A-Z][0-9]{7}$/.test(value);
+            return value.length > 3; 
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
             });
+        }
 
-            // Track WhatsApp actions
-            document.querySelectorAll('a[href*="whatsapp.com"], a[href*="wa.me"]').forEach(wa => {
-                wa.addEventListener('click', function() {
-                    trackSeoEvent('whatsapp_click', { destination: wa.getAttribute('href') });
-                });
-            });
-
-            // Track lead inquiry modal engagements
-            document.querySelectorAll('button[onclick*="openFormModal"]').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    trackSeoEvent('inquiry_modal_opened', { buttonText: btn.innerText.trim() });
-                });
-            });
-        })();
-    </script>
-
-    <!-- Animations, Counters & Modal Logic -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            
-            // 1. Scroll Progress
-            const progressBar = document.getElementById('progressBar');
-            window.addEventListener('scroll', () => {
-                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-                const progress = (scrollTop / docHeight) * 100;
-                if (progressBar) progressBar.style.width = progress + '%';
-            }, { passive: true });
-
-            // 2. Intersection Observer (Presentation PPT Animations)
-            const observerOptions = {
-                root: null,
-                rootMargin: '0px 0px -50px 0px',
-                threshold: 0.15 
-            };
-
-            const handleIntersect = (entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('in-view');
-                        // Trigger counters if this section contains them
-                        if(entry.target.querySelector('.counter')) {
-                            runCounters();
-                        }
-                    }
-                });
-            };
-
-            const observer = new IntersectionObserver(handleIntersect, observerOptions);
-            const sections = document.querySelectorAll('.animate-section');
-            sections.forEach(section => {
-                observer.observe(section);
+        // --- Multi-Tab Switching Logic ---
+        function switchTab(tabId) {
+            const tabs = ['dashboard', 'reservations', 'rooms', 'guests', 'billing', 'dining', 'reports', 'settings'];
+            tabs.forEach(t => {
+                const tabEl = document.getElementById(`tab-${t}`);
+                const navEl = document.getElementById(`nav-${t}`);
+                if (tabEl) tabEl.classList.add('hidden-view');
+                if (navEl) navEl.classList.remove('active');
             });
             
-            // Trigger first slide immediately
-            setTimeout(() => {
-                if(sections[0]) sections[0].classList.add('in-view');
-            }, 100);
-
-            // 3. Counter Animation
-            let countersRan = false;
-            function runCounters() {
-                if (countersRan) return;
-                countersRan = true;
-
-                const counters = document.querySelectorAll('.counter');
-                counters.forEach(counter => {
-                    const target = +counter.getAttribute('data-target');
-                    const suffix = counter.getAttribute('data-suffix') || '';
-                    const duration = 2000;
-                    const startTime = performance.now();
-
-                    function updateCount(currentTime) {
-                        const elapsed = currentTime - startTime;
-                        const progress = Math.min(elapsed / duration, 1);
-                        // Easing out curve
-                        const easeOutProgress = 1 - Math.pow(2, -10 * progress);
-                        const currentVal = Math.floor(easeOutProgress * target);
-                        
-                        counter.innerText = currentVal + suffix;
-
-                        if (progress < 1) {
-                            requestAnimationFrame(updateCount);
-                        } else {
-                            counter.innerText = target + suffix;
-                        }
-                    }
-                    requestAnimationFrame(updateCount);
-                });
-            }
-
-            // 4. Desktop Tilt Cards
-            if (window.matchMedia("(min-width: 992px)").matches) {
-                const tiltCards = document.querySelectorAll('.tilt-card');
-                tiltCards.forEach(card => {
-                    card.addEventListener('mousemove', (e) => {
-                        const rect = card.getBoundingClientRect();
-                        const x = e.clientX - rect.left;
-                        const y = e.clientY - rect.top;
-                        const centerX = rect.width / 2;
-                        const centerY = rect.height / 2;
-                        
-                        const rotateX = ((y - centerY) / centerY) * -3;
-                        const rotateY = ((x - centerX) / centerX) * 3;
-
-                        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-5px)`;
-                    });
-
-                    card.addEventListener('mouseleave', () => {
-                        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0)';
-                    });
-                });
-            }
-        });
-
-        // 5. Modal Controllers
-        const modal = document.getElementById('formModal');
-        const closeBtn = document.getElementById('closeModalBtn');
-
-        function openFormModal() {
-            if (!modal) return;
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
+            const targetTab = document.getElementById(`tab-${tabId}`);
+            const targetNav = document.getElementById(`nav-${tabId}`);
+            
+            if (targetTab) targetTab.classList.remove('hidden-view');
+            if (targetNav) targetNav.classList.add('active');
         }
 
-        function closeFormModal() {
-            if (!modal) return;
-            modal.classList.remove('active');
-            document.body.style.overflow = '';
-        }
+        // --- Core API & Logic ---
+        function apiCall(payload, btnElem, loadingText, callback) {
+            const originalText = btnElem ? btnElem.innerText : "";
+            if(btnElem) { btnElem.innerText = loadingText; btnElem.disabled = true; btnElem.classList.add('opacity-50'); }
+            
+            if(!navigator.onLine && payload.action !== 'getReceptionData') {
+                let queue = JSON.parse(localStorage.getItem('pms_offline_queue') || '[]');
+                queue.push(payload);
+                localStorage.setItem('pms_offline_queue', JSON.stringify(queue));
+                if(btnElem) { btnElem.innerText = originalText; btnElem.disabled = false; btnElem.classList.remove('opacity-50'); }
+                notify("Offline: Action saved locally.");
+                if(callback) callback({success: true, offline: true});
+                return;
+            }
 
-        if (closeBtn) closeBtn.addEventListener('click', closeFormModal);
-
-        if (modal) {
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeFormModal();
+            fetch(client.scriptUrl, { method: "POST", body: JSON.stringify(payload) })
+            .then(r=>r.json()).then(res => {
+                if(btnElem) { btnElem.innerText = originalText; btnElem.disabled = false; btnElem.classList.remove('opacity-50'); }
+                if(callback) callback(res);
+            }).catch(err => {
+                if(btnElem) { btnElem.innerText = originalText; btnElem.disabled = false; btnElem.classList.remove('opacity-50'); }
+                notify("Network communication failed.");
             });
         }
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
-                closeFormModal();
-            }
-        });
+        function syncOffline() {
+            if(!navigator.onLine) { document.getElementById('networkStatus').innerHTML = "<span class='text-orange-500'>• Offline</span>"; return; }
+            document.getElementById('networkStatus').innerHTML = "<span class='text-emerald-500'>• Online</span>";
+            let queue = JSON.parse(localStorage.getItem('pms_offline_queue') || '[]');
+            if(queue.length === 0) return;
+            fetch(client.scriptUrl, { method: "POST", body: JSON.stringify({ action: "syncOfflineData", payloads: queue }) })
+            .then(r=>r.json()).then(res => { if(res.success) { localStorage.removeItem('pms_offline_queue'); fetchData(null); } });
+        }
+        window.addEventListener('online', syncOffline);
+        window.addEventListener('offline', () => document.getElementById('networkStatus').innerHTML = "<span class='text-orange-500'>• Offline</span>");
 
-        // 6. Fast 1-Second Auto Popup Trigger
-        window.addEventListener('load', () => {
-            setTimeout(openFormModal, 1000);
-        });
+        function login() {
+            const btn = document.getElementById('btnLogin');
+            const orig = btn.innerText; btn.innerText = "Authenticating..."; btn.disabled = true; btn.classList.add('opacity-50');
+            const pin = document.getElementById('pinInput').value;
+            fetch(`${client.scriptUrl}?action=getReceptionData&pin=${pin}`)
+                .then(r=>r.json()).then(res => {
+                    btn.innerText = orig; btn.disabled = false; btn.classList.remove('opacity-50');
+                    if(res.success) {
+                        appData = res;
+                        
+                        // Inject Dynamic Names
+                        document.getElementById('propTitle').innerText = `${client.name} - Front Desk`;
+                        document.getElementById('sidebarPropName').innerText = client.name;
+                        
+                        document.getElementById('authBox').classList.add('hidden-view');
+                        document.getElementById('sidebar').classList.remove('hidden-view');
+                        document.getElementById('mainWrapper').classList.remove('hidden-view');
+                        populateAllViews();
+                    } else alert(res.error || "Incorrect PIN");
+                }).catch(() => {
+                    btn.innerText = orig; btn.disabled = false; btn.classList.remove('opacity-50');
+                    notify("Connection failed.");
+                });
+        }
+
+        function fetchData(btn) {
+            const pin = document.getElementById('pinInput').value;
+            if(btn) { btn.innerText = "Syncing..."; btn.disabled = true; btn.classList.add('opacity-50'); }
+            fetch(`${client.scriptUrl}?action=getReceptionData&pin=${pin}`)
+                .then(r=>r.json()).then(res => {
+                    if(btn) { btn.innerText = "Refresh UI"; btn.disabled = false; btn.classList.remove('opacity-50'); }
+                    if(res.success) { appData = res; populateAllViews(); notify("Dashboard Refreshed."); }
+                }).catch(() => {
+                    if(btn) { btn.innerText = "Refresh UI"; btn.disabled = false; btn.classList.remove('opacity-50'); }
+                });
+        }
+
+        function triggerBackup(btn) {
+            if(!client.backupSheetId) return notify("Backup Sheet ID not configured in Master Console.");
+            apiCall({ action: "syncBackup", backupId: client.backupSheetId }, btn, "Pushing to Cloud...", res => {
+                notify(res.success ? res.message : res.error);
+            });
+        }
+
+        // --- Data Binding to All Tabs ---
+        function populateAllViews() {
+            renderRooms(); 
+            renderApprovals();
+            renderReservationsAndGuests();
+            renderRoomsConfig();
+            renderBillingQueue();
+        }
+
+        function renderRooms() {
+            const grid = document.getElementById('roomGrid');
+            grid.innerHTML = "";
+            appData.rooms.forEach(r => {
+                let styles = r.Status === "Vacant" ? "border-emerald-200 bg-emerald-50 text-emerald-900" : 
+                            r.Status === "Occupied" ? "border-orange-200 bg-orange-50 text-orange-900" : 
+                            "border-slate-200 bg-slate-100 text-slate-800";
+                let dot = r.Status === "Vacant" ? "bg-emerald-500" : r.Status === "Occupied" ? "bg-orange-500" : "bg-slate-400";
+                let onclick = r.Status === "Vacant" ? `showActionOptions('${r.RoomNo}')` : 
+                              r.Status === "Occupied" ? `openCheckOut('${r.RoomNo}', ${r.Price})` : `showRestoreOptions('${r.RoomNo}')`;
+                
+                grid.innerHTML += `<div onclick="${onclick}" class="p-5 border rounded-2xl cursor-pointer ${styles} hover:shadow-md transition-all duration-200 relative group">
+                    <div class="absolute top-4 right-4 w-2 h-2 rounded-full ${dot}"></div>
+                    <div class="font-bold text-3xl mb-1">${r.RoomNo}</div>
+                    <div class="text-[10px] uppercase font-bold tracking-widest opacity-80">${r.Status}</div>
+                </div>`;
+            });
+        }
+
+        function renderApprovals() {
+            const list = document.getElementById('approvalQueue');
+            list.innerHTML = appData.pendingOrders.length ? "" : "<div class='p-6 text-center border border-dashed border-slate-200 rounded-xl bg-white'><p class='text-sm text-slate-500 font-medium'>No pending requests</p></div>";
+            appData.pendingOrders.forEach(o => {
+                list.innerHTML += `<div class="p-4 bg-orange-50/50 border border-orange-200 rounded-xl flex flex-col gap-3 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Room</span><p class="font-bold text-slate-900 text-lg">${o.RoomNo}</p></div>
+                        <span class="text-orange-700 font-bold bg-orange-100 px-2.5 py-1 rounded text-sm">₹${o.Amount}</span>
+                    </div>
+                    <p class="text-sm text-slate-600 font-medium">${o.Items}</p>
+                    <button onclick="approveOrder('${o.OrderId}', this)" class="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg text-sm font-bold shadow-sm transition">Approve</button>
+                </div>`;
+            });
+        }
+
+        function renderReservationsAndGuests() {
+            const resTable = document.getElementById('tblReservations');
+            const guestTable = document.getElementById('tblGuests');
+            resTable.innerHTML = ""; guestTable.innerHTML = "";
+            
+            const bookings = appData.activeBookings || [];
+            if(bookings.length === 0) {
+                resTable.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400">No active reservations</td></tr>`;
+                guestTable.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400">No guests in-house</td></tr>`;
+                return;
+            }
+
+            bookings.forEach(b => {
+                resTable.innerHTML += `<tr>
+                    <td class="font-mono text-blue-600">${b.BookingId}</td>
+                    <td class="font-bold text-slate-900">${b.GuestName}</td>
+                    <td class="font-mono text-xs">${b.Phone}</td>
+                    <td class="font-bold text-slate-900">${b.RoomNo}</td>
+                    <td class="text-xs text-slate-500">${b.CheckIn}</td>
+                    <td><span class="bg-emerald-50 text-emerald-700 px-2 py-1 rounded text-xs font-bold uppercase tracking-wider">${b.Status}</span></td>
+                </tr>`;
+
+                guestTable.innerHTML += `<tr>
+                    <td class="font-bold text-slate-900 text-lg">${b.RoomNo}</td>
+                    <td class="font-bold text-slate-900">${b.GuestName}</td>
+                    <td class="font-mono text-xs">${b.Phone}</td>
+                    <td class="font-mono font-bold text-emerald-600">₹${b.Advance || 0}</td>
+                    <td class="text-xs text-slate-500">${b.IdPhotoUrl.startsWith('data:image') ? 'Scan Uploaded' : b.IdPhotoUrl ? 'ID Number Verified' : 'Pending'}</td>
+                </tr>`;
+            });
+        }
+
+        function renderRoomsConfig() {
+            const tbl = document.getElementById('tblRoomsConfig');
+            tbl.innerHTML = "";
+            appData.rooms.forEach(r => {
+                let statusColor = r.Status === "Vacant" ? "text-emerald-600 bg-emerald-50" : r.Status === "Occupied" ? "text-orange-600 bg-orange-50" : "text-slate-600 bg-slate-100";
+                tbl.innerHTML += `<tr>
+                    <td class="font-bold text-slate-900 text-lg">${r.RoomNo}</td>
+                    <td class="text-slate-600">${r.RoomType || 'Standard'}</td>
+                    <td class="font-mono font-bold text-slate-900">₹${r.Price}</td>
+                    <td><span class="${statusColor} px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider">${r.Status}</span></td>
+                    <td><button onclick="showActionOptions('${r.RoomNo}')" class="text-blue-600 text-xs font-bold hover:underline">Manage</button></td>
+                </tr>`;
+            });
+        }
+
+        function renderBillingQueue() {
+            const queue = document.getElementById('billingQueue');
+            queue.innerHTML = "";
+            const occupiedRooms = appData.rooms.filter(r => r.Status === "Occupied");
+            
+            if(occupiedRooms.length === 0) {
+                queue.innerHTML = "<div class='col-span-full p-8 text-center text-slate-400 font-medium'>No rooms currently ready for checkout.</div>";
+                return;
+            }
+
+            occupiedRooms.forEach(r => {
+                queue.innerHTML += `<div class="p-6 border border-slate-200 bg-white rounded-2xl shadow-sm flex flex-col items-center text-center">
+                    <div class="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center text-orange-600 font-bold text-xl mb-3">${r.RoomNo}</div>
+                    <p class="text-sm font-bold text-slate-900 mb-4">Occupied Room</p>
+                    <button onclick="openCheckOut('${r.RoomNo}', ${r.Price})" class="w-full bg-slate-900 text-white py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-slate-800 transition">Initiate Checkout</button>
+                </div>`;
+            });
+        }
+
+        // --- Modal Control ---
+        function closeModals() { ['actionModal', 'restoreModal', 'ciModal', 'coModal'].forEach(id => { document.getElementById(id).classList.add('hidden-view'); }); }
+        function showActionOptions(rNo) { activeRoom = rNo; document.getElementById('actRoomText').innerText = rNo; document.getElementById('actionModal').classList.remove('hidden-view'); }
+        function showRestoreOptions(rNo) { activeRoom = rNo; document.getElementById('restRoomText').innerText = rNo; document.getElementById('restoreModal').classList.remove('hidden-view'); }
+        
+        function changeStatus(newStatus, btn) { apiCall({ action: "changeRoomStatus", roomNo: activeRoom, newStatus: newStatus }, btn, "...", res => { closeModals(); fetchData(null); }); }
+        
+        function openCheckIn() {
+            closeModals(); 
+            document.getElementById('ciRoomText').innerText = activeRoom;
+            
+            // Reset fields
+            document.getElementById('ciName').value = "";
+            document.getElementById('ciPhone').value = "";
+            document.getElementById('ciAdvance').value = "";
+            document.getElementById('ciIdType').value = "Aadhar Card";
+            document.getElementById('ciIdNumber').value = "";
+            document.getElementById('ciIdFile').value = "";
+            updateIdPlaceholder();
+            
+            document.querySelectorAll('.essentials').forEach(cb => cb.checked = false);
+            document.getElementById('ciModal').classList.remove('hidden-view');
+        }
+
+        async function doCheckIn() {
+            const name = document.getElementById('ciName').value.trim();
+            const phone = document.getElementById('ciPhone').value.trim();
+            
+            // Checking ID
+            const idType = document.getElementById('ciIdType').value;
+            const idNum = document.getElementById('ciIdNumber').value.trim();
+            const fileInput = document.getElementById('ciIdFile');
+            const file = fileInput.files[0];
+            
+            if(!name || !phone) return notify("Guest Name and Phone are mandatory!");
+
+            if(idNum && !validateId(idType, idNum)) {
+                return notify(`Invalid ${idType} format. Please check again.`);
+            }
+
+            if(!idNum && !file) {
+                return notify("Action Required: Please provide either a valid ID Number OR Upload an ID Photo to proceed.");
+            }
+
+            const btn = document.getElementById('btnCheckIn');
+            const orig = btn.innerText;
+            btn.innerText = "Processing ID...";
+            btn.disabled = true;
+
+            let finalIdPayload = "";
+            
+            if(file) {
+                try {
+                    finalIdPayload = await fileToBase64(file);
+                } catch(e) {
+                    btn.innerText = orig; btn.disabled = false;
+                    return notify("Failed to read image file.");
+                }
+            } else {
+                // If no file but number is given, store the type and number
+                finalIdPayload = `${idType}: ${idNum}`;
+            }
+
+            let ess = [];
+            if(document.getElementById('chkSoap').checked) ess.push("Soap");
+            if(document.getElementById('chkTowel').checked) ess.push("Towel");
+            if(document.getElementById('chkWater').checked) ess.push("Water");
+            
+            const payload = { 
+                action: "checkIn", 
+                roomNo: activeRoom, 
+                guestName: name, 
+                phone: phone, 
+                advance: document.getElementById('ciAdvance').value || 0, 
+                essentials: ess.join(","), 
+                idMissing: false, // Set to false because we strictly enforce it on frontend now
+                idPhotoBase64: finalIdPayload 
+            };
+            
+            apiCall(payload, btn, "Checking In...", res => { closeModals(); fetchData(null); });
+        }
+
+        function openCheckOut(rNo, price) {
+            activeBooking = appData.activeBookings.find(b => b.RoomNo == rNo);
+            if(!activeBooking) return;
+            document.getElementById('coRoomText').innerText = rNo;
+            const tariff = Number(price);
+            const food = appData.foodOrders.filter(o => o.RoomNo == rNo && o.Status == "Approved").reduce((a,b)=>a+Number(b.Amount),0);
+            const adv = Number(activeBooking.Advance || 0);
+            const final = (tariff + food) - adv;
+            document.getElementById('coTariff').innerText = `₹${tariff}`; document.getElementById('coFood').innerText = `₹${food}`;
+            document.getElementById('coAdvance').innerText = `-₹${adv}`; document.getElementById('coFinal').innerText = `₹${final}`;
+            activeBooking.calcData = { tariff, food, adv, final };
+            closeModals();
+            document.getElementById('coModal').classList.remove('hidden-view');
+        }
+
+        function doCheckOut() {
+            const payload = { action: "checkOut", bookingId: activeBooking.BookingId, roomNo: activeBooking.RoomNo, roomTotal: activeBooking.calcData.tariff, foodTotal: activeBooking.calcData.food, advance: activeBooking.calcData.adv, finalPaid: activeBooking.calcData.final, paymentMode: document.getElementById('coMode').value };
+            apiCall(payload, document.getElementById('btnCheckOut'), "Settling...", res => { closeModals(); fetchData(null); });
+        }
+
+        function approveOrder(id, btn) { apiCall({ action: "approveOrder", orderId: id }, btn, "Approving...", res => { fetchData(null); }); }
+
+        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
