@@ -33,7 +33,7 @@
             </div>
             <h2 id="loginPropName" class="text-2xl font-bold mb-1 text-slate-900 tracking-tight">Front Desk</h2>
             <p class="text-xs text-slate-500 mb-8 uppercase tracking-widest font-semibold">Enter Shop ID</p>
-            <input type="password" id="pinInput" class="w-full text-center text-3xl tracking-widest p-4 bg-slate-50 border border-slate-200 rounded-xl mb-6 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all font-mono" placeholder="••••">
+            <input type="password" id="pinInput" class="w-full text-center text-3xl tracking-widest p-4 bg-slate-50 border border-slate-200 rounded-xl mb-6 outline-none focus:border-blue-600 font-mono" placeholder="••••">
             <button id="btnLogin" onclick="login()" class="w-full bg-blue-900 text-white font-semibold py-3.5 rounded-xl hover:bg-blue-800 transition-all shadow-md">Unlock Terminal</button>
         </div>
     </div>
@@ -48,6 +48,9 @@
             <div id="nav-dashboard" onclick="switchTab('dashboard')" class="sidebar-item active">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg> Dashboard
             </div>
+            <div id="nav-foodorder" onclick="switchTab('foodorder'); renderFoodOrderTab();" class="sidebar-item">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg> Food Order
+            </div>
             <div id="nav-reservations" onclick="switchTab('reservations')" class="sidebar-item">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg> Reservations
             </div>
@@ -60,24 +63,13 @@
             <div id="nav-billing" onclick="switchTab('billing')" class="sidebar-item">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg> Billing
             </div>
-            <div id="nav-dining" onclick="switchTab('dining')" class="sidebar-item">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg> Dining
-            </div>
-            <div id="nav-reports" onclick="switchTab('reports')" class="sidebar-item">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg> Reports
-            </div>
             <div id="nav-settings" onclick="switchTab('settings')" class="sidebar-item">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Settings
             </div>
         </nav>
-        
-        <!-- Small Footer in Sidebar for PMS Credit -->
-        <div class="p-4 border-t border-slate-200 text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center bg-slate-50">
-            Powered by Ofbuzz
-        </div>
+        <div class="p-4 border-t border-slate-200 text-[10px] text-slate-400 font-bold uppercase tracking-widest text-center bg-slate-50">Powered by Ofbuzz</div>
     </aside>
 
-    <!-- MAIN DASHBOARD CONTENT -->
     <div id="mainWrapper" class="hidden-view flex-1 flex flex-col h-screen overflow-hidden bg-slate-50 relative">
         <header class="bg-white border-b border-slate-200 px-8 py-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 z-10 shrink-0">
             <div>
@@ -85,12 +77,8 @@
                 <p class="text-xs font-semibold tracking-wider text-slate-500 uppercase mt-1">Live Property Console <span id="networkStatus" class="text-emerald-600 ml-2 font-bold">• Online</span></p>
             </div>
             <div class="flex gap-3">
-                <button id="btnBackup" onclick="triggerBackup(this)" class="flex items-center gap-2 bg-white border border-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 transition shadow-sm">
-                    Sync Backup
-                </button>
-                <button id="btnSync" onclick="fetchData(this)" class="flex items-center gap-2 bg-blue-900 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-800 transition shadow-sm">
-                    Refresh UI
-                </button>
+                <button id="btnBackup" onclick="triggerBackup(this)" class="bg-white border border-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-slate-50 shadow-sm">Sync Backup</button>
+                <button id="btnSync" onclick="fetchData(this)" class="bg-blue-900 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-800 shadow-sm">Refresh UI</button>
             </div>
         </header>
 
@@ -105,16 +93,38 @@
                         <div class="flex gap-4 text-xs font-semibold text-slate-500">
                             <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Vacant</span>
                             <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-orange-500"></span> Occupied</span>
-                            <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-slate-400"></span> Maintenance</span>
                         </div>
                     </div>
                     <div id="roomGrid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4"></div>
                 </div>
 
-                <!-- FOOD APPROVALS -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 border-t-4 border-t-orange-500 flex flex-col h-full">
                     <h2 class="text-sm font-bold uppercase mb-4 text-orange-600 tracking-wider">Food Approvals</h2>
                     <div id="approvalQueue" class="space-y-3 flex-1 overflow-y-auto custom-scrollbar pr-1"></div>
+                </div>
+            </div>
+
+            <!-- TAB: FOOD ORDER (RECEPTION) -->
+            <div id="tab-foodorder" class="hidden-view max-w-7xl mx-auto space-y-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-6">
+                    <div class="flex-1 space-y-4">
+                        <h2 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3">Place Food Order (KOT)</h2>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-xs font-bold text-slate-500 uppercase">Select Room</label>
+                                <select id="foRoomSelect" class="w-full mt-1 bg-slate-50 border border-slate-200 p-3 rounded-lg outline-none font-bold text-slate-700"></select>
+                            </div>
+                        </div>
+                        <div id="foMenuContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 max-h-80 overflow-y-auto custom-scrollbar pr-2"></div>
+                    </div>
+                    <div class="w-full md:w-80 bg-slate-50 p-6 rounded-xl border border-slate-200 h-fit">
+                        <h3 class="font-bold text-slate-900 mb-3 border-b border-slate-200 pb-2">Order Cart</h3>
+                        <div id="foCartList" class="space-y-2 mb-4 text-sm font-medium text-slate-700"></div>
+                        <div class="border-t border-slate-200 pt-3 flex justify-between font-bold text-lg text-slate-900 mb-4">
+                            <span>Total:</span><span id="foCartTotal">₹0</span>
+                        </div>
+                        <button id="btnPlaceFO" onclick="submitReceptionOrder()" class="w-full bg-orange-600 text-white py-3 rounded-xl font-bold shadow-sm hover:bg-orange-700 transition">Place Order & Print KOT</button>
+                    </div>
                 </div>
             </div>
 
@@ -122,41 +132,24 @@
             <div id="tab-reservations" class="hidden-view max-w-7xl mx-auto space-y-6">
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                     <h2 class="text-lg font-bold text-slate-900 mb-4 border-b border-slate-100 pb-4">Active & Upcoming Reservations</h2>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left data-table">
-                            <thead><tr><th>Booking ID</th><th>Guest Name</th><th>Phone</th><th>Room</th><th>Check-In Date</th><th>Status</th></tr></thead>
-                            <tbody id="tblReservations"></tbody>
-                        </table>
-                    </div>
+                    <table class="w-full text-left data-table"><thead><tr><th>Booking ID</th><th>Guest Name</th><th>Phone</th><th>Room</th><th>Check-In</th><th>Status</th></tr></thead><tbody id="tblReservations"></tbody></table>
                 </div>
             </div>
 
             <div id="tab-guests" class="hidden-view max-w-7xl mx-auto space-y-6">
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                     <h2 class="text-lg font-bold text-slate-900 mb-4 border-b border-slate-100 pb-4">In-House Guest Directory</h2>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left data-table">
-                            <thead><tr><th>Room No</th><th>Guest Name</th><th>Contact</th><th>Advance Paid</th><th>ID Proof</th></tr></thead>
-                            <tbody id="tblGuests"></tbody>
-                        </table>
-                    </div>
+                    <table class="w-full text-left data-table"><thead><tr><th>Room No</th><th>Guest Name</th><th>Contact</th><th>Advance Paid</th><th>ID Proof</th></tr></thead><tbody id="tblGuests"></tbody></table>
                 </div>
             </div>
 
-            <!-- TAB: ROOMS -->
             <div id="tab-rooms" class="hidden-view max-w-7xl mx-auto space-y-6">
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                     <h2 class="text-lg font-bold text-slate-900 mb-4 border-b border-slate-100 pb-4">Property Room Configurations</h2>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left data-table">
-                            <thead><tr><th>Room No</th><th>Category</th><th>Tariff (₹)</th><th>Current Status</th><th>Action</th></tr></thead>
-                            <tbody id="tblRoomsConfig"></tbody>
-                        </table>
-                    </div>
+                    <table class="w-full text-left data-table"><thead><tr><th>Room No</th><th>Category</th><th>Tariff (₹)</th><th>Current Status</th><th>Action</th></tr></thead><tbody id="tblRoomsConfig"></tbody></table>
                 </div>
             </div>
 
-            <!-- TAB: BILLING -->
             <div id="tab-billing" class="hidden-view max-w-7xl mx-auto space-y-6">
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                     <h2 class="text-lg font-bold text-slate-900 mb-4 border-b border-slate-100 pb-4">Pending Checkouts & Billing</h2>
@@ -164,23 +157,28 @@
                 </div>
             </div>
 
-            <!-- TAB: DINING, REPORTS, SETTINGS (Placeholders for UI completeness) -->
-            <div id="tab-dining" class="hidden-view max-w-7xl mx-auto">
-                <div class="bg-white p-12 rounded-2xl shadow-sm border border-slate-200 text-center">
-                    <h2 class="text-xl font-bold text-slate-900 mb-2">Dining POS Integrated</h2>
-                    <p class="text-slate-500">Access the full Cafe Portal for advanced menu and kitchen management.</p>
-                </div>
-            </div>
-            <div id="tab-reports" class="hidden-view max-w-7xl mx-auto">
-                <div class="bg-white p-12 rounded-2xl shadow-sm border border-slate-200 text-center">
-                    <h2 class="text-xl font-bold text-slate-900 mb-2">Reports & Analytics</h2>
-                    <p class="text-slate-500">Comprehensive reporting is available in the Admin BI Console.</p>
-                </div>
-            </div>
-            <div id="tab-settings" class="hidden-view max-w-7xl mx-auto">
-                <div class="bg-white p-12 rounded-2xl shadow-sm border border-slate-200 text-center">
-                    <h2 class="text-xl font-bold text-slate-900 mb-2">System Settings</h2>
-                    <p class="text-slate-500">Configuration is managed via the Master Console.</p>
+            <!-- TAB: SETTINGS (A4 Invoice Data Setup) -->
+            <div id="tab-settings" class="hidden-view max-w-4xl mx-auto space-y-6">
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-xl font-bold text-slate-900 mb-2 border-b border-slate-100 pb-4">Property Billing Information</h2>
+                    <p class="text-xs text-slate-500 mb-6">This information will be printed on the A4 Checkout Invoice for lifetime.</p>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 uppercase block mb-1">Hotel Address</label>
+                            <input type="text" id="setAddress" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-semibold outline-none focus:border-blue-600">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-xs font-bold text-slate-500 uppercase block mb-1">GSTIN Number</label>
+                                <input type="text" id="setGstin" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-mono uppercase outline-none focus:border-blue-600">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-slate-500 uppercase block mb-1">Contact Phone</label>
+                                <input type="text" id="setPhone" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-semibold outline-none focus:border-blue-600">
+                            </div>
+                        </div>
+                        <button id="btnSaveSettings" onclick="saveSettings()" class="bg-blue-900 text-white font-bold py-3 px-6 rounded-xl hover:bg-blue-800 transition mt-4">Save Configuration</button>
+                    </div>
                 </div>
             </div>
 
@@ -193,103 +191,77 @@
         <div class="bg-white p-6 rounded-2xl w-full max-w-sm space-y-5 shadow-2xl border border-slate-100">
             <div class="flex justify-between items-center pb-4 border-b border-slate-100">
                 <h3 class="font-bold text-xl text-slate-900">Room <span id="actRoomText" class="text-blue-700"></span></h3>
-                <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600">X</button>
             </div>
-            <button onclick="openCheckIn()" class="w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold shadow-sm hover:bg-emerald-700 transition">Proceed to Check-In</button>
-            <button id="btnMaint" onclick="changeStatus('Maintenance', this)" class="w-full bg-white border border-slate-200 text-slate-700 py-3.5 rounded-xl font-bold hover:bg-slate-50 transition">Mark Maintenance</button>
+            <!-- Dynamic Actions based on Vacant/Occupied -->
+            <div id="actModalDynamic"></div>
         </div>
     </div>
 
-    <!-- Restore Modal -->
-    <div id="restoreModal" class="hidden-view fixed inset-0 modal-overlay flex items-center justify-center p-4 z-40">
-        <div class="bg-white p-6 rounded-2xl w-full max-w-sm space-y-5 shadow-2xl border border-slate-100">
-            <div class="flex justify-between items-center pb-4 border-b border-slate-100">
-                <h3 class="font-bold text-xl text-slate-900">Room <span id="restRoomText" class="text-blue-700"></span></h3>
-                <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
-            </div>
-            <p class="text-sm font-semibold text-slate-600 text-center">Is this room ready for guests?</p>
-            <button id="btnVacant" onclick="changeStatus('Vacant', this)" class="w-full bg-blue-700 text-white py-3.5 rounded-xl font-bold shadow-sm hover:bg-blue-800 transition">Mark Available (Vacant)</button>
-        </div>
-    </div>
-
-    <!-- Check-In Modal (UPDATED WITH ID VERIFICATION) -->
+    <!-- Check-In Modal (With ID Verification) -->
     <div id="ciModal" class="hidden-view fixed inset-0 modal-overlay flex items-center justify-center p-4 z-50">
-        <div class="bg-white p-7 rounded-2xl w-full max-w-md space-y-4 shadow-2xl border border-slate-100 h-[90vh] overflow-y-auto custom-scrollbar">
+        <div class="bg-white p-7 rounded-2xl w-full max-w-md space-y-4 shadow-2xl h-[90vh] overflow-y-auto custom-scrollbar">
             <div class="flex justify-between items-center pb-3 border-b border-slate-100 sticky top-0 bg-white z-10">
                 <h3 class="font-bold text-xl text-slate-900">Check-In: Room <span id="ciRoomText" class="text-blue-700"></span></h3>
-                <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600">X</button>
             </div>
             
             <div class="space-y-3">
-                <input type="text" id="ciName" placeholder="Guest Full Name" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-600 font-semibold text-sm">
-                <input type="tel" id="ciPhone" placeholder="Mobile Number" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-600 font-semibold text-sm">
-                <input type="number" id="ciAdvance" placeholder="Advance Payment (₹)" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl outline-none focus:border-blue-600 font-mono text-sm">
+                <input type="text" id="ciName" placeholder="Guest Full Name" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-semibold text-sm">
+                <input type="tel" id="ciPhone" placeholder="Mobile Number" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-semibold text-sm">
+                <input type="number" id="ciAdvance" placeholder="Advance Payment (₹)" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-mono text-sm">
             </div>
 
-            <!-- NEW ID VERIFICATION BLOCK -->
+            <!-- ID VERIFICATION -->
             <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100 space-y-3">
-                <p class="font-bold text-blue-800 uppercase tracking-wider text-[10px]">Guest ID Verification (Mandatory)</p>
-                <select id="ciIdType" onchange="updateIdPlaceholder()" class="w-full bg-white border border-blue-200 p-2.5 rounded-lg outline-none focus:border-blue-600 text-sm font-semibold text-slate-700 cursor-pointer">
-                    <option value="Aadhar Card">Aadhar Card</option>
-                    <option value="PAN Card">PAN Card</option>
-                    <option value="Voter ID">Voter ID</option>
-                    <option value="Driving License">Driving License</option>
-                    <option value="Passport">Passport</option>
+                <p class="font-bold text-blue-800 uppercase tracking-wider text-[10px]">Guest ID (Mandatory)</p>
+                <select id="ciIdType" class="w-full bg-white border border-blue-200 p-2.5 rounded-lg text-sm font-semibold text-slate-700">
+                    <option value="Aadhar Card">Aadhar Card</option><option value="PAN Card">PAN Card</option><option value="Passport">Passport</option>
                 </select>
-                <input type="text" id="ciIdNumber" placeholder="12-digit Aadhar No" class="w-full bg-white border border-blue-200 p-2.5 rounded-lg outline-none focus:border-blue-600 text-sm font-mono uppercase">
-                
-                <div class="flex items-center gap-2 py-1">
-                    <div class="h-px bg-blue-200 flex-1"></div>
-                    <span class="text-[10px] text-blue-400 font-bold uppercase">OR</span>
-                    <div class="h-px bg-blue-200 flex-1"></div>
-                </div>
-
-                <div class="relative">
-                    <input type="file" id="ciIdFile" accept="image/*,application/pdf" class="w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
-                    <p class="text-[9px] text-slate-400 mt-1 font-semibold">* Upload ID Scan directly (Will securely convert to Base64)</p>
-                </div>
+                <input type="text" id="ciIdNumber" placeholder="Enter ID Number" class="w-full bg-white border border-blue-200 p-2.5 rounded-lg font-mono">
+                <p class="text-[10px] text-center text-blue-400 font-bold uppercase">OR</p>
+                <input type="file" id="ciIdFile" accept="image/*,application/pdf" class="w-full text-xs cursor-pointer">
             </div>
             
             <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <p class="font-bold mb-3 text-slate-500 uppercase tracking-wider text-[10px]">Provided Essentials:</p>
+                <p class="font-bold mb-3 text-slate-500 uppercase tracking-wider text-[10px]">Free Essentials:</p>
                 <div class="grid grid-cols-2 gap-3 text-sm font-semibold text-slate-700">
-                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="chkSoap" class="essentials w-4 h-4 accent-blue-600"> Soap Kit</label>
-                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="chkTowel" class="essentials w-4 h-4 accent-blue-600"> Fresh Towels</label>
-                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="chkWater" class="essentials w-4 h-4 accent-blue-600"> Water Bottles</label>
+                    <label><input type="checkbox" id="chkSoap" class="accent-blue-600"> Soap Kit</label>
+                    <label><input type="checkbox" id="chkTowel" class="accent-blue-600"> Fresh Towels</label>
+                    <label><input type="checkbox" id="chkWater" class="accent-blue-600" checked> 1x Water Bottle</label>
                 </div>
             </div>
             
             <div class="pt-2 sticky bottom-0 bg-white">
-                <button id="btnCheckIn" onclick="doCheckIn()" class="w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold shadow-sm hover:bg-emerald-700 transition">Confirm Check-In</button>
+                <button id="btnCheckIn" onclick="doCheckIn()" class="w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold shadow-sm hover:bg-emerald-700">Confirm Check-In</button>
             </div>
         </div>
     </div>
 
     <!-- Check-Out Modal -->
     <div id="coModal" class="hidden-view fixed inset-0 modal-overlay flex items-center justify-center p-4 z-50">
-        <div class="bg-white p-7 rounded-2xl w-full max-w-sm space-y-5 shadow-2xl border border-slate-100">
+        <div class="bg-white p-7 rounded-2xl w-full max-w-sm space-y-5 shadow-2xl">
             <div class="flex justify-between items-center pb-4 border-b border-slate-100">
-                <h3 class="font-bold text-xl text-slate-900">Checkout: Room <span id="coRoomText" class="text-blue-700"></span></h3>
-                <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                <h3 class="font-bold text-xl text-slate-900">Checkout: <span id="coRoomText" class="text-blue-700"></span></h3>
+                <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600">X</button>
             </div>
             
             <div class="space-y-2 text-sm font-medium">
-                <div class="flex justify-between items-center p-2.5 rounded-lg bg-slate-50"><span class="text-slate-600">Room Tariff:</span> <span id="coTariff" class="font-bold text-slate-900 font-mono">₹0</span></div>
-                <div class="flex justify-between items-center p-2.5 rounded-lg bg-slate-50"><span class="text-slate-600">Dining Orders:</span> <span id="coFood" class="font-bold text-slate-900 font-mono">₹0</span></div>
-                <div class="flex justify-between items-center p-2.5 rounded-lg bg-emerald-50 text-emerald-700"><span class="font-semibold">Advance Paid:</span> <span id="coAdvance" class="font-bold font-mono">-₹0</span></div>
+                <div class="flex justify-between p-2.5 bg-slate-50 rounded-lg"><span class="text-slate-600">Room Tariff:</span> <span id="coTariff" class="font-bold">₹0</span></div>
+                <div class="flex justify-between p-2.5 bg-slate-50 rounded-lg"><span class="text-slate-600">Dining/Addons:</span> <span id="coFood" class="font-bold">₹0</span></div>
+                <div class="flex justify-between p-2.5 bg-emerald-50 text-emerald-700 rounded-lg"><span class="font-semibold">Advance Paid:</span> <span id="coAdvance" class="font-bold">-₹0</span></div>
             </div>
             
             <div class="pt-4 border-t border-slate-100">
                 <div class="flex justify-between items-center font-bold text-lg mb-4">
-                    <span class="text-slate-900">Final Payable:</span> 
-                    <span id="coFinal" class="text-blue-700 font-mono text-2xl tracking-tight">₹0</span>
+                    <span>Final Payable:</span> <span id="coFinal" class="text-blue-700 text-2xl">₹0</span>
                 </div>
-                <select id="coMode" class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl font-bold outline-none focus:border-blue-600 text-sm">
+                <select id="coMode" class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl font-bold">
                     <option value="Cash">Cash</option><option value="UPI">UPI</option><option value="Card">Card</option>
                 </select>
             </div>
             
-            <button id="btnCheckOut" onclick="doCheckOut()" class="w-full bg-blue-700 text-white py-3.5 rounded-xl font-bold shadow-sm hover:bg-blue-800 transition mt-2">Settle & Exit</button>
+            <button id="btnCheckOut" onclick="doCheckOut()" class="w-full bg-blue-700 text-white py-3.5 rounded-xl font-bold hover:bg-blue-800 transition mt-2">Print A4 Bill & Settle</button>
         </div>
     </div>
 
@@ -298,15 +270,14 @@
         const urlParams = new URLSearchParams(window.location.search);
         const slug = urlParams.get('hotel');
         let client = null, activeRoom = null, activeBooking = null;
-        let appData = { rooms: [], activeBookings: [], foodOrders: [], pendingOrders: [] };
+        let appData = { rooms: [], activeBookings: [], foodOrders: [], pendingOrders: [], menuItems: [], settings: {} };
+        let foCart = {};
 
         async function init() {
             const res = await fetch(`masterdata.json?_ts=${Date.now()}`);
             const data = await res.json();
             client = data[slug];
-            if(client) {
-                document.getElementById('loginPropName').innerText = client.name + ' PMS';
-            }
+            if(client) { document.getElementById('loginPropName').innerText = client.name; }
             syncOffline();
         }
 
@@ -314,58 +285,21 @@
             const el = document.getElementById('toast');
             el.innerText = msg;
             el.classList.remove('hidden-view');
-            setTimeout(() => el.classList.add('hidden-view'), 4000);
+            setTimeout(() => el.classList.add('hidden-view'), 3500);
         }
 
-        // --- ID Verification Frontend Logic ---
-        function updateIdPlaceholder() {
-            const type = document.getElementById('ciIdType').value;
-            const input = document.getElementById('ciIdNumber');
-            if(type === 'Aadhar Card') input.placeholder = "12-digit Aadhar No (e.g. 123456789012)";
-            else if(type === 'PAN Card') input.placeholder = "10-char PAN (e.g. ABCDE1234F)";
-            else if(type === 'Voter ID') input.placeholder = "10-char Voter ID (e.g. ABC1234567)";
-            else if(type === 'Driving License') input.placeholder = "DL Number (e.g. DL1420110012345)";
-            else if(type === 'Passport') input.placeholder = "Passport No (e.g. A1234567)";
-        }
-
-        function validateId(type, value) {
-            if(!value) return false;
-            value = value.toUpperCase().replace(/\s/g, '');
-            if(type === 'Aadhar Card') return /^\d{12}$/.test(value);
-            if(type === 'PAN Card') return /^[A-Z]{5}\d{4}[A-Z]$/.test(value);
-            if(type === 'Voter ID') return /^[A-Z]{3}\d{7}$/.test(value);
-            if(type === 'Driving License') return /^[A-Z0-9\-\s]{10,20}$/.test(value); // DL formats vary across states
-            if(type === 'Passport') return /^[A-Z][0-9]{7}$/.test(value);
-            return value.length > 3; 
-        }
-
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-        }
-
-        // --- Multi-Tab Switching Logic ---
         function switchTab(tabId) {
-            const tabs = ['dashboard', 'reservations', 'rooms', 'guests', 'billing', 'dining', 'reports', 'settings'];
+            const tabs = ['dashboard', 'foodorder', 'reservations', 'rooms', 'guests', 'billing', 'reports', 'settings'];
             tabs.forEach(t => {
                 const tabEl = document.getElementById(`tab-${t}`);
                 const navEl = document.getElementById(`nav-${t}`);
                 if (tabEl) tabEl.classList.add('hidden-view');
                 if (navEl) navEl.classList.remove('active');
             });
-            
-            const targetTab = document.getElementById(`tab-${tabId}`);
-            const targetNav = document.getElementById(`nav-${tabId}`);
-            
-            if (targetTab) targetTab.classList.remove('hidden-view');
-            if (targetNav) targetNav.classList.add('active');
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden-view');
+            document.getElementById(`nav-${tabId}`).classList.add('active');
         }
 
-        // --- Core API & Logic ---
         function apiCall(payload, btnElem, loadingText, callback) {
             const originalText = btnElem ? btnElem.innerText : "";
             if(btnElem) { btnElem.innerText = loadingText; btnElem.disabled = true; btnElem.classList.add('opacity-50'); }
@@ -375,7 +309,6 @@
                 queue.push(payload);
                 localStorage.setItem('pms_offline_queue', JSON.stringify(queue));
                 if(btnElem) { btnElem.innerText = originalText; btnElem.disabled = false; btnElem.classList.remove('opacity-50'); }
-                notify("Offline: Action saved locally.");
                 if(callback) callback({success: true, offline: true});
                 return;
             }
@@ -386,7 +319,7 @@
                 if(callback) callback(res);
             }).catch(err => {
                 if(btnElem) { btnElem.innerText = originalText; btnElem.disabled = false; btnElem.classList.remove('opacity-50'); }
-                notify("Network communication failed.");
+                notify("Network error.");
             });
         }
 
@@ -398,242 +331,174 @@
             fetch(client.scriptUrl, { method: "POST", body: JSON.stringify({ action: "syncOfflineData", payloads: queue }) })
             .then(r=>r.json()).then(res => { if(res.success) { localStorage.removeItem('pms_offline_queue'); fetchData(null); } });
         }
-        window.addEventListener('online', syncOffline);
-        window.addEventListener('offline', () => document.getElementById('networkStatus').innerHTML = "<span class='text-orange-500'>• Offline</span>");
 
         function login() {
             const btn = document.getElementById('btnLogin');
-            const orig = btn.innerText; btn.innerText = "Authenticating..."; btn.disabled = true; btn.classList.add('opacity-50');
-            const pin = document.getElementById('pinInput').value;
-            fetch(`${client.scriptUrl}?action=getReceptionData&pin=${pin}`)
+            btn.innerText = "Authenticating..."; btn.disabled = true;
+            fetch(`${client.scriptUrl}?action=getReceptionData&pin=${document.getElementById('pinInput').value}`)
                 .then(r=>r.json()).then(res => {
-                    btn.innerText = orig; btn.disabled = false; btn.classList.remove('opacity-50');
+                    btn.disabled = false;
                     if(res.success) {
                         appData = res;
-                        
-                        // Inject Dynamic Names
                         document.getElementById('propTitle').innerText = `${client.name} - Front Desk`;
                         document.getElementById('sidebarPropName').innerText = client.name;
+                        
+                        document.getElementById('setAddress').value = res.settings.BillAddress || "";
+                        document.getElementById('setGstin').value = res.settings.BillGSTIN || "";
+                        document.getElementById('setPhone').value = res.settings.BillPhone || "";
                         
                         document.getElementById('authBox').classList.add('hidden-view');
                         document.getElementById('sidebar').classList.remove('hidden-view');
                         document.getElementById('mainWrapper').classList.remove('hidden-view');
                         populateAllViews();
                     } else alert(res.error || "Incorrect PIN");
-                }).catch(() => {
-                    btn.innerText = orig; btn.disabled = false; btn.classList.remove('opacity-50');
-                    notify("Connection failed.");
                 });
         }
 
         function fetchData(btn) {
-            const pin = document.getElementById('pinInput').value;
-            if(btn) { btn.innerText = "Syncing..."; btn.disabled = true; btn.classList.add('opacity-50'); }
-            fetch(`${client.scriptUrl}?action=getReceptionData&pin=${pin}`)
+            if(btn) { btn.innerText = "Syncing..."; btn.disabled = true; }
+            fetch(`${client.scriptUrl}?action=getReceptionData&pin=${document.getElementById('pinInput').value}`)
                 .then(r=>r.json()).then(res => {
-                    if(btn) { btn.innerText = "Refresh UI"; btn.disabled = false; btn.classList.remove('opacity-50'); }
-                    if(res.success) { appData = res; populateAllViews(); notify("Dashboard Refreshed."); }
-                }).catch(() => {
-                    if(btn) { btn.innerText = "Refresh UI"; btn.disabled = false; btn.classList.remove('opacity-50'); }
+                    if(btn) { btn.innerText = "Refresh UI"; btn.disabled = false; }
+                    if(res.success) { appData = res; populateAllViews(); notify("Refreshed."); }
                 });
         }
 
         function triggerBackup(btn) {
-            if(!client.backupSheetId) return notify("Backup Sheet ID not configured in Master Console.");
-            apiCall({ action: "syncBackup", backupId: client.backupSheetId }, btn, "Pushing to Cloud...", res => {
-                notify(res.success ? res.message : res.error);
-            });
+            apiCall({ action: "syncBackup", backupId: client.backupSheetId }, btn, "Pushing...", res => { notify(res.message || res.error); });
         }
 
-        // --- Data Binding to All Tabs ---
         function populateAllViews() {
-            renderRooms(); 
-            renderApprovals();
-            renderReservationsAndGuests();
-            renderRoomsConfig();
-            renderBillingQueue();
+            renderRooms(); renderApprovals(); renderReservationsAndGuests(); renderRoomsConfig(); renderBillingQueue();
         }
 
+        // --- UPDATED ROOM RENDER (WITH ROOM TYPE) ---
         function renderRooms() {
-            const grid = document.getElementById('roomGrid');
-            grid.innerHTML = "";
+            const grid = document.getElementById('roomGrid'); grid.innerHTML = "";
             appData.rooms.forEach(r => {
                 let styles = r.Status === "Vacant" ? "border-emerald-200 bg-emerald-50 text-emerald-900" : 
-                            r.Status === "Occupied" ? "border-orange-200 bg-orange-50 text-orange-900" : 
-                            "border-slate-200 bg-slate-100 text-slate-800";
+                             r.Status === "Occupied" ? "border-orange-200 bg-orange-50 text-orange-900" : "border-slate-200 bg-slate-100 text-slate-800";
                 let dot = r.Status === "Vacant" ? "bg-emerald-500" : r.Status === "Occupied" ? "bg-orange-500" : "bg-slate-400";
-                let onclick = r.Status === "Vacant" ? `showActionOptions('${r.RoomNo}')` : 
-                              r.Status === "Occupied" ? `openCheckOut('${r.RoomNo}', ${r.Price})` : `showRestoreOptions('${r.RoomNo}')`;
                 
-                grid.innerHTML += `<div onclick="${onclick}" class="p-5 border rounded-2xl cursor-pointer ${styles} hover:shadow-md transition-all duration-200 relative group">
+                // Add Room Type right below Room Number
+                grid.innerHTML += `<div onclick="showActionOptions('${r.RoomNo}')" class="p-5 border rounded-2xl cursor-pointer ${styles} hover:shadow-md transition relative group">
                     <div class="absolute top-4 right-4 w-2 h-2 rounded-full ${dot}"></div>
-                    <div class="font-bold text-3xl mb-1">${r.RoomNo}</div>
-                    <div class="text-[10px] uppercase font-bold tracking-widest opacity-80">${r.Status}</div>
+                    <div class="font-bold text-3xl mb-0.5">${r.RoomNo}</div>
+                    <div class="text-xs font-bold opacity-90 mb-1.5">${r.RoomType || 'Standard'}</div>
+                    <div class="text-[10px] uppercase font-bold tracking-widest opacity-75">${r.Status}</div>
                 </div>`;
             });
         }
 
         function renderApprovals() {
             const list = document.getElementById('approvalQueue');
-            list.innerHTML = appData.pendingOrders.length ? "" : "<div class='p-6 text-center border border-dashed border-slate-200 rounded-xl bg-white'><p class='text-sm text-slate-500 font-medium'>No pending requests</p></div>";
+            list.innerHTML = appData.pendingOrders.length ? "" : "<div class='p-6 text-center border-dashed border-slate-200 rounded-xl bg-white'><p class='text-sm text-slate-500'>No pending requests</p></div>";
             appData.pendingOrders.forEach(o => {
-                list.innerHTML += `<div class="p-4 bg-orange-50/50 border border-orange-200 rounded-xl flex flex-col gap-3 shadow-sm">
-                    <div class="flex justify-between items-start">
-                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Room</span><p class="font-bold text-slate-900 text-lg">${o.RoomNo}</p></div>
-                        <span class="text-orange-700 font-bold bg-orange-100 px-2.5 py-1 rounded text-sm">₹${o.Amount}</span>
+                list.innerHTML += `<div class="p-4 bg-orange-50 border border-orange-200 rounded-xl shadow-sm">
+                    <div class="flex justify-between">
+                        <div><p class="font-bold text-lg">${o.RoomNo}</p></div>
+                        <span class="text-orange-700 font-bold bg-orange-100 px-2 py-1 rounded">₹${o.Total}</span>
                     </div>
-                    <p class="text-sm text-slate-600 font-medium">${o.Items}</p>
-                    <button onclick="approveOrder('${o.OrderId}', this)" class="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg text-sm font-bold shadow-sm transition">Approve</button>
+                    <p class="text-sm text-slate-600 mt-2 mb-3">${o.Items}</p>
+                    <button onclick="approveOrder('${o.OrderId}', this)" class="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg font-bold">Approve to Kitchen</button>
                 </div>`;
             });
         }
 
-        function renderReservationsAndGuests() {
-            const resTable = document.getElementById('tblReservations');
-            const guestTable = document.getElementById('tblGuests');
-            resTable.innerHTML = ""; guestTable.innerHTML = "";
+        // --- FOOD ORDER (RECEPTION) LOGIC ---
+        function renderFoodOrderTab() {
+            const select = document.getElementById('foRoomSelect'); select.innerHTML = "";
+            appData.rooms.filter(r => r.Status === "Occupied").forEach(r => select.innerHTML += `<option value="${r.RoomNo}">Room ${r.RoomNo}</option>`);
             
-            const bookings = appData.activeBookings || [];
-            if(bookings.length === 0) {
-                resTable.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-slate-400">No active reservations</td></tr>`;
-                guestTable.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-slate-400">No guests in-house</td></tr>`;
-                return;
-            }
-
-            bookings.forEach(b => {
-                resTable.innerHTML += `<tr>
-                    <td class="font-mono text-blue-600">${b.BookingId}</td>
-                    <td class="font-bold text-slate-900">${b.GuestName}</td>
-                    <td class="font-mono text-xs">${b.Phone}</td>
-                    <td class="font-bold text-slate-900">${b.RoomNo}</td>
-                    <td class="text-xs text-slate-500">${b.CheckIn}</td>
-                    <td><span class="bg-emerald-50 text-emerald-700 px-2 py-1 rounded text-xs font-bold uppercase tracking-wider">${b.Status}</span></td>
-                </tr>`;
-
-                guestTable.innerHTML += `<tr>
-                    <td class="font-bold text-slate-900 text-lg">${b.RoomNo}</td>
-                    <td class="font-bold text-slate-900">${b.GuestName}</td>
-                    <td class="font-mono text-xs">${b.Phone}</td>
-                    <td class="font-mono font-bold text-emerald-600">₹${b.Advance || 0}</td>
-                    <td class="text-xs text-slate-500">${b.IdPhotoUrl.startsWith('data:image') ? 'Scan Uploaded' : b.IdPhotoUrl ? 'ID Number Verified' : 'Pending'}</td>
-                </tr>`;
-            });
-        }
-
-        function renderRoomsConfig() {
-            const tbl = document.getElementById('tblRoomsConfig');
-            tbl.innerHTML = "";
-            appData.rooms.forEach(r => {
-                let statusColor = r.Status === "Vacant" ? "text-emerald-600 bg-emerald-50" : r.Status === "Occupied" ? "text-orange-600 bg-orange-50" : "text-slate-600 bg-slate-100";
-                tbl.innerHTML += `<tr>
-                    <td class="font-bold text-slate-900 text-lg">${r.RoomNo}</td>
-                    <td class="text-slate-600">${r.RoomType || 'Standard'}</td>
-                    <td class="font-mono font-bold text-slate-900">₹${r.Price}</td>
-                    <td><span class="${statusColor} px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider">${r.Status}</span></td>
-                    <td><button onclick="showActionOptions('${r.RoomNo}')" class="text-blue-600 text-xs font-bold hover:underline">Manage</button></td>
-                </tr>`;
-            });
-        }
-
-        function renderBillingQueue() {
-            const queue = document.getElementById('billingQueue');
-            queue.innerHTML = "";
-            const occupiedRooms = appData.rooms.filter(r => r.Status === "Occupied");
-            
-            if(occupiedRooms.length === 0) {
-                queue.innerHTML = "<div class='col-span-full p-8 text-center text-slate-400 font-medium'>No rooms currently ready for checkout.</div>";
-                return;
-            }
-
-            occupiedRooms.forEach(r => {
-                queue.innerHTML += `<div class="p-6 border border-slate-200 bg-white rounded-2xl shadow-sm flex flex-col items-center text-center">
-                    <div class="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center text-orange-600 font-bold text-xl mb-3">${r.RoomNo}</div>
-                    <p class="text-sm font-bold text-slate-900 mb-4">Occupied Room</p>
-                    <button onclick="openCheckOut('${r.RoomNo}', ${r.Price})" class="w-full bg-slate-900 text-white py-2 rounded-lg text-sm font-bold shadow-sm hover:bg-slate-800 transition">Initiate Checkout</button>
+            const cont = document.getElementById('foMenuContainer'); cont.innerHTML = "";
+            appData.menuItems.forEach(m => {
+                cont.innerHTML += `<div class="border p-3 rounded-lg bg-white shadow-sm flex justify-between items-center">
+                    <div><span class="font-bold text-sm block">${m.ItemName}</span><span class="text-xs text-orange-600 font-bold">₹${m.Price}</span></div>
+                    <button onclick="addToFOCart('${m.ItemId}', '${m.ItemName}', ${m.Price})" class="bg-slate-100 text-xs px-3 py-1.5 rounded font-bold hover:bg-slate-200">Add</button>
                 </div>`;
             });
         }
 
-        // --- Modal Control ---
-        function closeModals() { ['actionModal', 'restoreModal', 'ciModal', 'coModal'].forEach(id => { document.getElementById(id).classList.add('hidden-view'); }); }
-        function showActionOptions(rNo) { activeRoom = rNo; document.getElementById('actRoomText').innerText = rNo; document.getElementById('actionModal').classList.remove('hidden-view'); }
-        function showRestoreOptions(rNo) { activeRoom = rNo; document.getElementById('restRoomText').innerText = rNo; document.getElementById('restoreModal').classList.remove('hidden-view'); }
-        
-        function changeStatus(newStatus, btn) { apiCall({ action: "changeRoomStatus", roomNo: activeRoom, newStatus: newStatus }, btn, "...", res => { closeModals(); fetchData(null); }); }
-        
+        function addToFOCart(id, name, price) {
+            if(foCart[id]) foCart[id].qty++; else foCart[id] = {name, price, qty:1};
+            updateFOCart();
+        }
+
+        function updateFOCart() {
+            const list = document.getElementById('foCartList'); list.innerHTML = "";
+            let sum = 0;
+            Object.keys(foCart).forEach(k => {
+                sum += foCart[k].price * foCart[k].qty;
+                list.innerHTML += `<div class="flex justify-between border-b pb-1"><span>${foCart[k].name} x${foCart[k].qty}</span><span>₹${foCart[k].price * foCart[k].qty}</span></div>`;
+            });
+            document.getElementById('foCartTotal').innerText = `₹${sum}`;
+        }
+
+        function submitReceptionOrder() {
+            const room = document.getElementById('foRoomSelect').value;
+            const keys = Object.keys(foCart);
+            if(!room || keys.length === 0) return notify("Select Room and items.");
+            
+            let itemsStr = [], sum = 0;
+            keys.forEach(k => { itemsStr.push(`${foCart[k].name} (${foCart[k].qty})`); sum += foCart[k].price*foCart[k].qty; });
+            
+            const payload = { action: "placeOrder", roomNo: room, items: itemsStr.join(", "), amount: sum, tax:0, total:sum, status: "Approved", paymentStatus: "Postpaid" };
+            
+            apiCall(payload, document.getElementById('btnPlaceFO'), "Placing...", res => {
+                print58mm(room, itemsStr.join(", "), sum);
+                foCart = {}; updateFOCart(); fetchData(null);
+            });
+        }
+
+        function print58mm(room, items, total) {
+            const win = window.open('', '_blank', 'width=300,height=400');
+            win.document.write(`<html><head><style>@page{size:58mm auto; margin:0;} body{font-family:monospace;width:52mm;padding:2mm;font-size:11px;} .c{text-align:center;} .b{font-weight:bold;} .r{text-align:right;} hr{border-top:1px dashed #000;}</style></head><body>`);
+            win.document.write(`<div class="c b">KOT / RECEIPT</div><div class="c">${client.name}</div><hr>`);
+            win.document.write(`<div>Room: ${room}<br>Date: ${new Date().toLocaleString()}</div><hr>`);
+            win.document.write(`<div>${items.replace(/, /g, '<br>')}</div><hr>`);
+            win.document.write(`<div class="r b">Total: Rs ${total}</div><div class="c"><br>Charge to Room</div></body></html>`);
+            win.document.close(); win.focus(); win.print(); win.close();
+        }
+
+        function showActionOptions(rNo) {
+            activeRoom = rNo; document.getElementById('actRoomText').innerText = rNo;
+            const room = appData.rooms.find(r => r.RoomNo == rNo);
+            const actDiv = document.getElementById('actModalDynamic');
+            if(room.Status === "Vacant") {
+                actDiv.innerHTML = `<button onclick="openCheckIn()" class="w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold mb-3">Check-In Guest</button>
+                                    <button onclick="changeStatus('Maintenance', this)" class="w-full bg-white border border-slate-200 py-3.5 rounded-xl font-bold">Mark Maintenance</button>`;
+            } else if (room.Status === "Occupied") {
+                actDiv.innerHTML = `<button onclick="addWaterBottle(this)" class="w-full bg-blue-100 text-blue-700 py-3.5 rounded-xl font-bold mb-3 border border-blue-200">+ Add Water Bottle (₹50)</button>
+                                    <button onclick="openCheckOut('${rNo}', ${room.Price})" class="w-full bg-slate-900 text-white py-3.5 rounded-xl font-bold">Initiate Checkout</button>`;
+            } else {
+                actDiv.innerHTML = `<button onclick="changeStatus('Vacant', this)" class="w-full bg-blue-700 text-white py-3.5 rounded-xl font-bold">Mark Available (Vacant)</button>`;
+            }
+            document.getElementById('actionModal').classList.remove('hidden-view');
+        }
+
+        function closeModals() { ['actionModal', 'ciModal', 'coModal'].forEach(id => document.getElementById(id).classList.add('hidden-view')); }
+        function changeStatus(st, btn) { apiCall({action: "changeRoomStatus", roomNo: activeRoom, newStatus: st}, btn, "...", res=>{closeModals(); fetchData(null);}); }
+
         function openCheckIn() {
-            closeModals(); 
-            document.getElementById('ciRoomText').innerText = activeRoom;
-            
-            // Reset fields
-            document.getElementById('ciName').value = "";
-            document.getElementById('ciPhone').value = "";
-            document.getElementById('ciAdvance').value = "";
-            document.getElementById('ciIdType').value = "Aadhar Card";
-            document.getElementById('ciIdNumber').value = "";
-            document.getElementById('ciIdFile').value = "";
-            updateIdPlaceholder();
-            
-            document.querySelectorAll('.essentials').forEach(cb => cb.checked = false);
+            closeModals(); document.getElementById('ciRoomText').innerText = activeRoom;
+            document.getElementById('ciName').value = ""; document.getElementById('ciPhone').value = "";
             document.getElementById('ciModal').classList.remove('hidden-view');
         }
 
-        async function doCheckIn() {
+        function addWaterBottle(btn) {
+            apiCall({ action: "placeOrder", roomNo: activeRoom, items: "Extra Water Bottle (Add-on) (1)", amount: 50, tax: 0, total: 50, status: "Ready", paymentStatus: "Postpaid" }, btn, "Adding...", res => { closeModals(); fetchData(null); notify("Added ₹50 to bill."); });
+        }
+
+        function doCheckIn() {
             const name = document.getElementById('ciName').value.trim();
             const phone = document.getElementById('ciPhone').value.trim();
-            
-            // Checking ID
-            const idType = document.getElementById('ciIdType').value;
+            const file = document.getElementById('ciIdFile').files[0];
             const idNum = document.getElementById('ciIdNumber').value.trim();
-            const fileInput = document.getElementById('ciIdFile');
-            const file = fileInput.files[0];
             
-            if(!name || !phone) return notify("Guest Name and Phone are mandatory!");
-
-            if(idNum && !validateId(idType, idNum)) {
-                return notify(`Invalid ${idType} format. Please check again.`);
-            }
-
-            if(!idNum && !file) {
-                return notify("Action Required: Please provide either a valid ID Number OR Upload an ID Photo to proceed.");
-            }
-
-            const btn = document.getElementById('btnCheckIn');
-            const orig = btn.innerText;
-            btn.innerText = "Processing ID...";
-            btn.disabled = true;
-
-            let finalIdPayload = "";
+            if(!name || !phone || (!file && !idNum)) return alert("Guest Name, Phone, and valid ID are mandatory.");
             
-            if(file) {
-                try {
-                    finalIdPayload = await fileToBase64(file);
-                } catch(e) {
-                    btn.innerText = orig; btn.disabled = false;
-                    return notify("Failed to read image file.");
-                }
-            } else {
-                // If no file but number is given, store the type and number
-                finalIdPayload = `${idType}: ${idNum}`;
-            }
-
-            let ess = [];
-            if(document.getElementById('chkSoap').checked) ess.push("Soap");
-            if(document.getElementById('chkTowel').checked) ess.push("Towel");
-            if(document.getElementById('chkWater').checked) ess.push("Water");
-            
-            const payload = { 
-                action: "checkIn", 
-                roomNo: activeRoom, 
-                guestName: name, 
-                phone: phone, 
-                advance: document.getElementById('ciAdvance').value || 0, 
-                essentials: ess.join(","), 
-                idMissing: false, // Set to false because we strictly enforce it on frontend now
-                idPhotoBase64: finalIdPayload 
-            };
-            
-            apiCall(payload, btn, "Checking In...", res => { closeModals(); fetchData(null); });
+            const payload = { action: "checkIn", roomNo: activeRoom, guestName: name, phone: phone, advance: document.getElementById('ciAdvance').value||0, essentials: "Water", idPhotoBase64: idNum || "Uploaded" };
+            apiCall(payload, document.getElementById('btnCheckIn'), "Checking In...", res => { closeModals(); fetchData(null); });
         }
 
         function openCheckOut(rNo, price) {
@@ -641,22 +506,63 @@
             if(!activeBooking) return;
             document.getElementById('coRoomText').innerText = rNo;
             const tariff = Number(price);
-            const food = appData.foodOrders.filter(o => o.RoomNo == rNo && o.Status == "Approved").reduce((a,b)=>a+Number(b.Amount),0);
+            const food = appData.foodOrders.filter(o => o.RoomNo == rNo && o.PaymentStatus !== "Paid").reduce((a,b)=>a+Number(b.Total),0);
             const adv = Number(activeBooking.Advance || 0);
             const final = (tariff + food) - adv;
+            
             document.getElementById('coTariff').innerText = `₹${tariff}`; document.getElementById('coFood').innerText = `₹${food}`;
             document.getElementById('coAdvance').innerText = `-₹${adv}`; document.getElementById('coFinal').innerText = `₹${final}`;
             activeBooking.calcData = { tariff, food, adv, final };
-            closeModals();
-            document.getElementById('coModal').classList.remove('hidden-view');
+            closeModals(); document.getElementById('coModal').classList.remove('hidden-view');
         }
 
         function doCheckOut() {
             const payload = { action: "checkOut", bookingId: activeBooking.BookingId, roomNo: activeBooking.RoomNo, roomTotal: activeBooking.calcData.tariff, foodTotal: activeBooking.calcData.food, advance: activeBooking.calcData.adv, finalPaid: activeBooking.calcData.final, paymentMode: document.getElementById('coMode').value };
-            apiCall(payload, document.getElementById('btnCheckOut'), "Settling...", res => { closeModals(); fetchData(null); });
+            apiCall(payload, document.getElementById('btnCheckOut'), "Processing...", res => { 
+                printA4Invoice(res.invoiceId);
+                closeModals(); fetchData(null); 
+            });
+        }
+
+        function printA4Invoice(invId) {
+            const win = window.open('', '_blank');
+            const h = appData.settings;
+            win.document.write(`<html><head><style>@page{size:A4; margin:20mm;} body{font-family:sans-serif;color:#111;} table{width:100%;border-collapse:collapse;margin-top:20px;} th,td{border:1px solid #ccc;padding:10px;text-align:left;} .r{text-align:right;} .header{display:flex;justify-content:space-between;border-bottom:2px solid #000;padding-bottom:10px;margin-bottom:20px;} h1{margin:0;font-size:24px;}</style></head><body>`);
+            win.document.write(`<div class="header"><div><h1>${client.name}</h1><p>${h.BillAddress||''}<br>GSTIN: ${h.BillGSTIN||''}<br>Phone: ${h.BillPhone||''}</p></div><div><h2>INVOICE</h2><p>Inv #: ${invId||'N/A'}<br>Date: ${new Date().toLocaleDateString()}</p></div></div>`);
+            win.document.write(`<p><b>Guest Name:</b> ${activeBooking.GuestName}<br><b>Room No:</b> ${activeBooking.RoomNo}</p>`);
+            win.document.write(`<table><tr><th>Description</th><th class="r">Amount (Rs)</th></tr>`);
+            win.document.write(`<tr><td>Room Tariff</td><td class="r">${activeBooking.calcData.tariff}</td></tr>`);
+            win.document.write(`<tr><td>F&B and Addons</td><td class="r">${activeBooking.calcData.food}</td></tr>`);
+            win.document.write(`<tr><td>Advance Paid</td><td class="r">-${activeBooking.calcData.adv}</td></tr>`);
+            win.document.write(`<tr><th>Total Payable</th><th class="r">${activeBooking.calcData.final}</th></tr></table>`);
+            win.document.write(`<p style="margin-top:40px;text-align:center;font-size:12px;color:#555;">Thank you for staying with us. Visit Again!</p>`);
+            win.document.write(`</body></html>`);
+            win.document.close(); win.focus(); win.print(); win.close();
+        }
+
+        function saveSettings() {
+            const payload = { action: "updateBillingSettings", address: document.getElementById('setAddress').value, gstin: document.getElementById('setGstin').value, phone: document.getElementById('setPhone').value };
+            apiCall(payload, document.getElementById('btnSaveSettings'), "Saving...", res => { notify("Settings Saved."); fetchData(null); });
         }
 
         function approveOrder(id, btn) { apiCall({ action: "approveOrder", orderId: id }, btn, "Approving...", res => { fetchData(null); }); }
+
+        function renderReservationsAndGuests() {
+            const resTable = document.getElementById('tblReservations'); const guestTable = document.getElementById('tblGuests');
+            resTable.innerHTML = ""; guestTable.innerHTML = "";
+            (appData.activeBookings || []).forEach(b => {
+                resTable.innerHTML += `<tr><td class="font-mono">${b.BookingId}</td><td class="font-bold">${b.GuestName}</td><td>${b.Phone}</td><td>${b.RoomNo}</td><td>${b.CheckIn}</td><td>${b.Status}</td></tr>`;
+                guestTable.innerHTML += `<tr><td class="font-bold">${b.RoomNo}</td><td>${b.GuestName}</td><td>${b.Phone}</td><td>₹${b.Advance}</td><td>${b.IdPhotoUrl?'Yes':'No'}</td></tr>`;
+            });
+        }
+        function renderRoomsConfig() {
+            const tbl = document.getElementById('tblRoomsConfig'); tbl.innerHTML = "";
+            appData.rooms.forEach(r => tbl.innerHTML += `<tr><td class="font-bold">${r.RoomNo}</td><td>${r.RoomType}</td><td>₹${r.Price}</td><td>${r.Status}</td><td>--</td></tr>`);
+        }
+        function renderBillingQueue() {
+            const queue = document.getElementById('billingQueue'); queue.innerHTML = "";
+            appData.rooms.filter(r=>r.Status==="Occupied").forEach(r => queue.innerHTML += `<div class="p-6 border bg-white rounded-xl text-center"><p class="text-xl font-bold mb-3">Room ${r.RoomNo}</p><button onclick="openCheckOut('${r.RoomNo}', ${r.Price})" class="w-full bg-slate-900 text-white py-2 rounded">Checkout</button></div>`);
+        }
 
         window.addEventListener('DOMContentLoaded', init);
     </script>
