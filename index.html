@@ -125,7 +125,7 @@
 
             <div id="tab-guests" class="hidden-view max-w-7xl mx-auto space-y-6">
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                    <table class="w-full text-left data-table"><thead><tr><th>Room No</th><th>Guest Name</th><th>Contact</th><th>Advance Paid</th></tr></thead><tbody id="tblGuests"></tbody></table>
+                    <table class="w-full text-left data-table"><thead><tr><th>Room No</th><th>Guest Name</th><th>Contact</th><th>Advance Paid</th><th>ID Proof</th></tr></thead><tbody id="tblGuests"></tbody></table>
                 </div>
             </div>
 
@@ -141,7 +141,7 @@
                     <div id="billingQueue" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </div>
 
-                <!-- NEW: RECENT INVOICES (LOCAL REPRINT) -->
+                <!-- RECENT INVOICES (LOCAL REPRINT) -->
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mt-6">
                     <h2 class="text-lg font-bold text-slate-900 mb-4 border-b border-slate-100 pb-4">Recently Settled Invoices (Local)</h2>
                     <div id="recentInvoicesQueue" class="space-y-3">
@@ -159,33 +159,65 @@
         <div class="bg-white p-6 rounded-2xl w-full max-w-sm space-y-5 shadow-2xl border border-slate-100">
             <div class="flex justify-between items-center pb-4 border-b border-slate-100">
                 <h3 class="font-bold text-xl text-slate-900">Room <span id="actRoomText" class="text-blue-700"></span></h3>
-                <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600">X</button>
+                <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
             </div>
             <div id="actModalDynamic"></div>
         </div>
     </div>
 
-    <!-- Check-In Modal -->
+    <!-- Check-In Modal (With Complete ID Verification & Essentials) -->
     <div id="ciModal" class="hidden-view fixed inset-0 modal-overlay flex items-center justify-center p-4 z-50">
         <div class="bg-white p-7 rounded-2xl w-full max-w-md space-y-4 shadow-2xl h-[90vh] overflow-y-auto custom-scrollbar">
             <div class="flex justify-between items-center pb-3 border-b border-slate-100 sticky top-0 bg-white z-10">
                 <h3 class="font-bold text-xl text-slate-900">Check-In: Room <span id="ciRoomText" class="text-blue-700"></span></h3>
-                <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600">X</button>
+                <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
             </div>
             
             <div class="space-y-3">
-                <input type="text" id="ciName" placeholder="Guest Full Name" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-semibold text-sm outline-none">
-                <input type="tel" id="ciPhone" placeholder="Mobile Number" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-semibold text-sm outline-none">
-                <input type="number" id="ciAdvance" placeholder="Advance Payment (₹)" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-mono text-sm outline-none">
+                <input type="text" id="ciName" placeholder="Guest Full Name" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-semibold text-sm outline-none focus:border-blue-600">
+                <input type="tel" id="ciPhone" placeholder="Mobile Number" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-semibold text-sm outline-none focus:border-blue-600">
+                <input type="number" id="ciAdvance" placeholder="Advance Payment (₹)" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-mono text-sm outline-none focus:border-blue-600">
             </div>
 
+            <!-- ID VERIFICATION -->
             <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100 space-y-3">
-                <p class="font-bold text-blue-800 uppercase tracking-wider text-[10px]">Guest ID</p>
-                <input type="text" id="ciIdNumber" placeholder="Enter ID Number" class="w-full bg-white border border-blue-200 p-2.5 rounded-lg font-mono outline-none">
+                <p class="font-bold text-blue-800 uppercase tracking-wider text-[10px]">Guest ID Verification (Mandatory)</p>
+                <select id="ciIdType" onchange="updateIdPlaceholder()" class="w-full bg-white border border-blue-200 p-2.5 rounded-lg outline-none focus:border-blue-600 text-sm font-semibold text-slate-700 cursor-pointer">
+                    <option value="Aadhar Card">Aadhar Card</option>
+                    <option value="PAN Card">PAN Card</option>
+                    <option value="Voter ID">Voter ID</option>
+                    <option value="Driving License">Driving License</option>
+                    <option value="Passport">Passport</option>
+                </select>
+                <input type="text" id="ciIdNumber" placeholder="12-digit Aadhar No" class="w-full bg-white border border-blue-200 p-2.5 rounded-lg outline-none focus:border-blue-600 text-sm font-mono uppercase">
+                
+                <div class="flex items-center gap-2 py-1">
+                    <div class="h-px bg-blue-200 flex-1"></div>
+                    <span class="text-[10px] text-blue-400 font-bold uppercase">OR</span>
+                    <div class="h-px bg-blue-200 flex-1"></div>
+                </div>
+
+                <div class="relative">
+                    <input type="file" id="ciIdFile" accept="image/*,application/pdf" class="w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer">
+                    <p class="text-[9px] text-slate-400 mt-1 font-semibold">* Upload ID Scan directly (Will securely convert to Base64)</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <p class="font-bold mb-3 text-slate-500 uppercase tracking-wider text-[10px]">Provided Essentials:</p>
+                <div class="grid grid-cols-2 gap-3 text-sm font-semibold text-slate-700">
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="chkSoap" class="essentials w-4 h-4 accent-blue-600"> Soap Kit</label>
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="chkTowel" class="essentials w-4 h-4 accent-blue-600"> Fresh Towels</label>
+                    <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="chkWater" class="essentials w-4 h-4 accent-blue-600" checked> 1x Water Bottle</label>
+                </div>
             </div>
             
             <div class="pt-2 sticky bottom-0 bg-white">
-                <button id="btnCheckIn" onclick="doCheckIn()" class="w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold shadow-sm hover:bg-emerald-700">Confirm Check-In</button>
+                <button id="btnCheckIn" onclick="doCheckIn()" class="w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold shadow-sm hover:bg-emerald-700 transition">Confirm Check-In</button>
             </div>
         </div>
     </div>
@@ -195,7 +227,9 @@
         <div class="bg-white p-7 rounded-2xl w-full max-w-sm space-y-5 shadow-2xl">
             <div class="flex justify-between items-center pb-4 border-b border-slate-100">
                 <h3 class="font-bold text-xl text-slate-900">Checkout: <span id="coRoomText" class="text-blue-700"></span></h3>
-                <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600">X</button>
+                <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
             </div>
             
             <!-- Checkout Form Section -->
@@ -251,7 +285,7 @@
         let client = null, activeRoom = null, activeBooking = null, currentUser = null;
         let appData = { rooms: [], activeBookings: [], foodOrders: [], menuItems: [], settings: {}, pendingOrders: [] };
         let foCart = {};
-        let currentInvoiceData = null; // Store data for reprinting
+        let currentInvoiceData = null; 
 
         async function init() {
             const res = await fetch(`masterdata.json?_ts=${Date.now()}`);
@@ -266,13 +300,45 @@
             setTimeout(() => el.classList.add('hidden-view'), 3500);
         }
 
+        // --- ID VERIFICATION LOGIC ---
+        function updateIdPlaceholder() {
+            const type = document.getElementById('ciIdType').value;
+            const input = document.getElementById('ciIdNumber');
+            if(type === 'Aadhar Card') input.placeholder = "12-digit Aadhar No (e.g. 123456789012)";
+            else if(type === 'PAN Card') input.placeholder = "10-char PAN (e.g. ABCDE1234F)";
+            else if(type === 'Voter ID') input.placeholder = "10-char Voter ID (e.g. ABC1234567)";
+            else if(type === 'Driving License') input.placeholder = "DL Number (e.g. DL1420110012345)";
+            else if(type === 'Passport') input.placeholder = "Passport No (e.g. A1234567)";
+        }
+
+        function validateId(type, value) {
+            if(!value) return false;
+            value = value.toUpperCase().replace(/\s/g, '');
+            if(type === 'Aadhar Card') return /^\d{12}$/.test(value);
+            if(type === 'PAN Card') return /^[A-Z]{5}\d{4}[A-Z]$/.test(value);
+            if(type === 'Voter ID') return /^[A-Z]{3}\d{7}$/.test(value);
+            if(type === 'Driving License') return /^[A-Z0-9\-\s]{10,20}$/.test(value); 
+            if(type === 'Passport') return /^[A-Z][0-9]{7}$/.test(value);
+            return value.length > 3; 
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+        // ------------------------------
+
         function apiCall(payload, btnElem, loadingText, callback) {
             const originalText = btnElem ? btnElem.innerText : "";
             if(btnElem) { btnElem.innerText = loadingText; btnElem.disabled = true; btnElem.classList.add('opacity-50'); }
             
             fetch(client.scriptUrl, { method: "POST", body: JSON.stringify(payload) })
             .then(r=>r.json()).then(res => {
-                if(btnElem && btnElem.id !== 'btnCheckOut') { // Don't re-enable checkout button on success to prevent double click
+                if(btnElem && btnElem.id !== 'btnCheckOut') { 
                     btnElem.innerText = originalText; btnElem.disabled = false; btnElem.classList.remove('opacity-50'); 
                 }
                 if(callback) callback(res);
@@ -463,16 +529,56 @@
             closeModals(); document.getElementById('ciRoomText').innerText = activeRoom;
             document.getElementById('ciName').value = ""; document.getElementById('ciPhone').value = "";
             document.getElementById('ciAdvance').value = "";
+            document.getElementById('ciIdType').value = "Aadhar Card";
+            document.getElementById('ciIdNumber').value = "";
+            document.getElementById('ciIdFile').value = "";
+            updateIdPlaceholder();
+            document.querySelectorAll('.essentials').forEach(cb => cb.checked = false);
+            document.getElementById('chkWater').checked = true;
             document.getElementById('ciModal').classList.remove('hidden-view');
         }
 
-        function doCheckIn() {
+        async function doCheckIn() {
             const name = document.getElementById('ciName').value.trim();
             const phone = document.getElementById('ciPhone').value.trim();
+            const file = document.getElementById('ciIdFile').files[0];
+            const idNum = document.getElementById('ciIdNumber').value.trim();
+            const idType = document.getElementById('ciIdType').value;
+
             if(!name || !phone) return alert("Guest Name and Phone are mandatory.");
+            if(idNum && !validateId(idType, idNum)) return alert(`Invalid ${idType} format.`);
+            if(!idNum && !file) return alert("Please provide either a valid ID Number OR Upload an ID Photo.");
             
-            const payload = { action: "checkIn", roomNo: activeRoom, guestName: name, phone: phone, advance: document.getElementById('ciAdvance').value||0 };
-            apiCall(payload, document.getElementById('btnCheckIn'), "Checking In...", res => { closeModals(); fetchData(null); });
+            const btn = document.getElementById('btnCheckIn');
+            const orig = btn.innerText;
+            btn.innerText = "Processing ID...";
+            btn.disabled = true;
+
+            let finalIdPayload = "";
+            if(file) {
+                try { finalIdPayload = await fileToBase64(file); } 
+                catch(e) { btn.innerText = orig; btn.disabled = false; return notify("Failed to read image file."); }
+            } else {
+                finalIdPayload = `${idType}: ${idNum}`;
+            }
+
+            let ess = [];
+            if(document.getElementById('chkSoap').checked) ess.push("Soap");
+            if(document.getElementById('chkTowel').checked) ess.push("Towel");
+            if(document.getElementById('chkWater').checked) ess.push("Water");
+
+            const payload = { 
+                action: "checkIn", 
+                roomNo: activeRoom, 
+                guestName: name, 
+                phone: phone, 
+                advance: document.getElementById('ciAdvance').value||0,
+                essentials: ess.join(","), 
+                idMissing: false, 
+                idPhotoBase64: finalIdPayload 
+            };
+            
+            apiCall(payload, btn, "Checking In...", res => { closeModals(); fetchData(null); });
         }
 
         function openCheckOut(rNo, price) {
@@ -550,7 +656,7 @@
         function doCheckOut() {
             const btn = document.getElementById('btnCheckOut');
             btn.innerText = "Processing Checkout...";
-            btn.disabled = true; // BUG FIX: Prevent Double Click
+            btn.disabled = true; // Prevents double click
             btn.classList.add('opacity-50');
 
             const payload = { 
@@ -671,7 +777,7 @@
             resTable.innerHTML = ""; guestTable.innerHTML = "";
             (appData.activeBookings || []).forEach(b => {
                 resTable.innerHTML += `<tr><td class="font-mono">${b.BookingId}</td><td class="font-bold">${b.GuestName}</td><td>${b.Phone}</td><td>${b.RoomNo}</td><td>${b.CheckIn}</td><td><span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-bold uppercase tracking-wider">${b.Status}</span></td></tr>`;
-                guestTable.innerHTML += `<tr><td class="font-bold">${b.RoomNo}</td><td>${b.GuestName}</td><td>${b.Phone}</td><td class="font-mono font-bold text-emerald-600">₹${b.Advance}</td></tr>`;
+                guestTable.innerHTML += `<tr><td class="font-bold">${b.RoomNo}</td><td>${b.GuestName}</td><td>${b.Phone}</td><td class="font-mono font-bold text-emerald-600">₹${b.Advance}</td><td>${b.IdPhotoUrl?'Yes':'No'}</td></tr>`;
             });
         }
         
