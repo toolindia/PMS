@@ -1,14 +1,1 @@
-{
-  "satyam": {
-    "name": "Ofbuzz Technology",
-    "scriptUrl": "https://script.google.com/macros/s/AKfycbz_gp02q1Q0ucI1QbCmQCuA5co3kT6u58z4sImx0w3RFSFOX8ru2sP6bHGoFnBkgT4/exec",
-    "upiVpa": "ofbuzz@ptyes",
-    "expiryDate": "2027-10-21",
-    "backupSheetId": "",
-    "features": {
-      "dining": true,
-      "staff": true,
-      "feedback": true
-    }
-  }
-}
+
