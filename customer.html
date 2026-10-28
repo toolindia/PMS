@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guest Portal - PMS</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Add QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         body { background-color: #fafafa; color: #111; font-family: 'Inter', sans-serif;}
         .hidden-view { display: none !important; }
@@ -152,13 +154,13 @@
             <h3 class="font-black text-xl mb-2 text-center">Complete Payment</h3>
             <p class="text-center text-sm text-gray-500 mb-6">Scan QR code to pay via UPI</p>
             
-            <!-- This image src would ideally be generated dynamically based on the UPI ID and Amount -->
             <div class="flex justify-center mb-6">
-                <div class="w-48 h-48 bg-gray-100 border border-gray-300 flex items-center justify-center rounded-xl">
-                    <p class="text-gray-400 font-mono text-sm">[ UPI QR CODE ]<br><span id="qrUpiId" class="text-xs"></span></p>
-                </div>
+                <!-- Container for the QR Code -->
+                <div id="qrcode" class="p-2 border border-gray-300 rounded-lg"></div>
             </div>
             
+            <p id="qrUpiId" class="text-center text-xs text-gray-500 mb-6 font-mono"></p>
+
             <div class="bg-gray-50 p-3 rounded-lg text-center mb-6 border border-gray-200">
                 <p class="text-xs text-gray-500 uppercase font-bold">Amount to Pay</p>
                 <p id="paymentAmount" class="text-2xl font-black text-red-600">₹0</p>
@@ -171,7 +173,7 @@
         </div>
     </div>
 
-    <!-- FOOTER -->
+    <!-- OFBUZZ FOOTER (With Dynamic Hotel Contact) -->
     <footer class="bg-white border-t border-gray-200 py-6 mt-auto text-xs w-full">
         <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
@@ -181,6 +183,7 @@
                     <p class="text-[10px] text-gray-500 uppercase tracking-widest">Ofbuzz PMS &bull; An Indian Technology</p>
                 </div>
             </div>
+            <!-- DYNAMIC HOTEL CONTACT NUMBER WILL BE INJECTED HERE -->
             <a id="supportBtn" href="#" class="bg-red-50 border border-red-200 text-red-700 px-5 py-2.5 rounded-xl text-[11px] font-bold hover:bg-red-100 active:scale-95 transition-all cursor-pointer shadow-sm flex items-center gap-2">
                 📞 Call Reception
             </a>
@@ -191,10 +194,11 @@
         const urlParams = new URLSearchParams(window.location.search);
         const slug = urlParams.get('hotel');
         let client = null, cart = {}, menuItems = [];
-        let orderTotals = { subtotal: 0, tax: 0, total: 0 };
         const scores = { cleanliness: 5, staff: 5, amenities: 5, food: 5 };
+        let orderTotals = { subtotal: 0, tax: 0, total: 0 };
         const MIN_ORDER_AMOUNT = 100;
         const TAX_RATE = 0.10; // 10%
+        let qrCodeObj = null;
 
         function notify(msg) {
             const el = document.getElementById('toast');
@@ -262,9 +266,9 @@
                         document.getElementById('supportBtn').href = `tel:${res.hotelContact}`;
                         document.getElementById('loader').classList.add('hidden-view');
                         document.getElementById('mainContent').classList.remove('hidden-view');
-                        document.getElementById('qrUpiId').innerText = client.upiVpa;
+                        document.getElementById('qrUpiId').innerText = client.upiVpa || 'UPI ID not configured';
                         renderMenu();
-                        syncOffline();
+                        syncOffline(); // Initial sync check
                     }
                 });
         }
@@ -353,6 +357,31 @@
         function openPaymentModal() {
             const room = document.getElementById('guestRoom').value.trim();
             if (!room) return alert("Please enter your Room Number at the top first.");
+            
+            const upiId = client.upiVpa;
+            if(!upiId) {
+                alert("UPI ID is not configured for this hotel. Please contact reception.");
+                return;
+            }
+
+            // Create UPI string
+            const upiString = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(client.name)}&am=${orderTotals.total}&cu=INR&tn=Room%20${room}%20Order`;
+
+            // Generate QR Code
+            if(qrCodeObj) {
+                qrCodeObj.clear();
+                qrCodeObj.makeCode(upiString);
+            } else {
+                qrCodeObj = new QRCode(document.getElementById("qrcode"), {
+                    text: upiString,
+                    width: 150,
+                    height: 150,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+            }
+
             document.getElementById('paymentModal').classList.remove('hidden-view');
         }
 
@@ -372,7 +401,7 @@
                 tax: orderTotals.tax,
                 total: orderTotals.total,
                 status: "Pending",
-                paymentStatus: "Paid via UPI" // We assume they paid if they clicked "I've Paid"
+                paymentStatus: "Paid via UPI" 
             };
             
             apiCall(payload, document.getElementById('btnConfirmPay'), "Processing...", res => {
