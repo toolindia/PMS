@@ -25,7 +25,6 @@
     
     <div id="toast" class="hidden-view fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-6 py-3 rounded-lg text-sm font-semibold shadow-xl transition-all duration-300"></div>
 
-    <!-- LOGIN BOX -->
     <div id="authBox" class="fixed inset-0 bg-slate-900 flex items-center justify-center z-50">
         <div class="bg-white p-8 rounded-2xl shadow-2xl text-center w-full max-w-sm m-4">
             <div class="flex justify-center mb-5">
@@ -39,7 +38,6 @@
         </div>
     </div>
 
-    <!-- SIDEBAR -->
     <aside id="sidebar" class="hidden-view w-64 bg-white border-r border-slate-200 flex flex-col z-20 shrink-0">
         <div class="p-6 flex items-center gap-3 mb-2">
             <div class="w-9 h-9 bg-blue-700 rounded-xl flex items-center justify-center text-white font-bold text-sm shadow-sm">FD</div>
@@ -71,10 +69,9 @@
     </aside>
 
     <div id="mainWrapper" class="hidden-view flex-1 flex flex-col h-screen overflow-hidden bg-slate-50 relative">
-        <header class="bg-white border-b border-slate-200 px-8 py-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 z-10 shrink-0">
+        <header class="bg-white border-b border-slate-200 px-8 py-5 flex justify-between items-center z-10 shrink-0">
             <div>
                 <h1 id="propTitle" class="text-2xl font-bold text-slate-900 tracking-tight">Front Desk Control</h1>
-                <p class="text-xs font-semibold tracking-wider text-slate-500 uppercase mt-1">Live Property Console <span id="networkStatus" class="text-emerald-600 ml-2 font-bold">• Online</span></p>
             </div>
             <div class="flex gap-3">
                 <button id="btnSync" onclick="fetchData(this)" class="bg-blue-900 text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-blue-800 shadow-sm">Refresh UI</button>
@@ -83,9 +80,7 @@
 
         <main class="flex-1 overflow-y-auto p-4 sm:p-8 custom-scrollbar">
             
-            <!-- TAB: DASHBOARD -->
             <div id="tab-dashboard" class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- ROOM MATRIX -->
                 <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-sm font-bold uppercase text-slate-500 tracking-wider">Live Inventory Matrix</h2>
@@ -97,19 +92,18 @@
                     </div>
                     <div id="roomGrid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-4"></div>
                 </div>
+
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 border-t-4 border-t-orange-500 flex flex-col h-full">
+                    <h2 class="text-sm font-bold uppercase mb-4 text-orange-600 tracking-wider">Food Approvals</h2>
+                    <div id="approvalQueue" class="space-y-3 flex-1 overflow-y-auto custom-scrollbar pr-1"></div>
+                </div>
             </div>
 
-            <!-- TAB: FOOD ORDER -->
             <div id="tab-foodorder" class="hidden-view max-w-7xl mx-auto space-y-6">
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col md:flex-row gap-6">
                     <div class="flex-1 space-y-4">
                         <h2 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3">Place Food Order (KOT)</h2>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-xs font-bold text-slate-500 uppercase">Select Room</label>
-                                <select id="foRoomSelect" class="w-full mt-1 bg-slate-50 border border-slate-200 p-3 rounded-lg outline-none font-bold text-slate-700"></select>
-                            </div>
-                        </div>
+                        <select id="foRoomSelect" class="w-1/2 bg-slate-50 border border-slate-200 p-3 rounded-lg outline-none font-bold text-slate-700"></select>
                         <div id="foMenuContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 max-h-80 overflow-y-auto custom-scrollbar pr-2"></div>
                     </div>
                     <div class="w-full md:w-80 bg-slate-50 p-6 rounded-xl border border-slate-200 h-fit">
@@ -123,31 +117,26 @@
                 </div>
             </div>
 
-            <!-- TAB: RESERVATIONS, GUESTS, ROOMS -->
             <div id="tab-reservations" class="hidden-view max-w-7xl mx-auto space-y-6">
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                    <h2 class="text-lg font-bold text-slate-900 mb-4 border-b border-slate-100 pb-4">Active Reservations</h2>
                     <table class="w-full text-left data-table"><thead><tr><th>Booking ID</th><th>Guest Name</th><th>Phone</th><th>Room</th><th>Check-In</th><th>Status</th></tr></thead><tbody id="tblReservations"></tbody></table>
                 </div>
             </div>
 
             <div id="tab-guests" class="hidden-view max-w-7xl mx-auto space-y-6">
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                    <h2 class="text-lg font-bold text-slate-900 mb-4 border-b border-slate-100 pb-4">In-House Guest Directory</h2>
-                    <table class="w-full text-left data-table"><thead><tr><th>Room No</th><th>Guest Name</th><th>Contact</th><th>Advance Paid</th><th>ID Proof</th></tr></thead><tbody id="tblGuests"></tbody></table>
+                    <table class="w-full text-left data-table"><thead><tr><th>Room No</th><th>Guest Name</th><th>Contact</th><th>Advance Paid</th></tr></thead><tbody id="tblGuests"></tbody></table>
                 </div>
             </div>
 
             <div id="tab-rooms" class="hidden-view max-w-7xl mx-auto space-y-6">
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                    <h2 class="text-lg font-bold text-slate-900 mb-4 border-b border-slate-100 pb-4">Property Room Configurations</h2>
                     <table class="w-full text-left data-table"><thead><tr><th>Room No</th><th>Category</th><th>Tariff (₹)</th><th>Current Status</th></tr></thead><tbody id="tblRoomsConfig"></tbody></table>
                 </div>
             </div>
 
             <div id="tab-billing" class="hidden-view max-w-7xl mx-auto space-y-6">
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
-                    <h2 class="text-lg font-bold text-slate-900 mb-4 border-b border-slate-100 pb-4">Pending Checkouts</h2>
                     <div id="billingQueue" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
                 </div>
             </div>
@@ -176,20 +165,14 @@
             </div>
             
             <div class="space-y-3">
-                <input type="text" id="ciName" placeholder="Guest Full Name" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-semibold text-sm">
-                <input type="tel" id="ciPhone" placeholder="Mobile Number" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-semibold text-sm">
-                <input type="number" id="ciAdvance" placeholder="Advance Payment (₹)" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-mono text-sm">
+                <input type="text" id="ciName" placeholder="Guest Full Name" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-semibold text-sm outline-none">
+                <input type="tel" id="ciPhone" placeholder="Mobile Number" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-semibold text-sm outline-none">
+                <input type="number" id="ciAdvance" placeholder="Advance Payment (₹)" class="w-full bg-slate-50 border border-slate-200 p-3 rounded-xl font-mono text-sm outline-none">
             </div>
 
-            <!-- ID VERIFICATION -->
             <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100 space-y-3">
                 <p class="font-bold text-blue-800 uppercase tracking-wider text-[10px]">Guest ID</p>
-                <select id="ciIdType" class="w-full bg-white border border-blue-200 p-2.5 rounded-lg text-sm font-semibold text-slate-700">
-                    <option value="Aadhar Card">Aadhar Card</option><option value="PAN Card">PAN Card</option><option value="Passport">Passport</option>
-                </select>
-                <input type="text" id="ciIdNumber" placeholder="Enter ID Number" class="w-full bg-white border border-blue-200 p-2.5 rounded-lg font-mono">
-                <p class="text-[10px] text-center text-blue-400 font-bold uppercase">OR</p>
-                <input type="file" id="ciIdFile" accept="image/*,application/pdf" class="w-full text-xs cursor-pointer">
+                <input type="text" id="ciIdNumber" placeholder="Enter ID Number" class="w-full bg-white border border-blue-200 p-2.5 rounded-lg font-mono outline-none">
             </div>
             
             <div class="pt-2 sticky bottom-0 bg-white">
@@ -244,15 +227,13 @@
         const urlParams = new URLSearchParams(window.location.search);
         const slug = urlParams.get('hotel');
         let client = null, activeRoom = null, activeBooking = null, currentUser = null;
-        let appData = { rooms: [], activeBookings: [], foodOrders: [], menuItems: [], settings: {} };
+        let appData = { rooms: [], activeBookings: [], foodOrders: [], menuItems: [], settings: {}, pendingOrders: [] };
         let foCart = {};
 
         async function init() {
             const res = await fetch(`masterdata.json?_ts=${Date.now()}`);
             const data = await res.json();
             client = data[slug];
-            if(client) { document.getElementById('loginPropName').innerText = client.name; }
-            syncOffline();
         }
 
         function notify(msg) {
@@ -262,20 +243,10 @@
             setTimeout(() => el.classList.add('hidden-view'), 3500);
         }
 
-        // --- Core API & Logic ---
         function apiCall(payload, btnElem, loadingText, callback) {
             const originalText = btnElem ? btnElem.innerText : "";
             if(btnElem) { btnElem.innerText = loadingText; btnElem.disabled = true; btnElem.classList.add('opacity-50'); }
             
-            if(!navigator.onLine && payload.action !== 'getReceptionData') {
-                let queue = JSON.parse(localStorage.getItem('pms_offline_queue') || '[]');
-                queue.push(payload);
-                localStorage.setItem('pms_offline_queue', JSON.stringify(queue));
-                if(btnElem) { btnElem.innerText = originalText; btnElem.disabled = false; btnElem.classList.remove('opacity-50'); }
-                if(callback) callback({success: true, offline: true});
-                return;
-            }
-
             fetch(client.scriptUrl, { method: "POST", body: JSON.stringify(payload) })
             .then(r=>r.json()).then(res => {
                 if(btnElem) { btnElem.innerText = originalText; btnElem.disabled = false; btnElem.classList.remove('opacity-50'); }
@@ -286,51 +257,24 @@
             });
         }
 
-        function syncOffline() {
-            if(!navigator.onLine) { document.getElementById('networkStatus').innerHTML = "<span class='text-orange-500'>• Offline</span>"; return; }
-            document.getElementById('networkStatus').innerHTML = "<span class='text-emerald-500'>• Online</span>";
-            let queue = JSON.parse(localStorage.getItem('pms_offline_queue') || '[]');
-            if(queue.length === 0) return;
-            fetch(client.scriptUrl, { method: "POST", body: JSON.stringify({ action: "syncOfflineData", payloads: queue }) })
-            .then(r=>r.json()).then(res => { if(res.success) { localStorage.removeItem('pms_offline_queue'); fetchData(null); } });
-        }
-
-        // --- CORRECTED LOGIN FUNCTION ---
         function login() {
             const u = document.getElementById('usernameInput').value.trim();
             const p = document.getElementById('passwordInput').value.trim();
             const btn = document.getElementById('btnLogin');
-            const origText = btn.innerText;
-            btn.innerText = "Verifying..."; 
-            btn.disabled = true;
-            btn.classList.add('opacity-50');
+            btn.innerText = "Verifying..."; btn.disabled = true;
 
-            // Must use GET request for login action in AppScript
             fetch(`${client.scriptUrl}?action=login&username=${encodeURIComponent(u)}&password=${encodeURIComponent(p)}`)
                 .then(r=>r.json()).then(res => {
-                    btn.innerText = origText; 
-                    btn.disabled = false;
-                    btn.classList.remove('opacity-50');
-                    
+                    btn.innerText = "Login"; btn.disabled = false;
                     if(res.success) {
                         currentUser = res.user;
-                        appData.settings = res.settings;
                         document.getElementById('loggedUser').innerText = currentUser.Username;
-                        
                         document.getElementById('authBox').classList.add('hidden-view');
                         document.getElementById('sidebar').classList.remove('hidden-view');
                         document.getElementById('mainWrapper').classList.remove('hidden-view');
-                        
                         fetchData(null);
-                    } else {
-                        notify(res.error || "Invalid Credentials");
-                    }
-                }).catch(() => {
-                    btn.innerText = origText; 
-                    btn.disabled = false;
-                    btn.classList.remove('opacity-50');
-                    notify("Connection failed.");
-                });
+                    } else notify(res.error || "Invalid Credentials");
+                }).catch(() => { btn.innerText = "Login"; btn.disabled = false; notify("Network Error"); });
         }
 
         function fetchData(btn) {
@@ -339,9 +283,7 @@
                 .then(r=>r.json()).then(res => {
                     if(btn) { btn.innerText = "Refresh UI"; btn.disabled = false; }
                     if(res.success) { 
-                        appData.rooms = res.rooms;
-                        appData.activeBookings = res.activeBookings;
-                        appData.menuItems = res.menuItems;
+                        appData = res;
                         populateAllViews(); 
                         if(btn) notify("Refreshed."); 
                     }
@@ -361,7 +303,7 @@
         }
 
         function populateAllViews() {
-            renderRooms(); renderReservationsAndGuests(); renderRoomsConfig(); renderBillingQueue();
+            renderRooms(); renderApprovals(); renderReservationsAndGuests(); renderRoomsConfig(); renderBillingQueue();
         }
 
         function renderRooms() {
@@ -380,6 +322,21 @@
                     <div class="font-bold text-3xl mb-0.5">${r.RoomNo}</div>
                     <div class="text-xs font-bold opacity-90 mb-1.5">${r.RoomType || 'Standard'}</div>
                     <div class="text-[10px] uppercase font-bold tracking-widest opacity-75">${r.Status}</div>
+                </div>`;
+            });
+        }
+
+        function renderApprovals() {
+            const list = document.getElementById('approvalQueue');
+            list.innerHTML = appData.pendingOrders.length ? "" : "<div class='p-6 text-center border-dashed border-slate-200 rounded-xl bg-white'><p class='text-sm text-slate-500'>No pending requests</p></div>";
+            appData.pendingOrders.forEach(o => {
+                list.innerHTML += `<div class="p-4 bg-orange-50 border border-orange-200 rounded-xl shadow-sm">
+                    <div class="flex justify-between">
+                        <div><p class="font-bold text-lg">${o.RoomNo}</p></div>
+                        <span class="text-orange-700 font-bold bg-orange-100 px-2 py-1 rounded">₹${o.Total}</span>
+                    </div>
+                    <p class="text-sm text-slate-600 mt-2 mb-3">${o.Items}</p>
+                    <button onclick="approveOrder('${o.OrderId}', this)" class="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg font-bold">Approve to Kitchen</button>
                 </div>`;
             });
         }
@@ -420,6 +377,10 @@
             let itemsStr = [], sum = 0;
             keys.forEach(k => { itemsStr.push(`${foCart[k].name} (${foCart[k].qty})`); sum += foCart[k].price*foCart[k].qty; });
             
+            const taxPct = Number(appData.settings.FoodTaxPercent || 5) / 100;
+            const taxAmt = Math.round(sum * taxPct);
+            const totalAmt = sum + taxAmt;
+            
             const activeBook = appData.activeBookings.find(b => b.RoomNo == room);
 
             const payload = { 
@@ -429,15 +390,20 @@
                 phone: activeBook ? activeBook.Phone : "",
                 items: itemsStr.join(", "), 
                 amount: sum, 
-                status: "Pending" 
+                tax: taxAmt,
+                total: totalAmt,
+                status: "Pending", 
+                paymentStatus: "Charge to Room"
             };
             
             apiCall(payload, document.getElementById('btnPlaceFO'), "Placing...", res => {
-                print58mm(room, itemsStr.join(", "), sum);
+                print58mm(room, itemsStr.join(", "), totalAmt);
                 foCart = {}; updateFOCart(); fetchData(null);
             });
         }
         
+        function approveOrder(id, btn) { apiCall({ action: "approveOrder", orderId: id }, btn, "Approving...", res => { fetchData(null); }); }
+
         function print58mm(room, items, total) {
             const win = window.open('', '_blank', 'width=300,height=400');
             win.document.write(`<html><head><style>@page{size:58mm auto; margin:0;} body{font-family:monospace;width:52mm;padding:2mm;font-size:11px;} .c{text-align:center;} .b{font-weight:bold;} .r{text-align:right;} hr{border-top:1px dashed #000;}</style></head><body>`);
@@ -456,8 +422,7 @@
                 actDiv.innerHTML = `<button onclick="openCheckIn()" class="w-full bg-emerald-600 text-white py-3.5 rounded-xl font-bold mb-3">Check-In Guest</button>
                                     <button onclick="changeStatus('Maintenance', this)" class="w-full bg-white border border-slate-200 py-3.5 rounded-xl font-bold">Mark Maintenance</button>`;
             } else if (room.Status === "Occupied") {
-                actDiv.innerHTML = `<button onclick="addWaterBottle(this)" class="w-full bg-blue-100 text-blue-700 py-3.5 rounded-xl font-bold mb-3 border border-blue-200">+ Add Water Bottle</button>
-                                    <button onclick="openCheckOut('${rNo}', ${room.Price})" class="w-full bg-slate-900 text-white py-3.5 rounded-xl font-bold">Initiate Checkout</button>`;
+                actDiv.innerHTML = `<button onclick="openCheckOut('${rNo}', ${room.Price})" class="w-full bg-slate-900 text-white py-3.5 rounded-xl font-bold">Initiate Checkout</button>`;
             } else if (room.Status === "Pending Approval") {
                 actDiv.innerHTML = `<div class="p-4 bg-purple-50 border border-purple-200 rounded-xl text-center"><p class="text-purple-700 font-bold text-sm">Checkout Pending Admin Approval</p></div>`;
             } else {
@@ -474,11 +439,6 @@
             document.getElementById('ciName').value = ""; document.getElementById('ciPhone').value = "";
             document.getElementById('ciAdvance').value = "";
             document.getElementById('ciModal').classList.remove('hidden-view');
-        }
-
-        function addWaterBottle(btn) {
-            const activeBook = appData.activeBookings.find(b => b.RoomNo == activeRoom);
-            apiCall({ action: "placeOrder", bookingId: activeBook ? activeBook.BookingId : "", roomNo: activeRoom, phone: activeBook ? activeBook.Phone : "", items: "Extra Water Bottle (1)", amount: 50, status: "Pending" }, btn, "Adding...", res => { closeModals(); fetchData(null); notify("Sent to Kitchen."); });
         }
 
         function doCheckIn() {
@@ -530,15 +490,8 @@
             const roomTax = Math.round(roomBase * (roomTaxPct/100));
             
             let foodBase = 0;
-            // Removed direct calculation here since we no longer send foodOrders with getReceptionData due to logic update,
-            // Wait, foodOrders are not in the response anymore! Let's just use 0 for now as Reception doesn't fully need to calculate it if it's sent to admin,
-            // Actually I need to fix `getReceptionData` in AppScript to send `foodOrders`.
-            // *Correction*: In the AppScript `getReceptionData` I didn't include `foodOrders`. I must ensure I do. 
-            // Let's assume appData.foodOrders is available (I will verify AppScript).
-            if(appData.foodOrders) {
-                const roomOrders = appData.foodOrders.filter(o => o.BookingId == activeBooking.BookingId);
-                roomOrders.forEach(o => foodBase += Number(o.Amount));
-            }
+            const roomOrders = appData.foodOrders ? appData.foodOrders.filter(o => o.BookingId == activeBooking.BookingId) : [];
+            roomOrders.forEach(o => foodBase += Number(o.Amount));
             const foodTaxPct = Number(appData.settings.FoodTaxPercent || 5);
             const foodTax = Math.round(foodBase * (foodTaxPct/100));
 
@@ -636,7 +589,7 @@
             resTable.innerHTML = ""; guestTable.innerHTML = "";
             (appData.activeBookings || []).forEach(b => {
                 resTable.innerHTML += `<tr><td class="font-mono">${b.BookingId}</td><td class="font-bold">${b.GuestName}</td><td>${b.Phone}</td><td>${b.RoomNo}</td><td>${b.CheckIn}</td><td><span class="bg-slate-100 text-slate-700 px-2 py-1 rounded text-xs font-bold uppercase tracking-wider">${b.Status}</span></td></tr>`;
-                guestTable.innerHTML += `<tr><td class="font-bold">${b.RoomNo}</td><td>${b.GuestName}</td><td>${b.Phone}</td><td class="font-mono font-bold text-emerald-600">₹${b.Advance}</td><td>${b.IdPhotoUrl?'Yes':'No'}</td></tr>`;
+                guestTable.innerHTML += `<tr><td class="font-bold">${b.RoomNo}</td><td>${b.GuestName}</td><td>${b.Phone}</td><td class="font-mono font-bold text-emerald-600">₹${b.Advance}</td></tr>`;
             });
         }
         function renderRoomsConfig() {
@@ -646,10 +599,10 @@
         function renderBillingQueue() {
             const queue = document.getElementById('billingQueue'); queue.innerHTML = "";
             const occupiedRooms = appData.rooms.filter(r=>r.Status==="Occupied");
-            occupiedRooms.forEach(r => queue.innerHTML += `<div class="p-6 border bg-white rounded-xl text-center"><div class="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center text-orange-600 font-bold text-xl mx-auto mb-3">${r.RoomNo}</div><button onclick="openCheckOut('${r.RoomNo}', ${r.Price})" class="w-full bg-slate-900 text-white py-2 rounded-lg font-bold hover:bg-slate-800 transition">Initiate Checkout</button></div>`);
+            occupiedRooms.forEach(r => queue.innerHTML += `<div class="p-6 border bg-white rounded-xl text-center"><div class="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center text-orange-600 font-bold text-xl mx-auto mb-3">${r.RoomNo}</div><button onclick="openCheckOut('${r.RoomNo}', ${r.Price})" class="w-full bg-slate-900 text-white py-2 rounded-lg font-bold">Initiate Checkout</button></div>`);
         }
 
         window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
-</html>                                                        
+</html>
