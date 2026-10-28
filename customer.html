@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guest Portal - PMS</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Add QR Code Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script> <!-- Razorpay SDK -->
     <style>
         body { background-color: #fafafa; color: #111; font-family: 'Inter', sans-serif;}
         .hidden-view { display: none !important; }
@@ -22,34 +22,43 @@
     <header class="bg-red-600 text-white p-5 shadow-md sticky top-0 z-40">
         <div class="max-w-5xl mx-auto flex justify-between items-center">
             <h1 id="bPropName" class="text-xl font-black tracking-tight uppercase">Guest Portal <span id="networkStatus" class="text-green-300 text-[10px] ml-2 font-bold tracking-widest uppercase">• Online</span></h1>
-            <span class="text-[10px] font-bold bg-white text-red-600 px-3 py-1.5 rounded-full shadow tracking-widest uppercase">Powered by Ofbuzz</span>
+            <span class="text-[10px] font-bold bg-white text-red-600 px-3 py-1.5 rounded-full shadow tracking-widest uppercase">Room Service</span>
         </div>
     </header>
 
-    <!-- LOADING SCREEN -->
-    <div id="loader" class="fixed inset-0 bg-white flex flex-col items-center justify-center z-50">
-        <div class="w-12 h-12 border-4 border-red-200 border-t-red-600 rounded-full animate-spin mb-4"></div>
-        <p class="font-bold text-gray-500 uppercase tracking-widest text-sm">Connecting to Reception...</p>
+    <!-- AUTHENTICATION SCREEN -->
+    <div id="loginScreen" class="flex-1 flex flex-col items-center justify-center p-6">
+        <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 w-full max-w-md text-center">
+            <h2 class="text-2xl font-black mb-2">Welcome</h2>
+            <p class="text-gray-500 text-sm mb-6">Please verify your details to access Room Service.</p>
+            
+            <input type="text" id="authRoom" placeholder="Room Number" class="w-full border border-gray-300 p-3 rounded-xl outline-none focus:border-red-500 font-bold text-center mb-4 transition">
+            <input type="tel" id="authPhone" placeholder="Registered Phone Number" class="w-full border border-gray-300 p-3 rounded-xl outline-none focus:border-red-500 font-bold text-center mb-6 transition">
+            
+            <button id="btnVerify" onclick="verifyGuest()" class="w-full bg-red-600 text-white font-black uppercase tracking-wider py-4 rounded-xl shadow-md hover:bg-red-700 transition transform hover:scale-[1.02]">Access Portal</button>
+        </div>
     </div>
 
+    <!-- MAIN APP SCREEN -->
     <main id="mainContent" class="hidden-view flex-1 max-w-5xl mx-auto w-full p-4 sm:p-6 mt-2">
         
-        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-6 flex flex-col sm:flex-row gap-4 items-center">
-            <div class="flex-1 w-full">
-                <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Your Room Number</label>
-                <input type="text" id="guestRoom" placeholder="Enter Room No" class="w-full border border-gray-300 p-3 rounded-xl outline-none focus:border-red-500 font-bold text-lg text-center sm:text-left transition">
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 mb-6 flex justify-between items-center">
+            <div>
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Verified Guest</p>
+                <p id="displayGuestName" class="font-bold text-lg text-gray-900"></p>
+                <p id="displayRoomNo" class="text-sm font-mono text-gray-500"></p>
             </div>
-            <div class="flex-1 w-full text-center sm:text-right">
-                <p class="text-xs text-gray-400 uppercase font-bold tracking-widest mb-1">Total Cart Value</p>
-                <p id="cartTotalHeader" class="text-3xl font-black text-red-600">₹0</p>
+            <div class="text-right">
+                <p class="text-xs text-gray-400 uppercase font-bold tracking-widest mb-1">Cart Value</p>
+                <p id="cartTotalHeader" class="text-2xl font-black text-red-600">₹0</p>
             </div>
         </div>
 
         <!-- TABS -->
         <div class="flex border-b border-gray-200 mb-6">
-            <button onclick="switchTab('food')" id="tabBtn-food" class="flex-1 py-3 uppercase tracking-wider text-sm font-bold text-gray-500 tab-active transition">Room Service Menu</button>
-            <button onclick="switchTab('status')" id="tabBtn-status" class="flex-1 py-3 uppercase tracking-wider text-sm font-bold text-gray-500 transition">Track Orders</button>
-            <button onclick="switchTab('feedback')" id="tabBtn-feedback" class="flex-1 py-3 uppercase tracking-wider text-sm font-bold text-gray-500 transition">Rate Your Stay</button>
+            <button onclick="switchTab('food')" id="tabBtn-food" class="flex-1 py-3 uppercase tracking-wider text-sm font-bold text-gray-500 tab-active transition">Menu</button>
+            <button onclick="switchTab('status')" id="tabBtn-status" class="flex-1 py-3 uppercase tracking-wider text-sm font-bold text-gray-500 transition">Track</button>
+            <button onclick="switchTab('feedback')" id="tabBtn-feedback" class="flex-1 py-3 uppercase tracking-wider text-sm font-bold text-gray-500 transition">Rate Us</button>
         </div>
 
         <!-- FOOD MENU TAB -->
@@ -57,7 +66,6 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- MENU LIST -->
                 <div class="space-y-4">
-                    <h3 class="font-black text-xl mb-2 text-gray-800">Browse Menu</h3>
                     <div id="menuContainer" class="space-y-3"></div>
                 </div>
 
@@ -73,7 +81,7 @@
                             <span id="cartSubtotal">₹0</span>
                         </div>
                         <div class="flex justify-between text-sm text-gray-600 mb-2">
-                            <span>Taxes (10%):</span>
+                            <span>Taxes (<span id="taxLabel">10</span>%):</span>
                             <span id="cartTaxes">₹0</span>
                         </div>
                         <div class="flex justify-between text-lg font-bold text-gray-900">
@@ -81,8 +89,12 @@
                             <span id="cartTotalFinal">₹0</span>
                         </div>
                     </div>
-                    <p class="text-xs text-red-500 font-bold mb-4 text-center">* Minimum order value is ₹100</p>
-                    <button id="btnProceedToPay" onclick="openPaymentModal()" class="w-full bg-red-600 text-white font-black uppercase tracking-wider py-4 rounded-xl shadow-md hover:bg-red-700 transition transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed">Proceed to Pay</button>
+                    <p id="minOrderWarning" class="text-xs text-red-500 font-bold mb-4 text-center">* Minimum order value is ₹100</p>
+                    
+                    <div class="flex gap-2">
+                        <button id="btnChargeRoom" onclick="placeOrder('Charge to Room')" class="flex-1 bg-gray-800 text-white font-bold uppercase py-4 rounded-xl shadow-md hover:bg-gray-900 transition disabled:opacity-50 disabled:cursor-not-allowed">Charge to Room</button>
+                        <button id="btnProceedToPay" onclick="openPaymentModal()" class="flex-1 bg-red-600 text-white font-bold uppercase py-4 rounded-xl shadow-md hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed">Pay Now</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -94,98 +106,90 @@
                 <button onclick="fetchOrderStatus()" class="text-sm font-bold text-red-600 hover:text-red-700 bg-red-50 px-4 py-2 rounded-lg">Refresh Status</button>
             </div>
             <div id="orderStatusContainer" class="space-y-4">
-                <p class="text-gray-500 text-sm text-center py-4">Enter your room number above and click 'Refresh Status' to view your orders.</p>
+                <p class="text-gray-500 text-sm text-center py-4">No recent orders found.</p>
             </div>
         </div>
 
-        <!-- FEEDBACK TAB -->
+        <!-- FEEDBACK TAB (same as before) -->
         <div id="tab-feedback" class="hidden-view bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100">
+            <!-- Feedback HTML content ... -->
             <h3 class="font-black text-2xl mb-2 text-gray-800">How was your stay?</h3>
-            <p class="text-gray-500 text-sm mb-6 border-b pb-4">Please rate the following services out of 5 to help us improve.</p>
-
             <div class="space-y-6">
+                <!-- Cleanliness -->
                 <div>
-                    <label class="text-xs font-bold text-gray-500 uppercase block mb-2 tracking-wider">Cleanliness & Hygiene</label>
+                    <label class="text-xs font-bold text-gray-500 uppercase block mb-2">Cleanliness & Hygiene</label>
                     <div class="grid grid-cols-5 gap-3" data-metric="cleanliness">
-                        <button onclick="setScore('cleanliness', 1)" class="rating-btn border border-gray-300 py-2 rounded-xl font-bold hover:bg-gray-50 transition">1</button>
-                        <button onclick="setScore('cleanliness', 2)" class="rating-btn border border-gray-300 py-2 rounded-xl font-bold hover:bg-gray-50 transition">2</button>
-                        <button onclick="setScore('cleanliness', 3)" class="rating-btn border border-gray-300 py-2 rounded-xl font-bold hover:bg-gray-50 transition">3</button>
-                        <button onclick="setScore('cleanliness', 4)" class="rating-btn border border-gray-300 py-2 rounded-xl font-bold hover:bg-gray-50 transition">4</button>
-                        <button onclick="setScore('cleanliness', 5)" class="rating-btn active border border-gray-300 py-2 rounded-xl font-bold hover:bg-gray-50 transition">5</button>
+                        <button onclick="setScore('cleanliness', 1)" class="rating-btn border border-gray-300 py-2 rounded-xl font-bold">1</button>
+                        <button onclick="setScore('cleanliness', 2)" class="rating-btn border border-gray-300 py-2 rounded-xl font-bold">2</button>
+                        <button onclick="setScore('cleanliness', 3)" class="rating-btn border border-gray-300 py-2 rounded-xl font-bold">3</button>
+                        <button onclick="setScore('cleanliness', 4)" class="rating-btn border border-gray-300 py-2 rounded-xl font-bold">4</button>
+                        <button onclick="setScore('cleanliness', 5)" class="rating-btn active border border-gray-300 py-2 rounded-xl font-bold">5</button>
                     </div>
                 </div>
-
+                <!-- Staff -->
                 <div>
-                    <label class="text-xs font-bold text-gray-500 uppercase block mb-2 tracking-wider">Staff Courtesy & Service</label>
+                    <label class="text-xs font-bold text-gray-500 uppercase block mb-2">Staff Courtesy</label>
                     <div class="grid grid-cols-5 gap-3" data-metric="staff">
-                        <button onclick="setScore('staff', 1)" class="rating-btn border border-gray-300 py-2 rounded-xl font-bold transition">1</button>
-                        <button onclick="setScore('staff', 2)" class="rating-btn border border-gray-300 py-2 rounded-xl font-bold transition">2</button>
-                        <button onclick="setScore('staff', 3)" class="rating-btn border border-gray-300 py-2 rounded-xl font-bold transition">3</button>
-                        <button onclick="setScore('staff', 4)" class="rating-btn border border-gray-300 py-2 rounded-xl font-bold transition">4</button>
-                        <button onclick="setScore('staff', 5)" class="rating-btn active border border-gray-300 py-2 rounded-xl font-bold transition">5</button>
+                        <button onclick="setScore('staff', 1)" class="rating-btn border border-gray-300 py-2 rounded-xl font-bold">1</button>
+                        <button onclick="setScore('staff', 2)" class="rating-btn border border-gray-300 py-2 rounded-xl font-bold">2</button>
+                        <button onclick="setScore('staff', 3)" class="rating-btn border border-gray-300 py-2 rounded-xl font-bold">3</button>
+                        <button onclick="setScore('staff', 4)" class="rating-btn border border-gray-300 py-2 rounded-xl font-bold">4</button>
+                        <button onclick="setScore('staff', 5)" class="rating-btn active border border-gray-300 py-2 rounded-xl font-bold">5</button>
                     </div>
                 </div>
-
-                <div>
-                    <label class="text-xs font-bold text-gray-500 uppercase block mb-2 tracking-wider">Food & Beverages</label>
-                    <div class="grid grid-cols-5 gap-3" data-metric="food">
-                        <button onclick="setScore('food', 1)" class="rating-btn border border-gray-300 py-2 rounded-xl font-bold transition">1</button>
-                        <button onclick="setScore('food', 2)" class="rating-btn border border-gray-300 py-2 rounded-xl font-bold transition">2</button>
-                        <button onclick="setScore('food', 3)" class="rating-btn border border-gray-300 py-2 rounded-xl font-bold transition">3</button>
-                        <button onclick="setScore('food', 4)" class="rating-btn border border-gray-300 py-2 rounded-xl font-bold transition">4</button>
-                        <button onclick="setScore('food', 5)" class="rating-btn active border border-gray-300 py-2 rounded-xl font-bold transition">5</button>
-                    </div>
-                </div>
-
                 <div class="pt-4 border-t border-gray-100">
-                    <label class="text-xs font-bold text-gray-500 uppercase block mb-2 tracking-wider">Additional Comments</label>
-                    <textarea id="custComments" rows="4" placeholder="Tell us more about your experience..." class="w-full border border-gray-300 p-4 rounded-xl outline-none focus:border-red-500 transition"></textarea>
+                    <textarea id="custComments" rows="3" placeholder="Additional comments..." class="w-full border border-gray-300 p-4 rounded-xl outline-none focus:border-red-500"></textarea>
                 </div>
-
-                <button id="btnFeedback" onclick="submitFeedback()" class="w-full bg-red-600 text-white font-black uppercase tracking-wider py-4 rounded-xl shadow-md hover:bg-red-700 transition transform hover:scale-[1.02]">Submit Evaluation</button>
+                <button id="btnFeedback" onclick="submitFeedback()" class="w-full bg-red-600 text-white font-black uppercase py-4 rounded-xl shadow-md">Submit Evaluation</button>
             </div>
         </div>
 
     </main>
 
-    <!-- PAYMENT MODAL -->
+    <!-- PAYMENT MODAL (UPI or Razorpay logic handled in JS) -->
     <div id="paymentModal" class="hidden-view fixed inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="bg-white p-6 rounded-2xl w-full max-w-sm shadow-2xl">
+        <div class="bg-white p-6 rounded-2xl w-full max-w-sm shadow-2xl text-center relative">
+            <button onclick="document.getElementById('paymentModal').classList.add('hidden-view')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-800 font-bold">X</button>
             <h3 class="font-black text-xl mb-2 text-center">Complete Payment</h3>
-            <p class="text-center text-sm text-gray-500 mb-6">Scan QR code to pay via UPI</p>
+            <p class="text-sm text-gray-500 mb-6">Scan QR code or open UPI App</p>
             
             <div class="flex justify-center mb-6">
-                <!-- Container for the QR Code -->
                 <div id="qrcode" class="p-2 border border-gray-300 rounded-lg"></div>
             </div>
             
-            <p id="qrUpiId" class="text-center text-xs text-gray-500 mb-6 font-mono"></p>
+            <p id="qrUpiId" class="text-xs text-gray-500 mb-4 font-mono"></p>
+
+            <a id="upiAppBtn" href="#" class="block w-full bg-blue-100 text-blue-700 font-bold py-3 rounded-xl mb-6 border border-blue-200">Open UPI App (GPay/PhonePe)</a>
 
             <div class="bg-gray-50 p-3 rounded-lg text-center mb-6 border border-gray-200">
                 <p class="text-xs text-gray-500 uppercase font-bold">Amount to Pay</p>
                 <p id="paymentAmount" class="text-2xl font-black text-red-600">₹0</p>
             </div>
 
-            <div class="flex gap-3">
-                <button onclick="document.getElementById('paymentModal').classList.add('hidden-view')" class="flex-1 bg-white border border-gray-300 text-gray-700 font-bold py-3 rounded-xl hover:bg-gray-50 transition">Cancel</button>
-                <button id="btnConfirmPay" onclick="placeOrder()" class="flex-1 bg-green-600 text-white font-bold py-3 rounded-xl hover:bg-green-700 transition shadow-md">I've Paid</button>
-            </div>
+            <button id="btnConfirmPay" onclick="placeOrder('Paid via UPI')" class="w-full bg-green-600 text-white font-bold py-3 rounded-xl hover:bg-green-700 transition shadow-md">I have Paid</button>
         </div>
     </div>
 
-    <!-- OFBUZZ FOOTER (With Dynamic Hotel Contact) -->
+    <!-- VERIFICATION PENDING OVERLAY -->
+    <div id="verificationOverlay" class="hidden-view fixed inset-0 bg-white flex flex-col items-center justify-center z-50">
+        <div class="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-6"></div>
+        <h2 class="text-2xl font-black text-gray-800 mb-2">Verifying Payment</h2>
+        <p class="text-gray-500 font-medium text-center px-8">Please wait while the reception verifies your transaction. This may take up to 30 seconds.</p>
+        <p id="verificationTimer" class="mt-8 font-mono text-xl font-bold text-blue-600">30</p>
+    </div>
+
+    <!-- FOOTER -->
     <footer class="bg-white border-t border-gray-200 py-6 mt-auto text-xs w-full">
         <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <img src="https://i.pinimg.com/736x/bd/d0/5c/bdd05c94afb66b5a72f5e17a7a879ab3.jpg" alt="Ofbuzz Logo" class="w-7 h-7 rounded-full object-cover border border-gray-300">
                 <div>
-                    <p class="font-bold uppercase tracking-wider text-black">Ofbuzz Technology</p>
-                    <p class="text-[10px] text-gray-500 uppercase tracking-widest">Ofbuzz PMS &bull; An Indian Technology</p>
+                    <p id="footerPropName" class="font-bold uppercase tracking-wider text-black">Hotel Property</p>
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest">Powered by Ofbuzz</p>
                 </div>
             </div>
-            <!-- DYNAMIC HOTEL CONTACT NUMBER WILL BE INJECTED HERE -->
-            <a id="supportBtn" href="#" class="bg-red-50 border border-red-200 text-red-700 px-5 py-2.5 rounded-xl text-[11px] font-bold hover:bg-red-100 active:scale-95 transition-all cursor-pointer shadow-sm flex items-center gap-2">
-                📞 Call Reception
+            <a id="supportBtn" href="#" class="bg-red-50 border border-red-200 text-red-700 px-5 py-2.5 rounded-xl text-[11px] font-bold hover:bg-red-100 shadow-sm flex items-center gap-2">
+                📞 Reception
             </a>
         </div>
     </footer>
@@ -193,11 +197,9 @@
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const slug = urlParams.get('hotel');
-        let client = null, cart = {}, menuItems = [];
-        const scores = { cleanliness: 5, staff: 5, amenities: 5, food: 5 };
+        let client = null, cart = {}, menuItems = [], hotelConfig = {};
         let orderTotals = { subtotal: 0, tax: 0, total: 0 };
-        const MIN_ORDER_AMOUNT = 100;
-        const TAX_RATE = 0.10; // 10%
+        const scores = { cleanliness: 5, staff: 5, amenities: 5, food: 5 };
         let qrCodeObj = null;
 
         function notify(msg) {
@@ -207,42 +209,18 @@
             setTimeout(() => el.classList.add('hidden-view'), 3500);
         }
 
-        // OFFLINE SYNC WRAPPER FOR GUEST PORTAL
         function apiCall(payload, btnElem, loadingText, callback) {
             const originalText = btnElem ? btnElem.innerText : "";
-            if(btnElem) { btnElem.innerText = loadingText; btnElem.disabled = true; btnElem.classList.add('opacity-50', 'cursor-not-allowed'); }
+            if(btnElem) { btnElem.innerText = loadingText; btnElem.disabled = true; btnElem.classList.add('opacity-50'); }
             
-            if(!navigator.onLine && payload.action !== 'getCustomerPortalData' && payload.action !== 'trackOrder') {
-                let queue = JSON.parse(localStorage.getItem('pms_offline_queue') || '[]');
-                queue.push(payload);
-                localStorage.setItem('pms_offline_queue', JSON.stringify(queue));
-                if(btnElem) { btnElem.innerText = originalText; btnElem.disabled = false; btnElem.classList.remove('opacity-50', 'cursor-not-allowed'); }
-                notify("Offline: Request saved. It will sync automatically when network restores.");
-                if(callback) callback({success: true, offline: true});
-                return;
-            }
-
             fetch(client.scriptUrl, { method: "POST", body: JSON.stringify(payload) })
             .then(r=>r.json()).then(res => {
-                if(btnElem) { btnElem.innerText = originalText; btnElem.disabled = false; btnElem.classList.remove('opacity-50', 'cursor-not-allowed'); }
+                if(btnElem) { btnElem.innerText = originalText; btnElem.disabled = false; btnElem.classList.remove('opacity-50'); }
                 if(callback) callback(res);
             }).catch(err => {
-                if(btnElem) { btnElem.innerText = originalText; btnElem.disabled = false; btnElem.classList.remove('opacity-50', 'cursor-not-allowed'); }
-                notify("Network communication failed.");
+                if(btnElem) { btnElem.innerText = originalText; btnElem.disabled = false; btnElem.classList.remove('opacity-50'); }
+                notify("Network error.");
             });
-        }
-
-        window.addEventListener('online', () => { document.getElementById('networkStatus').innerHTML = "<span class='text-green-300'>• Online</span>"; syncOffline(); });
-        window.addEventListener('offline', () => document.getElementById('networkStatus').innerHTML = "<span class='text-red-300'>• Offline</span>");
-
-        function syncOffline() {
-            if(!navigator.onLine) return;
-            let queue = JSON.parse(localStorage.getItem('pms_offline_queue') || '[]');
-            if(queue.length === 0) return;
-            
-            notify(`Syncing offline requests...`);
-            fetch(client.scriptUrl, { method: "POST", body: JSON.stringify({ action: "syncOfflineData", payloads: queue }) })
-            .then(r=>r.json()).then(res => { if(res.success) localStorage.removeItem('pms_offline_queue'); });
         }
 
         async function init() {
@@ -250,27 +228,44 @@
             const data = await res.json();
             client = data[slug];
             
-            if(client) {
-                document.getElementById('bPropName').innerHTML = `${client.name} <span id="networkStatus" class="text-green-300 text-[10px] ml-2 font-bold tracking-widest uppercase">• Online</span>`;
-                fetchData();
+            if(!client) {
+                document.getElementById('loader').innerHTML = "<p class='font-bold text-red-500'>Hotel Not Found</p>";
             } else {
-                document.getElementById('loader').innerHTML = "<p class='font-bold text-red-500'>Hotel Not Found in Registry</p>";
+                document.getElementById('loader').classList.add('hidden-view');
+                document.getElementById('loginScreen').classList.remove('hidden-view');
+                document.getElementById('footerPropName').innerText = client.name;
             }
         }
 
-        function fetchData() {
-            fetch(`${client.scriptUrl}?action=getCustomerPortalData`)
+        function verifyGuest() {
+            const room = document.getElementById('authRoom').value.trim();
+            const phone = document.getElementById('authPhone').value.trim();
+            if(!room || !phone) return notify("Please enter both Room and Phone Number");
+
+            const btn = document.getElementById('btnVerify');
+            const orig = btn.innerText; btn.innerText = "Verifying..."; btn.disabled = true;
+
+            fetch(`${client.scriptUrl}?action=verifyGuest&roomNo=${room}&phone=${phone}`)
                 .then(r=>r.json()).then(res => {
+                    btn.innerText = orig; btn.disabled = false;
                     if(res.success) {
+                        hotelConfig = res;
                         menuItems = res.menu || [];
-                        document.getElementById('supportBtn').href = `tel:${res.hotelContact}`;
-                        document.getElementById('loader').classList.add('hidden-view');
+                        
+                        document.getElementById('loginScreen').classList.add('hidden-view');
                         document.getElementById('mainContent').classList.remove('hidden-view');
-                        document.getElementById('qrUpiId').innerText = client.upiVpa || 'UPI ID not configured';
+                        
+                        document.getElementById('displayGuestName').innerText = `Welcome, ${res.guestName}`;
+                        document.getElementById('displayRoomNo').innerText = `Room: ${room}`;
+                        document.getElementById('supportBtn').href = `tel:${res.hotelContact}`;
+                        document.getElementById('taxLabel').innerText = res.taxPercent;
+                        document.getElementById('minOrderWarning').innerText = `* Minimum order value is ₹${res.minOrder}`;
+                        
                         renderMenu();
-                        syncOffline(); // Initial sync check
+                    } else {
+                        notify(res.error);
                     }
-                });
+                }).catch(()=>{ btn.innerText = orig; btn.disabled = false; notify("Network Error"); });
         }
 
         function switchTab(tabId) {
@@ -293,14 +288,10 @@
                         <div>
                             <span class="font-black text-gray-800 block text-lg">${item.ItemName}</span>
                             <span class="text-xs text-gray-400 uppercase font-bold tracking-wider">${item.Category}</span>
-                            <p class="text-xs text-gray-500 mt-1">${item.Description || ''}</p>
                             <span class="block text-red-600 font-bold mt-2">₹${item.Price}</span>
                         </div>
-                        <button onclick="addToCart('${item.ItemId}', '${item.ItemName.replace(/'/g, "\\'")}', ${item.Price})" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-lg text-xs font-black uppercase tracking-wider active:scale-95 transition-all shadow-sm">
-                            Add +
-                        </button>
-                    </div>
-                `;
+                        <button onclick="addToCart('${item.ItemId}', '${item.ItemName.replace(/'/g, "\\'")}', ${item.Price})" class="bg-gray-100 text-gray-800 px-4 py-2 rounded-lg text-xs font-black uppercase active:scale-95">Add +</button>
+                    </div>`;
             });
         }
 
@@ -321,72 +312,82 @@
                     const line = cart[k];
                     const itemSum = line.qty * line.price;
                     subtotal += itemSum;
-                    el.innerHTML += `
-                        <div class="flex justify-between items-center py-2 border-b border-gray-200">
-                            <div><span class="font-bold text-gray-800">${line.name}</span> <span class="text-gray-400 text-xs ml-1">x${line.qty}</span></div>
-                            <span class="font-black text-gray-900">₹${itemSum}</span>
-                        </div>
-                    `;
+                    el.innerHTML += `<div class="flex justify-between items-center py-2 border-b border-gray-200">
+                        <div><span class="font-bold text-gray-800">${line.name}</span> <span class="text-gray-400 text-xs ml-1">x${line.qty}</span></div>
+                        <span class="font-black text-gray-900">₹${itemSum}</span>
+                    </div>`;
                 });
             }
             
-            const tax = Math.round(subtotal * TAX_RATE);
+            const tax = Math.round(subtotal * (hotelConfig.taxPercent / 100));
             const total = subtotal + tax;
-            
             orderTotals = { subtotal, tax, total };
             
             document.getElementById('cartSubtotal').innerText = `₹${subtotal}`;
             document.getElementById('cartTaxes').innerText = `₹${tax}`;
             document.getElementById('cartTotalFinal').innerText = `₹${total}`;
             document.getElementById('cartTotalHeader').innerText = `₹${total}`;
-            document.getElementById('paymentAmount').innerText = `₹${total}`;
             
-            const btnProceed = document.getElementById('btnProceedToPay');
-            if(subtotal > 0 && subtotal < MIN_ORDER_AMOUNT) {
-                btnProceed.disabled = true;
-                btnProceed.innerText = `Add ₹${MIN_ORDER_AMOUNT - subtotal} more to order`;
+            const minOrd = Number(hotelConfig.minOrder);
+            const btnPay = document.getElementById('btnProceedToPay');
+            const btnRoom = document.getElementById('btnChargeRoom');
+            
+            if(subtotal > 0 && subtotal < minOrd) {
+                btnPay.disabled = true; btnRoom.disabled = true;
+                btnPay.innerText = `Add ₹${minOrd - subtotal} more`;
             } else if (subtotal === 0) {
-                btnProceed.disabled = true;
-                btnProceed.innerText = "Send Order to Kitchen";
+                btnPay.disabled = true; btnRoom.disabled = true;
+                btnPay.innerText = "Pay Now";
             } else {
-                btnProceed.disabled = false;
-                btnProceed.innerText = "Proceed to Pay";
+                btnPay.disabled = false; btnRoom.disabled = false;
+                btnPay.innerText = "Pay Now";
             }
         }
 
         function openPaymentModal() {
-            const room = document.getElementById('guestRoom').value.trim();
-            if (!room) return alert("Please enter your Room Number at the top first.");
-            
-            const upiId = client.upiVpa;
-            if(!upiId) {
-                alert("UPI ID is not configured for this hotel. Please contact reception.");
+            // Razorpay flow (if key is configured)
+            if(hotelConfig.razorpayKey && hotelConfig.razorpayKey.length > 10) {
+                var options = {
+                    "key": hotelConfig.razorpayKey,
+                    "amount": orderTotals.total * 100, // in paise
+                    "currency": "INR",
+                    "name": client.name,
+                    "description": "Room Service",
+                    "handler": function (response){
+                        // Payment successful
+                        placeOrder("Paid via Razorpay");
+                    },
+                    "prefill": {
+                        "name": hotelConfig.guestName,
+                        "contact": document.getElementById('authPhone').value
+                    }
+                };
+                var rzp1 = new Razorpay(options);
+                rzp1.open();
                 return;
             }
 
-            // Create UPI string
-            const upiString = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(client.name)}&am=${orderTotals.total}&cu=INR&tn=Room%20${room}%20Order`;
+            // UPI Flow
+            const upiId = hotelConfig.upiVpa;
+            if(!upiId) return alert("Payment gateway/UPI not configured. Please use 'Charge to Room'.");
 
-            // Generate QR Code
+            const upiString = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(client.name)}&am=${orderTotals.total}&cu=INR&tn=Room%20${document.getElementById('authRoom').value}`;
+            document.getElementById('qrUpiId').innerText = upiId;
+            document.getElementById('paymentAmount').innerText = `₹${orderTotals.total}`;
+            document.getElementById('upiAppBtn').href = upiString;
+
             if(qrCodeObj) {
-                qrCodeObj.clear();
-                qrCodeObj.makeCode(upiString);
+                qrCodeObj.clear(); qrCodeObj.makeCode(upiString);
             } else {
-                qrCodeObj = new QRCode(document.getElementById("qrcode"), {
-                    text: upiString,
-                    width: 150,
-                    height: 150,
-                    colorDark : "#000000",
-                    colorLight : "#ffffff",
-                    correctLevel : QRCode.CorrectLevel.H
-                });
+                qrCodeObj = new QRCode(document.getElementById("qrcode"), { text: upiString, width: 150, height: 150 });
             }
 
             document.getElementById('paymentModal').classList.remove('hidden-view');
         }
 
-        function placeOrder() {
-            const room = document.getElementById('guestRoom').value.trim();
+        function placeOrder(paymentStatus) {
+            const room = document.getElementById('authRoom').value.trim();
+            const phone = document.getElementById('authPhone').value.trim();
             const keys = Object.keys(cart);
             if (!room || keys.length === 0) return;
 
@@ -394,32 +395,50 @@
             keys.forEach(k => { summary.push(`${cart[k].name} (${cart[k].qty})`); });
 
             const payload = { 
-                action: "placeOrder", 
-                roomNo: room, 
-                items: summary.join(", "), 
-                amount: orderTotals.subtotal,
-                tax: orderTotals.tax,
-                total: orderTotals.total,
-                status: "Pending",
-                paymentStatus: "Paid via UPI" 
+                action: "placeOrder", roomNo: room, phone: phone, items: summary.join(", "), 
+                amount: orderTotals.subtotal, tax: orderTotals.tax, total: orderTotals.total,
+                status: "Pending", paymentStatus: paymentStatus 
             };
             
-            apiCall(payload, document.getElementById('btnConfirmPay'), "Processing...", res => {
-                cart = {}; renderCart();
+            // If paying via UPI QR, show 30 sec verification screen
+            if(paymentStatus === "Paid via UPI") {
                 document.getElementById('paymentModal').classList.add('hidden-view');
-                notify(res.offline ? "Order saved offline. Will sync soon." : "Order sent to Kitchen!");
+                document.getElementById('verificationOverlay').classList.remove('hidden-view');
+                
+                let timeLeft = 30;
+                const timerEl = document.getElementById('verificationTimer');
+                const countdown = setInterval(() => {
+                    timeLeft--;
+                    timerEl.innerText = timeLeft;
+                    if(timeLeft <= 0) {
+                        clearInterval(countdown);
+                        document.getElementById('verificationOverlay').classList.add('hidden-view');
+                        finalizeOrderPlacement(payload);
+                    }
+                }, 1000);
+            } else {
+                // If Charge to Room or Razorpay
+                finalizeOrderPlacement(payload);
+            }
+        }
+
+        function finalizeOrderPlacement(payload) {
+            apiCall(payload, null, "", res => {
+                cart = {}; renderCart();
+                notify("Order sent to Kitchen!");
                 switchTab('status');
             });
         }
 
         function fetchOrderStatus() {
-            const room = document.getElementById('guestRoom').value.trim();
+            const room = document.getElementById('authRoom').value.trim();
+            const phone = document.getElementById('authPhone').value.trim();
             if(!room) return;
             
             const container = document.getElementById('orderStatusContainer');
             container.innerHTML = "<p class='text-center text-gray-400 text-sm'>Loading...</p>";
             
-            fetch(`${client.scriptUrl}?action=trackOrder&roomNo=${room}`)
+            fetch(`${client.scriptUrl}?action=trackOrder&roomNo=${room}&phone=${phone}`)
                 .then(r=>r.json()).then(res => {
                     if(res.success) {
                         container.innerHTML = "";
@@ -436,7 +455,10 @@
                                 <div class="p-4 border border-gray-200 rounded-xl mb-3 shadow-sm">
                                     <div class="flex justify-between items-start mb-2">
                                         <span class="text-xs font-mono text-gray-400">${o.Timestamp}</span>
-                                        <span class="text-xs font-bold uppercase flex items-center"><span class="status-dot ${statusColor}"></span>${o.Status}</span>
+                                        <div class="text-right">
+                                            <span class="text-[10px] font-bold uppercase block mb-1 text-gray-500">${o.PaymentStatus}</span>
+                                            <span class="text-xs font-bold uppercase flex items-center justify-end"><span class="status-dot ${statusColor}"></span>${o.Status}</span>
+                                        </div>
                                     </div>
                                     <p class="font-semibold text-gray-800 text-sm">${o.Items}</p>
                                     <p class="font-black text-red-600 mt-2">₹${o.Total}</p>
@@ -456,11 +478,9 @@
         }
 
         function submitFeedback() {
-            const room = document.getElementById('guestRoom').value.trim();
-            if (!room) return alert("Please enter your Room Number at the top.");
-
+            const room = document.getElementById('authRoom').value.trim();
             const payload = {
-                action: "submitFeedback", roomNo: room, guestName: "Guest",
+                action: "submitFeedback", roomNo: room, guestName: hotelConfig.guestName,
                 cleanliness: scores.cleanliness, staff: scores.staff, amenities: scores.amenities, food: scores.food,
                 comments: document.getElementById('custComments').value.trim()
             };
