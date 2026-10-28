@@ -69,7 +69,7 @@
     </aside>
 
     <div id="mainWrapper" class="hidden-view flex-1 flex flex-col h-screen overflow-hidden bg-slate-50 relative">
-        <header class="bg-white border-b border-slate-200 px-8 py-5 flex justify-between items-center z-10 shrink-0">
+        <header class="bg-white border-b border-slate-200 px-8 py-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 z-10 shrink-0">
             <div>
                 <h1 id="propTitle" class="text-2xl font-bold text-slate-900 tracking-tight">Front Desk Control</h1>
             </div>
@@ -137,7 +137,16 @@
 
             <div id="tab-billing" class="hidden-view max-w-7xl mx-auto space-y-6">
                 <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-lg font-bold text-slate-900 mb-4 border-b border-slate-100 pb-4">Pending Checkouts</h2>
                     <div id="billingQueue" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </div>
+
+                <!-- NEW: RECENT INVOICES (LOCAL REPRINT) -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mt-6">
+                    <h2 class="text-lg font-bold text-slate-900 mb-4 border-b border-slate-100 pb-4">Recently Settled Invoices (Local)</h2>
+                    <div id="recentInvoicesQueue" class="space-y-3">
+                        <p class="text-sm text-slate-500 text-center py-4">No recent checkouts on this device.</p>
+                    </div>
                 </div>
             </div>
 
@@ -156,7 +165,7 @@
         </div>
     </div>
 
-    <!-- Check-In Modal (With ID Verification) -->
+    <!-- Check-In Modal -->
     <div id="ciModal" class="hidden-view fixed inset-0 modal-overlay flex items-center justify-center p-4 z-50">
         <div class="bg-white p-7 rounded-2xl w-full max-w-md space-y-4 shadow-2xl h-[90vh] overflow-y-auto custom-scrollbar">
             <div class="flex justify-between items-center pb-3 border-b border-slate-100 sticky top-0 bg-white z-10">
@@ -189,36 +198,49 @@
                 <button onclick="closeModals()" class="text-slate-400 hover:text-slate-600">X</button>
             </div>
             
-            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-4">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-sm font-semibold text-slate-600">Actual Days Stayed:</span>
-                    <span id="actualDaysDisplay" class="font-bold text-slate-900 font-mono">1</span>
+            <!-- Checkout Form Section -->
+            <div id="coCheckoutForm">
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-sm font-semibold text-slate-600">Actual Days Stayed:</span>
+                        <span id="actualDaysDisplay" class="font-bold text-slate-900 font-mono">1</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-2 border-t border-slate-200">
+                        <span class="text-sm font-semibold text-slate-600">Charge for Days:</span>
+                        <input type="number" id="coDays" min="1" class="w-16 p-1 border rounded text-center font-mono font-bold outline-none focus:border-blue-500" onchange="recalculateBill()">
+                    </div>
+                    <p id="overrideWarning" class="text-[10px] text-red-500 font-bold mt-2 hidden-view">* Changing days requires Admin Approval</p>
                 </div>
-                <div class="flex justify-between items-center pt-2 border-t border-slate-200">
-                    <span class="text-sm font-semibold text-slate-600">Charge for Days:</span>
-                    <input type="number" id="coDays" min="1" class="w-16 p-1 border rounded text-center font-mono font-bold outline-none focus:border-blue-500" onchange="recalculateBill()">
+
+                <div class="space-y-2 text-sm font-medium">
+                    <div class="flex justify-between p-2.5 bg-slate-50 rounded-lg"><span class="text-slate-600">Room Base:</span> <span id="coRoomBase" class="font-bold font-mono">₹0</span></div>
+                    <div class="flex justify-between p-2.5 bg-slate-50 rounded-lg"><span class="text-slate-600">Room GST (<span id="rTaxPct"></span>%):</span> <span id="coRoomTax" class="font-bold font-mono">₹0</span></div>
+                    <div class="flex justify-between p-2.5 bg-slate-50 rounded-lg"><span class="text-slate-600">Food Base:</span> <span id="coFoodBase" class="font-bold font-mono">₹0</span></div>
+                    <div class="flex justify-between p-2.5 bg-slate-50 rounded-lg"><span class="text-slate-600">Food GST (<span id="fTaxPct"></span>%):</span> <span id="coFoodTax" class="font-bold font-mono">₹0</span></div>
+                    <div class="flex justify-between p-2.5 bg-emerald-50 text-emerald-700 rounded-lg"><span class="font-semibold">Advance:</span> <span id="coAdvance" class="font-bold font-mono">-₹0</span></div>
                 </div>
-                <p id="overrideWarning" class="text-[10px] text-red-500 font-bold mt-2 hidden-view">* Changing days requires Admin Approval</p>
+                
+                <div class="pt-4 border-t border-slate-100">
+                    <div class="flex justify-between items-center font-bold text-lg mb-4">
+                        <span>Payable:</span> <span id="coFinal" class="text-blue-700 text-2xl font-mono">₹0</span>
+                    </div>
+                    <select id="coMode" class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl font-bold mb-3">
+                        <option value="Cash">Cash</option><option value="UPI">UPI</option><option value="Card">Card</option>
+                    </select>
+                </div>
+                
+                <button id="btnCheckOut" onclick="doCheckOut()" class="w-full bg-blue-700 text-white py-3.5 rounded-xl font-bold hover:bg-blue-800 transition">Complete Checkout</button>
             </div>
 
-            <div class="space-y-2 text-sm font-medium">
-                <div class="flex justify-between p-2.5 bg-slate-50 rounded-lg"><span class="text-slate-600">Room Base:</span> <span id="coRoomBase" class="font-bold font-mono">₹0</span></div>
-                <div class="flex justify-between p-2.5 bg-slate-50 rounded-lg"><span class="text-slate-600">Room GST (<span id="rTaxPct"></span>%):</span> <span id="coRoomTax" class="font-bold font-mono">₹0</span></div>
-                <div class="flex justify-between p-2.5 bg-slate-50 rounded-lg"><span class="text-slate-600">Food Base:</span> <span id="coFoodBase" class="font-bold font-mono">₹0</span></div>
-                <div class="flex justify-between p-2.5 bg-slate-50 rounded-lg"><span class="text-slate-600">Food GST (<span id="fTaxPct"></span>%):</span> <span id="coFoodTax" class="font-bold font-mono">₹0</span></div>
-                <div class="flex justify-between p-2.5 bg-emerald-50 text-emerald-700 rounded-lg"><span class="font-semibold">Advance:</span> <span id="coAdvance" class="font-bold font-mono">-₹0</span></div>
+            <!-- Checkout Success Section (Prevents Double Submit & Allows Reprint) -->
+            <div id="coSuccessView" class="hidden-view text-center py-4">
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-4xl mx-auto mb-4 font-bold">✓</div>
+                <h3 class="text-xl font-bold text-slate-900 mb-2">Checkout Complete!</h3>
+                <p class="text-slate-500 mb-6 font-medium text-sm">Invoice ID: <span id="coSuccessInvId" class="font-bold text-slate-800"></span></p>
+                <button onclick="reprintCurrent()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold mb-3 transition shadow-sm">Print Invoice Again</button>
+                <button onclick="closeModals()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-3 rounded-xl font-bold transition">Close Window</button>
             </div>
-            
-            <div class="pt-4 border-t border-slate-100">
-                <div class="flex justify-between items-center font-bold text-lg mb-4">
-                    <span>Payable:</span> <span id="coFinal" class="text-blue-700 text-2xl font-mono">₹0</span>
-                </div>
-                <select id="coMode" class="w-full bg-slate-50 border border-slate-200 p-3.5 rounded-xl font-bold mb-3">
-                    <option value="Cash">Cash</option><option value="UPI">UPI</option><option value="Card">Card</option>
-                </select>
-            </div>
-            
-            <button id="btnCheckOut" onclick="doCheckOut()" class="w-full bg-blue-700 text-white py-3.5 rounded-xl font-bold hover:bg-blue-800 transition">Complete Checkout</button>
+
         </div>
     </div>
 
@@ -229,6 +251,7 @@
         let client = null, activeRoom = null, activeBooking = null, currentUser = null;
         let appData = { rooms: [], activeBookings: [], foodOrders: [], menuItems: [], settings: {}, pendingOrders: [] };
         let foCart = {};
+        let currentInvoiceData = null; // Store data for reprinting
 
         async function init() {
             const res = await fetch(`masterdata.json?_ts=${Date.now()}`);
@@ -249,7 +272,9 @@
             
             fetch(client.scriptUrl, { method: "POST", body: JSON.stringify(payload) })
             .then(r=>r.json()).then(res => {
-                if(btnElem) { btnElem.innerText = originalText; btnElem.disabled = false; btnElem.classList.remove('opacity-50'); }
+                if(btnElem && btnElem.id !== 'btnCheckOut') { // Don't re-enable checkout button on success to prevent double click
+                    btnElem.innerText = originalText; btnElem.disabled = false; btnElem.classList.remove('opacity-50'); 
+                }
                 if(callback) callback(res);
             }).catch(err => {
                 if(btnElem) { btnElem.innerText = originalText; btnElem.disabled = false; btnElem.classList.remove('opacity-50'); }
@@ -459,6 +484,15 @@
             document.getElementById('actualDaysDisplay').innerText = activeBooking.actualDays;
             document.getElementById('coDays').value = activeBooking.actualDays;
             
+            // Reset modal views
+            document.getElementById('coCheckoutForm').classList.remove('hidden-view');
+            document.getElementById('coSuccessView').classList.add('hidden-view');
+            
+            // Reset CheckOut Button
+            const btn = document.getElementById('btnCheckOut');
+            btn.disabled = false;
+            btn.classList.remove('opacity-50');
+
             recalculateBill(price);
             
             closeModals(); document.getElementById('coModal').classList.remove('hidden-view');
@@ -479,7 +513,7 @@
                 btn.classList.replace("hover:bg-blue-800", "hover:bg-purple-700");
                 warning.classList.remove('hidden-view');
             } else {
-                btn.innerText = "Print A4 Bill & Settle";
+                btn.innerText = "Complete Checkout";
                 btn.classList.replace("bg-purple-600", "bg-blue-700");
                 btn.classList.replace("hover:bg-purple-700", "hover:bg-blue-800");
                 warning.classList.add('hidden-view');
@@ -495,7 +529,10 @@
             const foodTaxPct = Number(appData.settings.FoodTaxPercent || 5);
             const foodTax = Math.round(foodBase * (foodTaxPct/100));
 
-            const adv = Number(activeBooking.Advance || 0);
+            // BUG FIX: Ensure Advance is properly parsed as a Number
+            const adv = parseFloat(activeBooking.Advance) || 0;
+            
+            // BUG FIX: Exact subtraction of Advance
             const final = (roomBase + roomTax + foodBase + foodTax) - adv;
             
             document.getElementById('rTaxPct').innerText = roomTaxPct;
@@ -511,6 +548,11 @@
         }
 
         function doCheckOut() {
+            const btn = document.getElementById('btnCheckOut');
+            btn.innerText = "Processing Checkout...";
+            btn.disabled = true; // BUG FIX: Prevent Double Click
+            btn.classList.add('opacity-50');
+
             const payload = { 
                 action: "checkOutRequest", 
                 bookingId: activeBooking.BookingId, 
@@ -528,18 +570,58 @@
                 requestedBy: currentUser ? currentUser.Username : "Reception"
             };
             
-            apiCall(payload, document.getElementById('btnCheckOut'), "Processing...", res => { 
+            apiCall(payload, btn, "Processing...", res => { 
                 if(res.status === "pending_approval") {
                     notify("Sent for Admin Approval. Room locked.");
+                    closeModals();
+                    fetchData(null); 
                 } else {
-                    printA4Invoice(res.invoiceId);
+                    // Save for Reprint
+                    currentInvoiceData = {
+                        invId: res.invoiceId,
+                        guestName: activeBooking.GuestName,
+                        roomNo: activeBooking.RoomNo,
+                        phone: activeBooking.Phone,
+                        calcData: activeBooking.calcData,
+                        mode: document.getElementById('coMode').value,
+                        date: new Date().toLocaleString()
+                    };
+                    
+                    // Save to local storage for History
+                    let recent = JSON.parse(localStorage.getItem('pms_recent_invoices') || '[]');
+                    recent.unshift(currentInvoiceData);
+                    if(recent.length > 20) recent.pop(); // keep last 20
+                    localStorage.setItem('pms_recent_invoices', JSON.stringify(recent));
+
+                    // Show Success Screen instead of closing
+                    document.getElementById('coCheckoutForm').classList.add('hidden-view');
+                    document.getElementById('coSuccessView').classList.remove('hidden-view');
+                    document.getElementById('coSuccessInvId').innerText = res.invoiceId;
+
+                    printA4Invoice(res.invoiceId, currentInvoiceData);
                     notify("Checkout successful!");
+                    fetchData(null); 
                 }
-                closeModals(); fetchData(null); 
             });
         }
 
-        function printA4Invoice(invId) {
+        // Feature: Reprint Current Invoice directly from modal
+        function reprintCurrent() {
+            if(currentInvoiceData) {
+                printA4Invoice(currentInvoiceData.invId, currentInvoiceData);
+            }
+        }
+
+        // Feature: Reprint Any Past Invoice from local history
+        function reprintPastInvoice(index) {
+            let recent = JSON.parse(localStorage.getItem('pms_recent_invoices') || '[]');
+            if(recent[index]) {
+                printA4Invoice(recent[index].invId, recent[index]);
+            }
+        }
+
+        // Modified print function to accept dynamic data
+        function printA4Invoice(invId, invData) {
             const win = window.open('', '_blank');
             const h = appData.settings;
             
@@ -563,19 +645,19 @@
                             ${h.BillAddress || ''}<br>GSTIN: ${h.BillGSTIN || ''}<br>Phone: ${h.BillPhone || ''}
                             </p>
                         </div>
-                        <div style="text-align: right;"><h2>INVOICE</h2><p>Inv #: ${invId}<br>Date: ${new Date().toLocaleDateString()}</p></div>
+                        <div style="text-align: right;"><h2>INVOICE</h2><p>Inv #: ${invId}<br>Date: ${invData.date}</p></div>
                      </div>`;
                      
-            html += `<div style="margin-bottom: 30px;"><h3 style="margin-bottom: 5px;">Billed To:</h3><p style="margin:0; font-size: 14px;"><b>Name:</b> ${activeBooking.GuestName}<br><b>Room No:</b> ${activeBooking.RoomNo}<br><b>Phone:</b> ${activeBooking.Phone}</p></div>`;
+            html += `<div style="margin-bottom: 30px;"><h3 style="margin-bottom: 5px;">Billed To:</h3><p style="margin:0; font-size: 14px;"><b>Name:</b> ${invData.guestName}<br><b>Room No:</b> ${invData.roomNo}<br><b>Phone:</b> ${invData.phone}</p></div>`;
                      
             html += `<table>
                         <tr><th>Description</th><th class="r">Amount (Rs)</th></tr>
-                        <tr><td>Room Charges (${activeBooking.calcData.requestedDays} Days)</td><td class="r">${activeBooking.calcData.roomBase.toFixed(2)}</td></tr>
-                        <tr><td>Room GST (${h.RoomTaxPercent || 12}%)</td><td class="r">${activeBooking.calcData.roomTax.toFixed(2)}</td></tr>
-                        <tr><td>Food & Beverages (Base)</td><td class="r">${activeBooking.calcData.foodBase.toFixed(2)}</td></tr>
-                        <tr><td>Food GST (${h.FoodTaxPercent || 5}%)</td><td class="r">${activeBooking.calcData.foodTax.toFixed(2)}</td></tr>
-                        <tr><td>Advance Paid</td><td class="r">-${activeBooking.calcData.adv.toFixed(2)}</td></tr>
-                        <tr class="tot-row"><td>Total Amount Paid (${document.getElementById('coMode').value})</td><td class="r">${activeBooking.calcData.final.toFixed(2)}</td></tr>
+                        <tr><td>Room Charges (${invData.calcData.requestedDays} Days)</td><td class="r">${invData.calcData.roomBase.toFixed(2)}</td></tr>
+                        <tr><td>Room GST (${h.RoomTaxPercent || 12}%)</td><td class="r">${invData.calcData.roomTax.toFixed(2)}</td></tr>
+                        <tr><td>Food & Beverages (Base)</td><td class="r">${invData.calcData.foodBase.toFixed(2)}</td></tr>
+                        <tr><td>Food GST (${h.FoodTaxPercent || 5}%)</td><td class="r">${invData.calcData.foodTax.toFixed(2)}</td></tr>
+                        <tr><td>Advance Paid</td><td class="r">-${invData.calcData.adv.toFixed(2)}</td></tr>
+                        <tr class="tot-row"><td>Total Amount Paid (${invData.mode})</td><td class="r">${invData.calcData.final.toFixed(2)}</td></tr>
                      </table>`;
                      
             html += `<p style="text-align: center; margin-top: 50px; font-style: italic; color: #64748b;">Thank you for your stay with us!</p></body></html>`;
@@ -592,14 +674,43 @@
                 guestTable.innerHTML += `<tr><td class="font-bold">${b.RoomNo}</td><td>${b.GuestName}</td><td>${b.Phone}</td><td class="font-mono font-bold text-emerald-600">₹${b.Advance}</td></tr>`;
             });
         }
+        
         function renderRoomsConfig() {
             const tbl = document.getElementById('tblRoomsConfig'); tbl.innerHTML = "";
             appData.rooms.forEach(r => tbl.innerHTML += `<tr><td class="font-bold text-lg">${r.RoomNo}</td><td>${r.RoomType}</td><td class="font-mono font-bold">₹${r.Price}</td><td>${r.Status}</td></tr>`);
         }
+        
         function renderBillingQueue() {
             const queue = document.getElementById('billingQueue'); queue.innerHTML = "";
             const occupiedRooms = appData.rooms.filter(r=>r.Status==="Occupied");
-            occupiedRooms.forEach(r => queue.innerHTML += `<div class="p-6 border bg-white rounded-xl text-center"><div class="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center text-orange-600 font-bold text-xl mx-auto mb-3">${r.RoomNo}</div><button onclick="openCheckOut('${r.RoomNo}', ${r.Price})" class="w-full bg-slate-900 text-white py-2 rounded-lg font-bold">Initiate Checkout</button></div>`);
+            
+            if(occupiedRooms.length === 0) {
+                 queue.innerHTML = "<p class='text-sm text-slate-500 col-span-full'>No pending checkouts.</p>";
+            } else {
+                occupiedRooms.forEach(r => queue.innerHTML += `<div class="p-6 border bg-white rounded-xl text-center"><div class="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center text-orange-600 font-bold text-xl mx-auto mb-3">${r.RoomNo}</div><button onclick="openCheckOut('${r.RoomNo}', ${r.Price})" class="w-full bg-slate-900 text-white py-2 rounded-lg font-bold">Initiate Checkout</button></div>`);
+            }
+
+            // Render Recent Local Checkouts for Reprint
+            const recentQueue = document.getElementById('recentInvoicesQueue');
+            recentQueue.innerHTML = "";
+            let recent = JSON.parse(localStorage.getItem('pms_recent_invoices') || '[]');
+            
+            if(recent.length === 0) {
+                recentQueue.innerHTML = "<p class='text-sm text-slate-500 text-center py-4'>No recent checkouts on this device.</p>";
+            } else {
+                recent.forEach((inv, index) => {
+                    recentQueue.innerHTML += `
+                    <div class="flex justify-between items-center p-4 bg-slate-50 border border-slate-200 rounded-xl hover:bg-slate-100 transition">
+                        <div>
+                            <p class="font-bold text-slate-900">Room ${inv.roomNo} - ${inv.guestName}</p>
+                            <p class="text-xs text-slate-500 font-mono mt-1">ID: ${inv.invId} | ${inv.date}</p>
+                        </div>
+                        <button onclick="reprintPastInvoice(${index})" class="bg-white border border-slate-300 text-blue-700 hover:bg-blue-50 px-4 py-2 rounded-lg text-xs font-bold shadow-sm transition">
+                            Reprint Bill
+                        </button>
+                    </div>`;
+                });
+            }
         }
 
         window.addEventListener('DOMContentLoaded', init);
