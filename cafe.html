@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant Control - Ofbuzz PMS</title>
+    <title>Restaurant Control - PMS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -20,7 +20,7 @@
 </head>
 <body class="flex h-screen overflow-hidden" onclick="enableAudio()">
 
-    <!-- Notification Sound -->
+    <!-- Notification Sound (Short Beep) -->
     <audio id="orderBeep" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 
     <div id="toast" class="hidden-view fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-6 py-3 rounded-xl text-sm font-bold shadow-2xl transition-all duration-300"></div>
@@ -41,7 +41,7 @@
     <!-- SIDEBAR -->
     <aside id="sidebar" class="hidden-view w-64 bg-white border-r border-slate-200 flex flex-col z-20 shrink-0">
         <div class="p-6 flex items-center gap-3">
-            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm">O</div>
+            <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-sm">C</div>
             <span id="sidebarPropName" class="font-bold text-slate-900 tracking-tight text-lg overflow-hidden whitespace-nowrap text-ellipsis">CAFE</span>
         </div>
         <nav class="flex-1 px-4 space-y-1">
@@ -104,21 +104,6 @@
             </div>
 
         </main>
-
-        <!-- FOOTER -->
-        <footer class="bg-white border-t border-slate-200 py-4 px-8 text-xs shrink-0">
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-7 h-7 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center overflow-hidden">
-                        <img src="https://i.pinimg.com/736x/bd/d0/5c/bdd05c94afb66b5a72f5e17a7a879ab3.jpg" alt="Ofbuzz Logo" class="w-full h-full object-cover">
-                    </div>
-                    <div>
-                        <p class="font-bold uppercase tracking-wider text-slate-900">Ofbuzz Technology</p>
-                        <p class="text-[10px] text-slate-500 uppercase tracking-widest">Ofbuzz PMS &bull; An Indian Technology</p>
-                    </div>
-                </div>
-            </div>
-        </footer>
     </div>
 
     <script>
@@ -135,7 +120,7 @@
                     document.getElementById('orderBeep').pause();
                     document.getElementById('orderBeep').currentTime = 0;
                     audioEnabled = true;
-                }).catch(e => console.log("Audio play blocked by browser until user interacts."));
+                }).catch(e => console.log("Audio play blocked."));
             }
         }
 
@@ -176,31 +161,35 @@
             const origText = btn.innerText;
             btn.innerText = "Verifying...";
             btn.disabled = true;
+            btn.classList.add('opacity-50');
 
             fetch(`${client.scriptUrl}?action=getDiningData&pin=${pin}`)
                 .then(r=>r.json()).then(res => {
                     btn.innerText = origText;
                     btn.disabled = false;
+                    btn.classList.remove('opacity-50');
 
                     if(res.success) {
                         diningData = res;
-                        document.getElementById('propTitle').innerText = `${client.name} - Cafe Hub`;
+                        document.getElementById('propTitle').innerText = `${client.name} - Kitchen`;
                         document.getElementById('sidebarPropName').innerHTML = `${client.name} <span class="text-orange-500 ml-1">CAFE</span>`;
 
                         document.getElementById('authBox').classList.add('hidden-view');
                         document.getElementById('sidebar').classList.remove('hidden-view');
                         document.getElementById('mainWrapper').classList.remove('hidden-view');
+                        
+                        // Set initial count so it doesn't beep on first load
+                        lastOrderCount = res.recentOrders.filter(o => o.Status === "Approved").length;
                         renderUI();
                         
-                        // Start polling for new orders every 15 seconds
-                        setInterval(fetchDataSilent, 15000);
+                        // Poll for new orders
+                        setInterval(fetchDataSilent, 10000);
 
-                    } else {
-                        notify(res.error || "Incorrect Kitchen PIN");
-                    }
+                    } else notify(res.error || "Incorrect Kitchen PIN");
                 }).catch(() => {
                     btn.innerText = origText;
                     btn.disabled = false;
+                    btn.classList.remove('opacity-50');
                     notify("Connection failed.");
                 });
         }
@@ -213,7 +202,7 @@
                         diningData = res;
                         const approvedOrders = diningData.recentOrders.filter(o => o.Status === "Approved");
                         if (approvedOrders.length > lastOrderCount) {
-                            playBeep(); // Play sound if there are new approved orders
+                            playBeep(); // Beep on new approved order
                         }
                         lastOrderCount = approvedOrders.length;
                         renderUI();
@@ -236,16 +225,21 @@
             kOrders.innerHTML = "";
             const approvedOrders = diningData.recentOrders.filter(o => o.Status === "Approved");
             
-            lastOrderCount = approvedOrders.length;
-
             if(approvedOrders.length === 0) {
                 kOrders.innerHTML = "<div class='col-span-1 xl:col-span-2 p-8 text-center bg-slate-50 border border-dashed border-slate-200 rounded-xl'><p class='text-slate-500 font-semibold text-sm'>No active orders pending for preparation.</p></div>";
             }
             
             approvedOrders.forEach(o => {
+                let paymentBadge = o.PaymentStatus === 'Paid via UPI' || o.PaymentStatus === 'Paid' 
+                                   ? `<span class="bg-green-100 text-green-700 px-2 py-1 rounded text-[10px] font-bold">PAID</span>`
+                                   : `<span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-[10px] font-bold">ROOM CHARGE</span>`;
+                
                 kOrders.innerHTML += `<div class="p-6 border border-slate-200 rounded-2xl bg-white shadow-sm hover:shadow-md transition">
                     <div class="flex justify-between items-start mb-4 border-b border-slate-100 pb-4">
-                        <span class="font-bold text-xl text-slate-900">Room ${o.RoomNo}</span>
+                        <div>
+                            <span class="font-bold text-xl text-slate-900 block">Room ${o.RoomNo}</span>
+                            ${paymentBadge}
+                        </div>
                         <span class="text-[10px] bg-orange-50 text-orange-600 border border-orange-100 px-3 py-1 rounded font-bold uppercase tracking-wider">Preparing</span>
                     </div>
                     <p class="font-semibold text-sm text-slate-600 mb-6 bg-slate-50 p-4 rounded-xl border border-slate-100">${o.Items}</p>
